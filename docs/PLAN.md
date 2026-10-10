@@ -15,7 +15,7 @@ Constraint: no local Gradle (see CLAUDE.md); CI is the gate. Keep batches small 
 | 7 | Reminders UI + "from reminder" browse source + permission health | S7 | 0.8.0 | [x] |
 | 8 | Widgets (reader, lists, Hebrew date, weekday, bookmark, continue-reading + extras), deep links, auto-update | S8 | 0.9.0 | [x] |
 | 9 | Settings home, appearance (fonts, sizes, light/dark colors), logs UI (view/copy/download/clear/auto-clear), backup/restore | S9 | 0.10.0 | [x] |
-| 10 | Polish & hardening: a11y, perf (baseline profile), security review, shortcuts/tile, UI tests on emulator, release signing + artifacts | S10 | 1.0.0 | [~] |
+| 10 | Polish & hardening: a11y, perf (baseline profile), security review, shortcuts/tile, UI tests on emulator, release signing + artifacts | S10 | 0.9.0 (1.0.0 after owner sign-off) | [x] |
 
 ## Per-batch routine (also in skill `batch-workflow`)
 1) read spec slice 2) implement + unit tests 3) push, CI green 4) 4-persona review (`release-checklist`) 5) version + What's New + docs 6) merge.
@@ -32,3 +32,7 @@ User approved continuous batch-by-batch development without asking for approval 
 - Zmanim via KosherJava (offline) rather than Hebcal API; default location Jerusalem, Israel schedule.
 - Hebrew day switches at midnight by default (tzeit optional).
 - Fonts bundled (OFL) in `res/font`.
+
+
+## Status (2026-10-10)
+All batches implemented. CI green: unit tests, R8 release build, androidTest compile; emulator E2E (5 tests) and live Sefaria probe pass. Remaining before calling it 1.0.0: owner items in AGENT.md (verified prayer texts, halachic confirmations) and a real-device pass (notifications, widgets, TalkBack).
