@@ -24,7 +24,8 @@ class HebrewCalendarTest {
     @Test
     fun leapYears() {
         val leap = (5700..5800).filter(HebrewCalendar::isLeapYear)
-        assertTrue(5784 in leap && 5787 !in leap && 5779 in leap)
+        assertTrue(5784 in leap && 5787 in leap && 5779 in leap) // 5784, 5787 are 8th and 11th of the 19-year cycle
+        assertTrue(5785 !in leap && 5786 !in leap)
         assertEquals(13, HebrewCalendar.monthsInYear(5784))
         assertEquals(12, HebrewCalendar.monthsInYear(5785))
     }

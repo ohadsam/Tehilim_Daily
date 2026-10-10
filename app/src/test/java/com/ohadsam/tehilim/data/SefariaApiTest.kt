@@ -27,13 +27,18 @@ class SefariaApiTest {
     @After
     fun tearDown() = server.shutdown()
 
-    private suspend fun kindOfFailure(): PsalmErrorKind =
+    private suspend fun failureOf(): Throwable =
         try {
             api.fetchChapter(1)
             error("expected failure")
-        } catch (e: PsalmException) {
-            e.kind
+        } catch (e: Exception) {
+            e
         }
+
+    private suspend fun assertKind(expected: PsalmErrorKind) {
+        val e = failureOf()
+        assertTrue("expected $expected but got $e", e is PsalmException && e.kind == expected)
+    }
 
     @Test
     fun requestsTheDocumentedUrlAndParsesBody() = runTest {
@@ -46,12 +51,26 @@ class SefariaApiTest {
     }
 
     @Test
-    fun mapsHttpAndNetworkFailures() = runTest {
+    fun http404IsNotFound() = runTest {
         server.enqueue(MockResponse().setResponseCode(404))
-        assertEquals(PsalmErrorKind.NOT_FOUND, kindOfFailure())
+        assertKind(PsalmErrorKind.NOT_FOUND)
+    }
+
+    @Test
+    fun http503IsServerError() = runTest {
         server.enqueue(MockResponse().setResponseCode(503))
-        assertEquals(PsalmErrorKind.SERVER, kindOfFailure())
+        assertKind(PsalmErrorKind.SERVER)
+    }
+
+    @Test
+    fun droppedConnectionIsOffline() = runTest {
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START))
-        assertEquals(PsalmErrorKind.OFFLINE, kindOfFailure())
+        assertKind(PsalmErrorKind.OFFLINE)
+    }
+
+    @Test
+    fun invalidBodyIsInvalidData() = runTest {
+        server.enqueue(MockResponse().setBody("""{"he":["x"]}"""))
+        assertKind(PsalmErrorKind.INVALID_DATA)
     }
 }
