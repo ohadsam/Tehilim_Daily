@@ -8,11 +8,15 @@ import androidx.room.Room
 import com.ohadsam.tehilim.data.BookmarksRepository
 import com.ohadsam.tehilim.data.FavoritesRepository
 import com.ohadsam.tehilim.data.PsalmsRepository
+import com.ohadsam.tehilim.data.RemindersRepository
 import com.ohadsam.tehilim.data.SaidRepository
 import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
 import com.ohadsam.tehilim.data.prefs.ReaderPrefs
 import com.ohadsam.tehilim.data.sefaria.SefariaApi
+import com.ohadsam.tehilim.location.LocationStore
+import com.ohadsam.tehilim.reminders.NotificationHelper
+import com.ohadsam.tehilim.reminders.ReminderScheduler
 import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -53,4 +57,14 @@ class AppContainer(context: Context) {
     val said: SaidRepository by lazy { SaidRepository(database.saidDao(), logger) }
 
     val bookmarks: BookmarksRepository by lazy { BookmarksRepository(database.bookmarkDao(), logger) }
+
+    val reminders: RemindersRepository by lazy { RemindersRepository(database.reminderDao(), logger) }
+
+    val locations: LocationStore = LocationStore(context.applicationContext)
+
+    val notifications: NotificationHelper = NotificationHelper(context.applicationContext)
+
+    val reminderScheduler: ReminderScheduler by lazy {
+        ReminderScheduler(context.applicationContext, reminders, locations, logger)
+    }
 }

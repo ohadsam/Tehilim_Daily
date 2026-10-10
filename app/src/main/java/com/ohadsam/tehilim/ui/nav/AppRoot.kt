@@ -7,6 +7,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,8 +30,14 @@ import com.ohadsam.tehilim.ui.more.MoreScreen
 import com.ohadsam.tehilim.ui.today.TodayScreen
 
 @Composable
-fun AppRoot(container: AppContainer) {
+fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled: () -> Unit = {}) {
     val nav = rememberNavController()
+    LaunchedEffect(startRoute) {
+        if (startRoute != null) {
+            runCatching { nav.navigate(startRoute) }
+            onRouteHandled()
+        }
+    }
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
     Scaffold(
@@ -55,7 +62,10 @@ fun AppRoot(container: AppContainer) {
         },
     ) { padding ->
         NavHost(nav, startDestination = Destination.TODAY.route, modifier = Modifier.padding(padding)) {
-            composable(Destination.TODAY.route) { TodayScreen(container) }
+            composable(
+                "today?mode={mode}",
+                listOf(navArgument("mode") { type = NavType.StringType; defaultValue = "month" }),
+            ) { entry -> TodayScreen(container, initialWeek = entry.arguments?.getString("mode") == "week") }
             composable(
                 "browse?chapter={chapter}&verse={verse}",
                 listOf(

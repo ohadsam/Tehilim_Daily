@@ -60,8 +60,8 @@ private val gregorianFormat = DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", Loc
  * date/day. Follows "today" across midnight as long as the user has not navigated away from it.
  */
 @Composable
-fun TodayScreen(container: AppContainer) {
-    var mode by rememberSaveable { mutableStateOf(DayMode.MONTH) }
+fun TodayScreen(container: AppContainer, initialWeek: Boolean = false) {
+    var mode by rememberSaveable { mutableStateOf(if (initialWeek) DayMode.WEEK else DayMode.MONTH) }
     var todayEpoch by rememberSaveable { mutableLongStateOf(LocalDate.now().toEpochDay()) }
     var selectedEpoch by rememberSaveable { mutableLongStateOf(todayEpoch) }
     var startAtEnd by rememberSaveable { mutableStateOf(false) }

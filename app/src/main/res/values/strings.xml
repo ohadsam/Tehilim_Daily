@@ -109,4 +109,12 @@
     <string name="bm_search">חיפוש בסימניות</string>
     <string name="bm_clear_all">מחיקת כל הסימניות</string>
     <string name="bm_clear_confirm">למחוק את כל %1$d הסימניות? ניתן יהיה לבטל מיד אחרי המחיקה.</string>
+
+    <string name="channel_desc">תזכורות לקריאת תהילים</string>
+    <string name="channel_sound_vibrate">תזכורות · צליל ורטט</string>
+    <string name="channel_sound">תזכורות · צליל</string>
+    <string name="channel_vibrate">תזכורות · רטט</string>
+    <string name="channel_silent">תזכורות · שקט (הודעה קופצת בלבד)</string>
+    <string name="notif_said">נאמר</string>
+    <string name="notif_snooze">נודניק %1$d דק׳</string>
 </resources>
