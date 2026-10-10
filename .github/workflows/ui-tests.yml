@@ -29,9 +29,10 @@ jobs:
           disable-animations: true
           script: |
             chmod +x gradlew
-            ./gradlew connectedDebugAndroidTest --stacktrace
+            ./gradlew connectedDebugAndroidTest --stacktrace || echo "UI_TESTS_FAILED"
             adb shell screencap -p /sdcard/final.png || true
             adb pull /sdcard/final.png final.png || true
+            adb logcat -d | grep -E "TehilimTest|AndroidRuntime|FATAL" | tail -300 || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:

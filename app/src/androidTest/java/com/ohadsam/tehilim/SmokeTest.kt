@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -40,6 +42,12 @@ class SmokeTest {
         rule.onAllNodesWithText(text(R.string.fav_tab_refuah)).onFirst().assertExists()
         rule.onAllNodesWithText(text(R.string.tab_reminders)).onFirst().performClick()
         rule.waitForIdle()
+        try {
+            rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_new)).fetchSemanticsNodes().isNotEmpty() }
+        } catch (e: Throwable) {
+            rule.onRoot().printToLog("TehilimTest") // dump the semantics tree to logcat for diagnosis
+            throw e
+        }
         rule.onAllNodesWithText(text(R.string.rem_new)).onFirst().assertExists()
     }
 }
