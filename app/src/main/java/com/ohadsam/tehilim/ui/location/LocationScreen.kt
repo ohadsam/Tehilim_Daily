@@ -60,7 +60,7 @@ fun LocationScreen(container: AppContainer, onBack: () -> Unit) {
     val context = LocalContext.current
     val store = container.locations
     val scope = rememberCoroutineScope()
-    var version by mutableIntStateOf(0)
+    var version by remember { mutableIntStateOf(0) }
     var choice by remember { mutableStateOf(store.choice) }
     var query by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
