@@ -1,6 +1,11 @@
 package com.ohadsam.tehilim
 
+import android.graphics.Bitmap
+import android.util.Base64
+import android.util.Log
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -11,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.ByteArrayOutputStream
 
 /** End-to-end smoke test on a real emulator: the app starts, shows the five tabs, and the main screens open. */
 @RunWith(AndroidJUnit4::class)
@@ -49,5 +55,35 @@ class SmokeTest {
             throw e
         }
         rule.onAllNodesWithText(text(R.string.rem_new)).onFirst().assertExists()
+    }
+
+    /** Not an assertion: captures each main screen (half size, JPEG, base64 in logcat) so the UI can be reviewed from CI logs. */
+    @Test
+    fun captureScreens() {
+        fun shot(name: String) {
+            rule.waitForIdle()
+            val full = rule.onRoot().captureToImage().asAndroidBitmap()
+            val small = Bitmap.createScaledBitmap(full, full.width / 2, full.height / 2, true)
+            val out = ByteArrayOutputStream()
+            small.compress(Bitmap.CompressFormat.JPEG, 75, out)
+            val b64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
+            b64.chunked(3000).forEachIndexed { i, chunk -> Log.i("TehilimShot", "$name|$i|$chunk") }
+            Log.i("TehilimShot", "$name|END|")
+        }
+
+        runCatching { rule.waitUntil(20_000) { rule.onAllNodesWithText("פרק", substring = true).fetchSemanticsNodes().size > 1 } }
+        shot("01_today")
+        listOf(
+            R.string.tab_browse to "02_browse",
+            R.string.tab_favorites to "03_favorites",
+            R.string.tab_reminders to "04_reminders",
+            R.string.tab_more to "05_more",
+        ).forEach { (res, name) ->
+            rule.onAllNodesWithText(text(res)).onFirst().performClick()
+            runCatching { rule.waitUntil(8_000) { rule.onAllNodesWithText("פרק", substring = true).fetchSemanticsNodes().isNotEmpty() || res != R.string.tab_browse } }
+            shot(name)
+        }
+        rule.onAllNodesWithText(text(R.string.set_title)).onFirst().performClick()
+        shot("06_settings")
     }
 }
