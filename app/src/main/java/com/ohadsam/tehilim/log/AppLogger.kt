@@ -35,6 +35,11 @@ class AppLogger(
 
     fun snapshot(): List<LogEntry> = buffer.snapshot()
 
+    /** Blocks until queued file writes are done (used before export and in tests). */
+    fun flush() {
+        runCatching { io.submit {}.get() }
+    }
+
     /** Whole log as plain text, oldest first, for copy / share / download. */
     fun exportText(): String = buffer.snapshot().joinToString("\n") { it.format() }
 

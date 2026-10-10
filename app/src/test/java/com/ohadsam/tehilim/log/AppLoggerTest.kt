@@ -39,7 +39,7 @@ class AppLoggerTest {
         val f = File(dir, "app.log")
         val first = AppLogger(file = f, clock = { 7L })
         first.i("T", "persist me")
-        Thread.sleep(200) // background writer
+        first.flush()
         val second = AppLogger(file = f, clock = { 8L })
         assertEquals(listOf("persist me"), second.snapshot().map { it.message })
         dir.deleteRecursively()

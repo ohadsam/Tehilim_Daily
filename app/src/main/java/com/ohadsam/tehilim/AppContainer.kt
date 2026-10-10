@@ -4,7 +4,14 @@ import android.content.Context
 import android.util.Log
 import com.ohadsam.tehilim.log.AppLogger
 import com.ohadsam.tehilim.log.LogLevel
+import androidx.room.Room
+import com.ohadsam.tehilim.data.PsalmsRepository
+import com.ohadsam.tehilim.data.db.AppDatabase
+import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
+import com.ohadsam.tehilim.data.sefaria.SefariaApi
+import okhttp3.OkHttpClient
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 /** Manual dependency container (no DI framework); created once in [TehilimApp]. */
 class AppContainer(context: Context) {
@@ -19,4 +26,19 @@ class AppContainer(context: Context) {
             }
         },
     )
+
+    private val database: AppDatabase by lazy {
+        Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db").build()
+    }
+
+    private val httpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    val psalms: PsalmsRepository by lazy {
+        PsalmsRepository(RoomPsalmsLocal(database.chapterDao()), SefariaApi(httpClient), logger)
+    }
 }
