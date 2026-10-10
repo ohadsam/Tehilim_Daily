@@ -1,0 +1,85 @@
+package com.ohadsam.tehilim.ui.favorites
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.ohadsam.tehilim.AppContainer
+import com.ohadsam.tehilim.R
+import com.ohadsam.tehilim.domain.PsalmRef
+import com.ohadsam.tehilim.favorites.FavoritesState
+import com.ohadsam.tehilim.favorites.Person
+import com.ohadsam.tehilim.ui.reader.DayReader
+
+/** Reads one favorite (its people are shown highlighted above the text) or all chapters linked to one person. */
+@Composable
+fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: Long?, onBack: () -> Unit) {
+    val state by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
+    val settings by container.readerPrefs.settings.collectAsState()
+
+    val favorite = favoriteId?.let { id -> state.favorites.firstOrNull { it.id == id } }
+    val person = personId?.let { state.person(it) }
+    val title: String
+    val people: List<Person>
+    val chapters: List<PsalmRef>
+    when {
+        favorite != null -> {
+            title = favorite.name
+            people = state.personsOf(favorite)
+            chapters = favorite.chapters
+        }
+        person != null -> {
+            title = person.name
+            people = listOf(person)
+            chapters = state.favoritesOf(person).flatMap { it.chapters }.distinct()
+        }
+        else -> {
+            title = ""
+            people = emptyList()
+            chapters = emptyList()
+        }
+    }
+
+    Column(Modifier.fillMaxSize()) {
+        Row(Modifier.fillMaxWidth().padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back)) }
+            Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+        }
+        Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            people.forEach { PersonTag(it) }
+        }
+        if (chapters.isEmpty()) {
+            Text(
+                stringResource(R.string.fav_reader_empty),
+                modifier = Modifier.padding(24.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            androidx.compose.runtime.key(favoriteId, personId, chapters) {
+                DayReader(
+                    repo = container.psalms,
+                    chapters = chapters,
+                    settings = settings,
+                    startAtEnd = false,
+                    onPreviousDay = null,
+                    onNextDay = null,
+                )
+            }
+        }
+    }
+}
