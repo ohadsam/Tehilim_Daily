@@ -56,8 +56,9 @@ class SefariaParserTest {
     }
 
     @Test
-    fun rejectsLengthMismatch() {
-        assertEquals(PsalmErrorKind.INVALID_DATA, kind("""{"he":["אב","גד"],"length":3}"""))
+    fun ignoresSefariaLengthFieldWhichIsTheBookLengthNotTheChapterLength() {
+        // Real responses carry "length":150 for every chapter of Psalms.
+        assertEquals(2, SefariaParser.parseChapter("""{"he":["אב","גד"],"length":150}""").verses.size)
     }
 
     @Test

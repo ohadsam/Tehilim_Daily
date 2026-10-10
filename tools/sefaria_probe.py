@@ -50,18 +50,16 @@ def main():
         bad = [i + 1 for i, v in enumerate(verses) if not HEBREW.search(v)]
         if bad:
             errors.append(f"Psalms.{n}: verses without Hebrew letters: {bad[:5]}")
-        length = d.get("length")
-        if isinstance(length, int) and length != len(verses):
-            errors.append(f"Psalms.{n}: length {length} != {len(verses)} verses")
+        # NB: Sefaria's "length" is the number of chapters in the book (150), not this chapter's verse count.
         counts[n] = len(verses)
         titles.add(d.get("heVersionTitle") or d.get("versionTitle") or "?")
         time.sleep(0.25)
     total = sum(counts.values())
+    print("VERSE_COUNTS=" + json.dumps([counts.get(i) for i in range(1, 151)]))
     print("TOTAL_VERSES", total)
     print("VERSION_TITLES", sorted(titles))
     if counts.get(119) != 176:
         errors.append(f"Psalms.119 has {counts.get(119)} verses, expected 176")
-    print("VERSE_COUNTS=" + json.dumps([counts.get(i) for i in range(1, 151)]))
     if errors:
         print("\n".join(errors))
         return 1

@@ -16,7 +16,10 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - name: Fetch all 150 chapters and check integrity
-        run: python3 tools/sefaria_probe.py | tee probe.txt
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 tools/sefaria_probe.py | tee probe.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: sefaria-probe, path: probe.txt }

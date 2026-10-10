@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 
 data class RemoteChapter(val verses: List<String>, val versionTitle: String?)
@@ -43,8 +42,8 @@ object SefariaParser {
         verses.forEachIndexed { i, v ->
             if (v.isEmpty() || !hebrewLetter.containsMatchIn(v)) throw invalid("verse ${i + 1} is empty or has no Hebrew letters")
         }
-        val expected = root["length"].asIntOrNull()
-        if (expected != null && expected != verses.size) throw invalid("verse count ${verses.size} != Sefaria length $expected")
+        // NOTE: Sefaria's `length` field is the number of chapters in the book (150), NOT the verses of this chapter,
+        // so it must not be used for validation. Verse counts are checked against PsalmVerseCounts by the repository.
         return RemoteChapter(verses, versionTitle)
     }
 
@@ -67,8 +66,6 @@ object SefariaParser {
         is JsonPrimitive -> listOf(e.content)
         else -> throw invalid("unexpected text shape")
     }
-
-    private fun JsonElement?.asIntOrNull(): Int? = (this as? JsonPrimitive)?.intOrNull
 
     private fun JsonElement.asText(): String = (this as? JsonPrimitive)?.contentOrNull ?: toString()
 
