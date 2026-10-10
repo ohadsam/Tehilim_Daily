@@ -20,8 +20,8 @@ class LogBuffer(private val capacity: Int = DEFAULT_CAPACITY) {
     @Synchronized
     fun snapshot(): List<LogEntry> = entries.toList()
 
-    @Synchronized
-    val size: Int get() = entries.size
+    val size: Int
+        @Synchronized get() = entries.size
 
     @Synchronized
     fun clear() = entries.clear()

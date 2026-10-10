@@ -21,7 +21,7 @@ class SefariaApiTest {
     @Before
     fun setUp() {
         server = MockWebServer().also { it.start() }
-        api = SefariaApi(OkHttpClient(), server.url("/").toString().trimEnd('/'))
+        api = SefariaApi(OkHttpClient.Builder().retryOnConnectionFailure(false).build(), server.url("/").toString().trimEnd('/'))
     }
 
     @After

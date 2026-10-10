@@ -40,14 +40,13 @@ import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.ui.reader.ChipStrip
 import com.ohadsam.tehilim.ui.reader.DayReader
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 private enum class DayMode { MONTH, WEEK }
 
-private val gregorianFormat = DateTimeFormatter.ofPattern("d בMMMM yyyy", Locale("he"))
+private val gregorianFormat = DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", Locale("he"))
 
 /**
  * Landing screen: today's chapters by Hebrew day-of-month or by weekday, with free navigation to any other
@@ -169,6 +168,3 @@ private fun WeekStrip(selected: LocalDate, onPick: (LocalDate) -> Unit) {
         onSelect = { onPick(days[it]) },
     )
 }
-
-@Suppress("unused")
-private val keepImports = DayOfWeek.SUNDAY
