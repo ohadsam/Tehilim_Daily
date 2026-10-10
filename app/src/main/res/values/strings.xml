@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">תהילים יומי</string>
+
+    <string name="tab_today">היום</string>
+    <string name="tab_browse">קריאה</string>
+    <string name="tab_favorites">מועדפים</string>
+    <string name="tab_reminders">תזכורות</string>
+    <string name="tab_more">עוד</string>
+
+    <string name="placeholder_coming">המסך הזה ייבנה בהמשך</string>
+
+    <string name="more_about">אודות</string>
+    <string name="more_version">גרסה %1$s</string>
+    <string name="more_whats_new">מה חדש</string>
+    <string name="more_logs">יומני מערכת</string>
+    <string name="more_logs_count">%1$d רשומות</string>
+
+    <string name="whats_new_title">מה חדש בגרסה %1$s</string>
+    <string name="whats_new_close">הבנתי</string>
+    <string name="whats_new_empty">אין חדשות לגרסה זו</string>
+</resources>

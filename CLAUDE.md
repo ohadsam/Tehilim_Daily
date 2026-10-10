@@ -5,8 +5,8 @@
 **קרא קודם `docs/PLAN.md` (באצ'ים וסטטוס) ו-`docs/SPEC.md` (מפרט). אל תסרוק את הקוד לפני כן.**
 
 ## Stack
-Kotlin, Jetpack Compose (Material 3), Glance (App Widgets), Hilt, Room, DataStore, WorkManager + AlarmManager,
-Retrofit/OkHttp + kotlinx.serialization, android.icu `HebrewCalendar` (לוח עברי, ללא רשת), KosherJava Zmanim (זמני שבת/חג, ללא רשת).
+Kotlin, Jetpack Compose (Material 3), Glance (App Widgets), manual DI (`AppContainer`, no Hilt), Room, DataStore, WorkManager + AlarmManager,
+OkHttp + kotlinx.serialization (no Retrofit), android.icu `HebrewCalendar` (לוח עברי, ללא רשת), KosherJava Zmanim (זמני שבת/חג, ללא רשת).
 Single `:app` module, package-by-feature. minSdk 26, targetSdk = latest stable. Package: `com.ohadsam.tehilim`.
 
 ## Package layout (grows by batch — do not pre-create empty packages)
@@ -47,3 +47,6 @@ targeted edits, update `docs/PLAN.md` status + `AGENT.md` at batch end, run `rel
 ## Release process
 `.claude/skills/release-checklist/SKILL.md` after every batch (security, appearance, performance, UI/UX, usability emphasis).
 Branch → push → CI green → PR/merge. Bump version (`versionName`/`versionCode`) and update the in-app What's New each user-visible batch.
+
+## Content accuracy is critical
+Psalm text and schedules must be exact (SPEC Addendum A3): integrity checks on every fetch, golden tests for schedules, no text edits beyond tag stripping.
