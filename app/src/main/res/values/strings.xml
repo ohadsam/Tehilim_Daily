@@ -281,4 +281,10 @@
     <string name="logs_keep_forever">לא למחוק</string>
     <string name="logs_days">%1$d ימים</string>
     <string name="logs_count">מוצגות %1$d מתוך %2$d רשומות</string>
+
+    <string name="continue_reading">המשך מהמקום שבו הפסקתי · פרק %1$s</string>
+    <string name="prefetch_offer">שמורים במכשיר %1$d מתוך %2$d פרקים. להוריד את כולם כדי לקרוא גם בלי אינטרנט?</string>
+    <string name="prefetch_running">מוריד את התהילים… %1$d מתוך %2$d</string>
+    <string name="prefetch_later">לא עכשיו</string>
+    <string name="prefetch_download">הורדה</string>
 </resources>

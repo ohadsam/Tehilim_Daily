@@ -7,6 +7,7 @@ import com.ohadsam.tehilim.log.LogLevel
 import androidx.room.Room
 import com.ohadsam.tehilim.data.BookmarksRepository
 import com.ohadsam.tehilim.data.FavoritesRepository
+import com.ohadsam.tehilim.data.PrefetchController
 import com.ohadsam.tehilim.data.PsalmsRepository
 import com.ohadsam.tehilim.data.RemindersRepository
 import com.ohadsam.tehilim.data.SaidRepository
@@ -81,4 +82,8 @@ class AppContainer(context: Context) {
     }
 
     val backup: BackupRepository by lazy { BackupRepository(database, logger) }
+
+    private val appScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    val prefetch: PrefetchController by lazy { PrefetchController(psalms, appScope) }
 }

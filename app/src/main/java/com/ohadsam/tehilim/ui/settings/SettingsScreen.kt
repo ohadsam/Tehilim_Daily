@@ -89,7 +89,8 @@ fun SettingsScreen(
     val reader by container.readerPrefs.settings.collectAsState()
     val prayer by container.prayerPrefs.settings.collectAsState()
     var cached by remember { mutableIntStateOf(0) }
-    var progress by remember { mutableStateOf<Int?>(null) }
+    val prefetchState by container.prefetch.state.collectAsState()
+    val progress = prefetchState?.done
     var confirmClearCache by remember { mutableStateOf(false) }
     var confirmImport by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<Int?>(null) }
@@ -193,13 +194,9 @@ fun SettingsScreen(
             Text(stringResource(R.string.set_cache_status, cached, PSALMS_COUNT))
             progress?.let { LinearProgressIndicator(progress = { it / PSALMS_COUNT.toFloat() }, modifier = Modifier.fillMaxWidth()) }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(enabled = progress == null, onClick = {
-                    progress = cached
-                    scope.launch {
-                        container.psalms.prefetchAll { progress = it.done }
-                        progress = null
-                    }
-                }) { Text(stringResource(R.string.search_download_all)) }
+                OutlinedButton(enabled = progress == null, onClick = { container.prefetch.start() }) {
+                    Text(stringResource(R.string.search_download_all))
+                }
                 OutlinedButton(onClick = { confirmClearCache = true }) { Text(stringResource(R.string.set_clear_cache)) }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

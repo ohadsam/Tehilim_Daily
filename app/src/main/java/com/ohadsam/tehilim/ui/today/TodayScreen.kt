@@ -37,6 +37,7 @@ import com.ohadsam.tehilim.R
 import com.ohadsam.tehilim.calendar.HebrewCalendar
 import com.ohadsam.tehilim.calendar.HebrewDate
 import com.ohadsam.tehilim.domain.HebrewNumerals
+import com.ohadsam.tehilim.domain.PSALMS_COUNT
 import com.ohadsam.tehilim.domain.title
 import com.ohadsam.tehilim.favorites.FavoritesState
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ private val gregorianFormat = DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", Loc
  * date/day. Follows "today" across midnight as long as the user has not navigated away from it.
  */
 @Composable
-fun TodayScreen(container: AppContainer, initialWeek: Boolean = false) {
+fun TodayScreen(container: AppContainer, initialWeek: Boolean = false, onContinue: (Int) -> Unit = {}) {
     var mode by rememberSaveable { mutableStateOf(if (initialWeek) DayMode.WEEK else DayMode.MONTH) }
     var todayEpoch by rememberSaveable { mutableLongStateOf(LocalDate.now().toEpochDay()) }
     var selectedEpoch by rememberSaveable { mutableLongStateOf(todayEpoch) }
@@ -89,6 +90,15 @@ fun TodayScreen(container: AppContainer, initialWeek: Boolean = false) {
 
     Column(Modifier.fillMaxSize()) {
         Header(hebrew, selected, isToday, onToday = { goTo(LocalDate.ofEpochDay(todayEpoch)) })
+        val lastChapter = container.readerPrefs.lastChapter
+        if (lastChapter > 0) {
+            AssistChip(
+                onClick = { onContinue(lastChapter) },
+                label = { Text(stringResource(R.string.continue_reading, HebrewNumerals.toHebrew(lastChapter))) },
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+        PrefetchCard(container)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
             DayMode.entries.forEachIndexed { i, m ->
                 SegmentedButton(
@@ -189,4 +199,35 @@ private fun WeekStrip(selected: LocalDate, onPick: (LocalDate) -> Unit) {
         selectedIndex = selected.dayOfWeek.value % 7,
         onSelect = { onPick(days[it]) },
     )
+}
+
+/** One-time offer to download every psalm so the app works fully offline; shows progress while running. */
+@Composable
+private fun PrefetchCard(container: AppContainer) {
+    val state by container.prefetch.state.collectAsState()
+    var cached by androidx.compose.runtime.remember { mutableStateOf(PSALMS_COUNT) }
+    var dismissed by androidx.compose.runtime.remember { mutableStateOf(container.readerPrefs.prefetchPromptDismissed) }
+    androidx.compose.runtime.LaunchedEffect(state == null) { cached = container.psalms.cachedChapters().size }
+    val running = state
+    if (running != null) {
+        androidx.compose.material3.Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+            Column(Modifier.padding(12.dp)) {
+                Text(stringResource(R.string.prefetch_running, running.done, PSALMS_COUNT), style = MaterialTheme.typography.bodyMedium)
+                androidx.compose.material3.LinearProgressIndicator(progress = { running.done / PSALMS_COUNT.toFloat() }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            }
+        }
+    } else if (!dismissed && cached < PSALMS_COUNT) {
+        androidx.compose.material3.Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+            Column(Modifier.padding(12.dp)) {
+                Text(stringResource(R.string.prefetch_offer, cached, PSALMS_COUNT), style = MaterialTheme.typography.bodyMedium)
+                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                    androidx.compose.material3.TextButton(onClick = {
+                        container.readerPrefs.prefetchPromptDismissed = true
+                        dismissed = true
+                    }) { Text(stringResource(R.string.prefetch_later)) }
+                    androidx.compose.material3.Button(onClick = { container.prefetch.start() }) { Text(stringResource(R.string.prefetch_download)) }
+                }
+            }
+        }
+    }
 }

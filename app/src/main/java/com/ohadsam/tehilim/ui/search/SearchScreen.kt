@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,14 +56,15 @@ fun SearchScreen(container: AppContainer, onBack: () -> Unit, onOpen: (chapter: 
     var library by remember { mutableStateOf<List<PsalmChapter>>(emptyList()) }
     var hits by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
     var downloaded by remember { mutableIntStateOf(0) }
-    var downloading by remember { mutableStateOf(false) }
+    val prefetchState by container.prefetch.state.collectAsState()
+    val downloading = prefetchState != null
     val scope = rememberCoroutineScope()
 
     suspend fun reload() {
         library = container.psalms.allCached()
         downloaded = library.size
     }
-    LaunchedEffect(Unit) { reload() }
+    LaunchedEffect(prefetchState == null) { reload() }
     LaunchedEffect(query, library) {
         delay(250) // debounce typing
         hits = withContext(Dispatchers.Default) { PsalmSearch.search(library, query) }
@@ -82,16 +84,9 @@ fun SearchScreen(container: AppContainer, onBack: () -> Unit, onOpen: (chapter: 
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.search_incomplete, downloaded, PSALMS_COUNT), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (downloading) {
-                    LinearProgressIndicator(progress = { downloaded / PSALMS_COUNT.toFloat() }, modifier = Modifier.fillMaxWidth())
+                    LinearProgressIndicator(progress = { (prefetchState?.done ?: downloaded) / PSALMS_COUNT.toFloat() }, modifier = Modifier.fillMaxWidth())
                 } else {
-                    Button(onClick = {
-                        downloading = true
-                        scope.launch {
-                            container.psalms.prefetchAll { downloaded = it.done }
-                            reload()
-                            downloading = false
-                        }
-                    }) { Text(stringResource(R.string.search_download_all)) }
+                    Button(onClick = { container.prefetch.start() }) { Text(stringResource(R.string.search_download_all)) }
                 }
             }
         }

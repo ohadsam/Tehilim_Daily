@@ -69,7 +69,13 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
             composable(
                 "today?mode={mode}",
                 listOf(navArgument("mode") { type = NavType.StringType; defaultValue = "month" }),
-            ) { entry -> TodayScreen(container, initialWeek = entry.arguments?.getString("mode") == "week") }
+            ) { entry ->
+                TodayScreen(
+                    container,
+                    initialWeek = entry.arguments?.getString("mode") == "week",
+                    onContinue = { nav.navigate("browse?chapter=$it&verse=0") },
+                )
+            }
             composable(
                 "browse?chapter={chapter}&verse={verse}",
                 listOf(

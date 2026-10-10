@@ -51,7 +51,13 @@ class ReaderPrefs(context: Context) {
         get() = prefs.getInt(KEY_LAST_CHAPTER, 0)
         set(value) = prefs.edit().putInt(KEY_LAST_CHAPTER, value).apply()
 
+    /** The one-time "download everything for offline use" card on the home screen was dismissed. */
+    var prefetchPromptDismissed: Boolean
+        get() = prefs.getBoolean(KEY_PREFETCH_DISMISSED, false)
+        set(value) = prefs.edit().putBoolean(KEY_PREFETCH_DISMISSED, value).apply()
+
     private companion object {
+        const val KEY_PREFETCH_DISMISSED = "prefetch_dismissed"
         const val KEY_LAST_CHAPTER = "last_chapter"
         const val KEY_SIZE = "font_size_sp"
         const val KEY_FONT = "font_key"
