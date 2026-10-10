@@ -3,9 +3,7 @@ package com.ohadsam.tehilim
 import android.graphics.Bitmap
 import android.util.Base64
 import android.util.Log
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
@@ -13,6 +11,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,12 +48,12 @@ class SmokeTest {
         rule.onAllNodesWithText(text(R.string.tab_reminders)).onFirst().performClick()
         rule.waitForIdle()
         try {
-            rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_new)).fetchSemanticsNodes().isNotEmpty() }
+            rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_new), useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
         } catch (e: Throwable) {
             rule.onRoot().printToLog("TehilimTest") // dump the semantics tree to logcat for diagnosis
             throw e
         }
-        rule.onAllNodesWithText(text(R.string.rem_new)).onFirst().assertExists()
+        rule.onAllNodesWithText(text(R.string.rem_new), useUnmergedTree = true).onFirst().assertExists()
     }
 
     /** Not an assertion: captures each main screen (half size, JPEG, base64 in logcat) so the UI can be reviewed from CI logs. */
@@ -62,7 +61,7 @@ class SmokeTest {
     fun captureScreens() {
         fun shot(name: String) {
             rule.waitForIdle()
-            val full = rule.onRoot().captureToImage().asAndroidBitmap()
+            val full = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
             val small = Bitmap.createScaledBitmap(full, full.width / 2, full.height / 2, true)
             val out = ByteArrayOutputStream()
             small.compress(Bitmap.CompressFormat.JPEG, 75, out)
@@ -80,6 +79,10 @@ class SmokeTest {
             R.string.tab_more to "05_more",
         ).forEach { (res, name) ->
             rule.onAllNodesWithText(text(res)).onFirst().performClick()
+            if (res == R.string.tab_more) {
+                shot("05a_more_whatsnew")
+                runCatching { rule.onAllNodesWithText(text(R.string.whats_new_close)).onFirst().performClick() }
+            }
             runCatching { rule.waitUntil(8_000) { rule.onAllNodesWithText("פרק", substring = true).fetchSemanticsNodes().isNotEmpty() || res != R.string.tab_browse } }
             shot(name)
         }
