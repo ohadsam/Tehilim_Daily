@@ -38,7 +38,7 @@ abstract class ListWidget(private val kind: Kind, private val heading: String) :
         val state = context.container.favorites.state.first()
         val rows = rowsFor(state)
         provideContent {
-            GlanceTheme(colors = WidgetColors) {
+            GlanceTheme(colors = widgetColors(context)) {
                 Column(GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(10.dp)) {
                     Text(heading, style = TextStyle(color = GlanceTheme.colors.secondary, fontSize = 15.sp, fontWeight = FontWeight.Bold), modifier = GlanceModifier.padding(bottom = 6.dp))
                     if (rows.isEmpty()) {

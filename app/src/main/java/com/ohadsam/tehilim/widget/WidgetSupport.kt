@@ -9,11 +9,14 @@ import androidx.glance.material3.ColorProviders
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.MainActivity
 import com.ohadsam.tehilim.TehilimApp
-import com.ohadsam.tehilim.ui.theme.DarkColors
-import com.ohadsam.tehilim.ui.theme.LightColors
+import com.ohadsam.tehilim.ui.theme.Palettes
 
 /** Widget colours follow the app palette (light/dark), so widgets match the app and react to the system theme. */
-val WidgetColors = ColorProviders(light = LightColors, dark = DarkColors)
+fun widgetColors(context: Context): ColorProviders {
+    val s = context.container.themePrefs.settings.value
+    val p = Palettes.byKey(s.paletteKey)
+    return ColorProviders(light = p.light, dark = p.dark)
+}
 
 val Context.container: AppContainer get() = (applicationContext as TehilimApp).container
 

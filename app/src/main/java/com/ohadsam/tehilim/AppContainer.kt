@@ -13,6 +13,7 @@ import com.ohadsam.tehilim.data.SaidRepository
 import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
 import com.ohadsam.tehilim.data.prefs.ReaderPrefs
+import com.ohadsam.tehilim.data.prefs.ThemePrefs
 import com.ohadsam.tehilim.data.sefaria.SefariaApi
 import com.ohadsam.tehilim.location.LocationStore
 import com.ohadsam.tehilim.reminders.NotificationHelper
@@ -36,6 +37,8 @@ class AppContainer(context: Context) {
     )
 
     val readerPrefs: ReaderPrefs = ReaderPrefs(context.applicationContext)
+
+    val themePrefs: ThemePrefs = ThemePrefs(context.applicationContext)
 
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db").build()

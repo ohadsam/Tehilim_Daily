@@ -84,7 +84,7 @@ class ReaderWidget : GlanceAppWidget() {
         val prefs = getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, id)
         val model = load(context, prefs)
         provideContent {
-            GlanceTheme(colors = WidgetColors) { Content(context, model) }
+            GlanceTheme(colors = widgetColors(context)) { Content(context, model) }
         }
     }
 

@@ -34,7 +34,7 @@ class HebrewDateWidget : GlanceAppWidget() {
         val h = HebrewCalendar.fromLocalDate(today)
         val chapters = summarizeChapters(PsalmSchedules.monthly(h.day.coerceAtMost(h.daysInMonth), h.daysInMonth))
         provideContent {
-            GlanceTheme(colors = WidgetColors) {
+            GlanceTheme(colors = widgetColors(context)) {
                 Column(
                     GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(10.dp)
                         .clickable(openApp(context, "today?mode=month")),
@@ -60,7 +60,7 @@ class WeekdayWidget : GlanceAppWidget() {
         val today = LocalDate.now()
         val chapters = summarizeChapters(PsalmSchedules.weekly(today.dayOfWeek))
         provideContent {
-            GlanceTheme(colors = WidgetColors) {
+            GlanceTheme(colors = widgetColors(context)) {
                 Column(
                     GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(10.dp)
                         .clickable(openApp(context, "today?mode=week")),

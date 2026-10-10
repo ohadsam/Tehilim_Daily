@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -28,7 +30,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             // The app is Hebrew-only: always lay out right-to-left regardless of device locale.
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                TehilimTheme {
+                val themeSettings by container.themePrefs.settings.collectAsState()
+                TehilimTheme(themeSettings) {
                     AppRoot(container, pendingRoute.value, onRouteHandled = { pendingRoute.value = null })
                 }
             }

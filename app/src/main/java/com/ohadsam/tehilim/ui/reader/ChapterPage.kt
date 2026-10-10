@@ -43,6 +43,8 @@ import com.ohadsam.tehilim.R
 import com.ohadsam.tehilim.data.PsalmsRepository
 import com.ohadsam.tehilim.data.prefs.ReaderSettings
 import com.ohadsam.tehilim.domain.HebrewNumerals
+import com.ohadsam.tehilim.domain.TextDisplay
+import com.ohadsam.tehilim.ui.theme.ReaderFont
 import com.ohadsam.tehilim.domain.PsalmErrorKind
 import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.domain.PsalmText
@@ -84,6 +86,12 @@ private fun ChapterText(
     highlightVerse: Int,
     bookmarks: BookmarkHooks?,
 ) {
+    val shown: (String) -> String = { TextDisplay.apply(it, settings.showNikud, settings.showTaamim) }
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(settings.keepScreenOn) {
+        view.keepScreenOn = settings.keepScreenOn
+        onDispose { view.keepScreenOn = false }
+    }
     val marks = remember(bookmarks, ref.chapter) { bookmarks?.forChapter?.invoke(ref.chapter).orEmpty() }
     val listState = rememberLazyListState()
     LaunchedEffect(highlightVerse, text) {
@@ -148,8 +156,12 @@ private fun ChapterText(
                     )
                 }
                 Text(
-                    v.text,
-                    style = ReaderTextStyle.copy(fontSize = settings.fontSizeSp.sp, lineHeight = (settings.fontSizeSp * 1.65f).sp),
+                    shown(v.text),
+                    style = ReaderTextStyle.copy(
+                        fontFamily = ReaderFont.fromKey(settings.fontKey).family,
+                        fontSize = settings.fontSizeSp.sp,
+                        lineHeight = (settings.fontSizeSp * settings.lineHeight).sp,
+                    ),
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.weight(1f),
                 )

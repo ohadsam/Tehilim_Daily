@@ -47,7 +47,7 @@ class BookmarkWidget : GlanceAppWidget() {
             val prefs = currentState<Preferences>()
             val index = if (bookmarks.isEmpty()) 0 else (prefs[BOOKMARK_INDEX] ?: 0).mod(bookmarks.size)
             val b = bookmarks.getOrNull(index)
-            GlanceTheme(colors = WidgetColors) {
+            GlanceTheme(colors = widgetColors(context)) {
                 Column(GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(12.dp)) {
                     if (b == null) {
                         Text("אין עדיין סימניות. החזיקו לחיצה על פסוק באפליקציה.", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp))
