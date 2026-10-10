@@ -27,6 +27,8 @@ import com.ohadsam.tehilim.ui.favorites.FavoritesScreen
 import com.ohadsam.tehilim.ui.history.HistoryScreen
 import com.ohadsam.tehilim.ui.search.SearchScreen
 import com.ohadsam.tehilim.ui.location.LocationScreen
+import com.ohadsam.tehilim.ui.logs.LogsScreen
+import com.ohadsam.tehilim.ui.settings.SettingsScreen
 import com.ohadsam.tehilim.ui.more.MoreScreen
 import com.ohadsam.tehilim.ui.reminders.RemindersScreen
 import com.ohadsam.tehilim.ui.today.TodayScreen
@@ -100,7 +102,28 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                 RemindersScreen(container, onOpenRoute = { nav.navigate(it) }, onOpenLocation = { nav.navigate("location") })
             }
             composable("location") { LocationScreen(container, onBack = { nav.popBackStack() }) }
-            composable(Destination.MORE.route) { MoreScreen(container, onOpenHistory = { nav.navigate("history") }) }
+            composable(Destination.MORE.route) {
+                MoreScreen(
+                    container,
+                    onOpenHistory = { nav.navigate("history") },
+                    onOpenSettings = { nav.navigate("settings") },
+                    onOpenLogs = { nav.navigate("logs") },
+                    onOpenBookmarks = { nav.navigate("bookmarks") },
+                )
+            }
+            composable("settings") {
+                SettingsScreen(
+                    container,
+                    onBack = { nav.popBackStack() },
+                    onOpenLocation = { nav.navigate("location") },
+                    onOpenLogs = { nav.navigate("logs") },
+                    onOpenBookmarks = { nav.navigate("bookmarks") },
+                    onOpenReminders = { nav.navigate(Destination.REMINDERS.route) },
+                    onOpenHistory = { nav.navigate("history") },
+                    onShowWhatsNew = { nav.navigate("more") },
+                )
+            }
+            composable("logs") { LogsScreen(container, onBack = { nav.popBackStack() }) }
             composable("bookmarks") {
                 BookmarksScreen(container, onBack = { nav.popBackStack() }, onOpen = { nav.navigate("browse?chapter=${it.chapter}&verse=${it.verse}") })
             }

@@ -1,5 +1,6 @@
 package com.ohadsam.tehilim.ui.favorites
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,6 +70,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
         Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             people.forEach { PersonTag(it) }
         }
+        PrayerBlocks(container, people.firstOrNull()?.kind)
         if (chapters.isEmpty()) {
             Text(
                 stringResource(R.string.fav_reader_empty),
@@ -95,6 +97,32 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                         )
                     },
                 )
+                }
+            }
+        }
+    }
+}
+
+/** Collapsible "before" / "after" prayers; shown only when enabled in Settings and a *verified* text exists. */
+@Composable
+private fun PrayerBlocks(container: AppContainer, kind: com.ohadsam.tehilim.favorites.PersonKind?) {
+    val prayer by container.prayerPrefs.settings.collectAsState()
+    val audience = when (kind) {
+        com.ohadsam.tehilim.favorites.PersonKind.REFUAH -> "refuah"
+        com.ohadsam.tehilim.favorites.PersonKind.ILUI_NISHMAT -> "ilui"
+        null -> "general"
+    }
+    listOf("before" to prayer.showBefore, "after" to prayer.showAfter).forEach { (k, enabled) ->
+        val text = if (enabled) com.ohadsam.tehilim.prayers.PrayerCatalog.pick(container.prayers, k, audience, prayer.nusach) else null
+        if (text != null) {
+            var open by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+            androidx.compose.material3.Card(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                Column(Modifier.padding(12.dp)) {
+                    Text(
+                        text.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.fillMaxWidth().clickable { open = !open },
+                    )
+                    if (open) Text(text.text, modifier = Modifier.padding(top = 8.dp))
                 }
             }
         }

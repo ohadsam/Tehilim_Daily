@@ -27,7 +27,13 @@ import com.ohadsam.tehilim.BuildConfig
 import com.ohadsam.tehilim.R
 
 @Composable
-fun MoreScreen(container: AppContainer, onOpenHistory: () -> Unit = {}) {
+fun MoreScreen(
+    container: AppContainer,
+    onOpenHistory: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
+    onOpenLogs: () -> Unit = {},
+    onOpenBookmarks: () -> Unit = {},
+) {
     val context = LocalContext.current
     val store = remember { WhatsNewStore(context) }
     val whatsNew = remember { store.load() }
@@ -39,6 +45,17 @@ fun MoreScreen(container: AppContainer, onOpenHistory: () -> Unit = {}) {
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         )
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.set_title)) },
+            supportingContent = { Text(stringResource(R.string.more_settings_sub)) },
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenSettings),
+        )
+        HorizontalDivider()
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.bm_title)) },
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenBookmarks),
+        )
+        HorizontalDivider()
         ListItem(
             headlineContent = { Text(stringResource(R.string.more_whats_new)) },
             supportingContent = { Text(stringResource(R.string.more_version, BuildConfig.VERSION_NAME)) },
@@ -54,6 +71,7 @@ fun MoreScreen(container: AppContainer, onOpenHistory: () -> Unit = {}) {
         ListItem(
             headlineContent = { Text(stringResource(R.string.more_logs)) },
             supportingContent = { Text(stringResource(R.string.more_logs_count, container.logger.snapshot().size)) },
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenLogs),
         )
     }
 
