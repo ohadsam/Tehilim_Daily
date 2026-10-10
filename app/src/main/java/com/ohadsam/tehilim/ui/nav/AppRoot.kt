@@ -26,7 +26,9 @@ import com.ohadsam.tehilim.ui.favorites.FavoriteReaderScreen
 import com.ohadsam.tehilim.ui.favorites.FavoritesScreen
 import com.ohadsam.tehilim.ui.history.HistoryScreen
 import com.ohadsam.tehilim.ui.search.SearchScreen
+import com.ohadsam.tehilim.ui.location.LocationScreen
 import com.ohadsam.tehilim.ui.more.MoreScreen
+import com.ohadsam.tehilim.ui.reminders.RemindersScreen
 import com.ohadsam.tehilim.ui.today.TodayScreen
 
 @Composable
@@ -94,7 +96,10 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
             composable("person/{id}", listOf(navArgument("id") { type = NavType.LongType })) { entry ->
                 FavoriteReaderScreen(container, null, entry.arguments?.getLong("id"), onBack = { nav.popBackStack() })
             }
-            composable(Destination.REMINDERS.route) { PlaceholderScreen(stringResource(Destination.REMINDERS.label)) }
+            composable(Destination.REMINDERS.route) {
+                RemindersScreen(container, onOpenRoute = { nav.navigate(it) }, onOpenLocation = { nav.navigate("location") })
+            }
+            composable("location") { LocationScreen(container, onBack = { nav.popBackStack() }) }
             composable(Destination.MORE.route) { MoreScreen(container, onOpenHistory = { nav.navigate("history") }) }
             composable("bookmarks") {
                 BookmarksScreen(container, onBack = { nav.popBackStack() }, onOpen = { nav.navigate("browse?chapter=${it.chapter}&verse=${it.verse}") })

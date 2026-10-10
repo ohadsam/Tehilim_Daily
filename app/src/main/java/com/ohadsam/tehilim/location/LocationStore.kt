@@ -35,8 +35,17 @@ class LocationStore(context: Context) {
         get() = runCatching { TzeitMethod.valueOf(prefs.getString(KEY_TZEIT, null) ?: "") }.getOrDefault(TzeitMethod.DEGREES_8_5)
         set(value) = prefs.edit().putString(KEY_TZEIT, value.name).apply()
 
+    /** User override of the candle-lighting offset in minutes (null = the place's default: 40 in Jerusalem, else 18). */
+    var candleMinutesOverride: Int?
+        get() = if (prefs.contains(KEY_CANDLE)) prefs.getInt(KEY_CANDLE, 18) else null
+        set(value) = prefs.edit().apply { if (value == null) remove(KEY_CANDLE) else putInt(KEY_CANDLE, value) }.apply()
+
     /** The place used for all zmanim; never fails (falls back to Jerusalem). */
-    fun resolved(liveFix: GeoFix? = null): ResolvedLocation = LocationResolver.resolve(choice, liveFix, lastAutoFix)
+    fun resolved(liveFix: GeoFix? = null): ResolvedLocation {
+        val r = LocationResolver.resolve(choice, liveFix, lastAutoFix)
+        val override = candleMinutesOverride ?: return r
+        return r.copy(place = r.place.copy(candleLightingMinutes = override))
+    }
 
     private companion object {
         const val KEY_CHOICE = "choice"
@@ -45,6 +54,7 @@ class LocationStore(context: Context) {
         const val KEY_ELEV = "elev"
         const val KEY_TIME = "time"
         const val KEY_TZEIT = "tzeit"
+        const val KEY_CANDLE = "candle_minutes"
 
         fun encodeChoice(c: LocationChoice): String = when (c) {
             LocationChoice.Auto -> "auto"
