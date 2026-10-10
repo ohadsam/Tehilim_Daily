@@ -48,6 +48,19 @@ class SmokeTest {
     }
 
     @Test
+    fun permissionsScreenShowsAllItems() {
+        rule.onAllNodesWithText(text(R.string.tab_more)).onFirst().performClick()
+        runCatching { rule.onAllNodesWithText(text(R.string.whats_new_close)).onFirst().performClick() }
+        rule.onAllNodesWithText(text(R.string.set_title)).onFirst().performClick()
+        rule.onNode(hasText(text(R.string.set_permissions)), useUnmergedTree = true).performScrollTo().performClick()
+        rule.waitForIdle()
+        listOf(R.string.perm_notifications, R.string.perm_exact, R.string.perm_battery).forEach {
+            rule.onAllNodesWithText(text(it), substring = true).onFirst().assertExists()
+        }
+        shot2("11_permissions")
+    }
+
+    @Test
     fun favoritesAndRemindersTabsOpen() {
         rule.onAllNodesWithText(text(R.string.tab_favorites)).onFirst().performClick()
         rule.waitForIdle()
