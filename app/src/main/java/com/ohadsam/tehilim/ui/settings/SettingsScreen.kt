@@ -82,6 +82,7 @@ fun SettingsScreen(
     onOpenReminders: () -> Unit,
     onOpenHistory: () -> Unit,
     onShowWhatsNew: () -> Unit,
+    onOpenPermissions: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -207,7 +208,39 @@ fun SettingsScreen(
         }
 
         Section(R.string.set_support) {
+            val permSummary = remember(context) { com.ohadsam.tehilim.permissions.PermissionChecker.check(context) }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.set_permissions)) },
+                supportingContent = {
+                    val n = permSummary.missingRequired.size + permSummary.missingOptional.size
+                    Text(if (n == 0) stringResource(R.string.set_permissions_ok) else stringResource(R.string.set_permissions_issues, n))
+                },
+                modifier = Modifier.clickable(onClick = onOpenPermissions),
+            )
+            HorizontalDivider()
             NavRow(R.string.more_logs, onOpenLogs)
+        }
+
+        Section(R.string.set_share) {
+            var asZip by remember { mutableStateOf(false) }
+            Text(stringResource(R.string.set_share_intro), style = MaterialTheme.typography.bodySmall)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    R.string.set_share_whatsapp to com.ohadsam.tehilim.share.AppSharer.Target.WHATSAPP,
+                    R.string.set_share_email to com.ohadsam.tehilim.share.AppSharer.Target.EMAIL,
+                    R.string.set_share_other to com.ohadsam.tehilim.share.AppSharer.Target.ANY,
+                ).forEach { (label, target) ->
+                    OutlinedButton(onClick = {
+                        val ok = runCatching {
+                            val v = BuildConfig.VERSION_NAME
+                            val file = com.ohadsam.tehilim.share.AppSharer.prepare(context, v, asZip)
+                            context.startActivity(com.ohadsam.tehilim.share.AppSharer.intent(context, file, v, asZip, target).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }.isSuccess
+                        if (!ok) message = R.string.set_share_failed
+                    }) { Text(stringResource(label)) }
+                }
+            }
+            FilterChip(asZip, { asZip = !asZip }, { Text(stringResource(R.string.set_share_zip)) })
         }
 
         Section(R.string.more_about) {

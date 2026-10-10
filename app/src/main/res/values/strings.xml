@@ -296,4 +296,33 @@
     <string name="loc_rollover_midnight">בחצות (תאריך לועזי)</string>
     <string name="loc_rollover_sunset">בשקיעה</string>
     <string name="loc_rollover_tzeit">בצאת הכוכבים</string>
+
+    <string name="perm_title">בדיקת הרשאות</string>
+    <string name="perm_all_good">כל ההרשאות תקינות — התזכורות אמורות לפעול כראוי.</string>
+    <string name="perm_missing_required">%1$d הרשאות חיוניות חסרות — התזכורות עלולות לא להופיע.</string>
+    <string name="perm_missing_optional">הכול חיוני תקין. יש %1$d המלצות לשיפור.</string>
+    <string name="perm_recheck">בדיקה מחדש</string>
+    <string name="perm_ok">תקין</string>
+    <string name="perm_needs_attention">דורש טיפול</string>
+    <string name="perm_optional_tag">(מומלץ)</string>
+    <string name="perm_notifications">הצגת התראות</string>
+    <string name="perm_notifications_body">נדרש כדי שהתזכורות יופיעו.</string>
+    <string name="perm_channels">ערוצי ההתראות פעילים</string>
+    <string name="perm_channels_body">אם ערוץ התראות כבוי במערכת, תזכורות מסוג זה לא יופיעו.</string>
+    <string name="perm_exact">התראות בשעה מדויקת</string>
+    <string name="perm_exact_body">בלי זה אנדרואיד עשוי לאחר תזכורות בכמה דקות.</string>
+    <string name="perm_battery">פטור מחיסכון בסוללה</string>
+    <string name="perm_battery_body">מונע מהמכשיר \"להרדים\" את האפליקציה ולפספס תזכורות. מומלץ במיוחד במכשירי שיאומי, סמסונג והואוויי.</string>
+    <string name="perm_location">מיקום (גס)</string>
+    <string name="perm_location_body">לחישוב אוטומטי של כניסת ויציאת שבת. אפשר גם לבחור עיר ידנית.</string>
+    <string name="set_permissions">בדיקת הרשאות</string>
+    <string name="set_permissions_ok">הכול תקין</string>
+    <string name="set_permissions_issues">יש %1$d פריטים שדורשים תשומת לב</string>
+    <string name="set_share">שיתוף האפליקציה</string>
+    <string name="set_share_intro">שלחו את האפליקציה (קובץ APK) עם הוראות התקנה. התקנה של גרסה חדשה מעל הקיימת מעדכנת אותה בלי להסיר.</string>
+    <string name="set_share_whatsapp">וואטסאפ</string>
+    <string name="set_share_email">אימייל</string>
+    <string name="set_share_other">אחר…</string>
+    <string name="set_share_zip">שליחה כקובץ zip (אם האימייל חוסם APK)</string>
+    <string name="set_share_failed">לא ניתן היה להכין את הקובץ לשיתוף</string>
 </resources>

@@ -28,6 +28,7 @@ import com.ohadsam.tehilim.ui.history.HistoryScreen
 import com.ohadsam.tehilim.ui.search.SearchScreen
 import com.ohadsam.tehilim.ui.location.LocationScreen
 import com.ohadsam.tehilim.ui.logs.LogsScreen
+import com.ohadsam.tehilim.ui.permissions.PermissionsScreen
 import com.ohadsam.tehilim.ui.settings.SettingsScreen
 import com.ohadsam.tehilim.ui.more.MoreScreen
 import com.ohadsam.tehilim.ui.reminders.RemindersScreen
@@ -127,8 +128,10 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenReminders = { nav.navigate(Destination.REMINDERS.route) },
                     onOpenHistory = { nav.navigate("history") },
                     onShowWhatsNew = { nav.navigate("more") },
+                    onOpenPermissions = { nav.navigate("permissions") },
                 )
             }
+            composable("permissions") { PermissionsScreen(onBack = { nav.popBackStack() }) }
             composable("logs") { LogsScreen(container, onBack = { nav.popBackStack() }) }
             composable("bookmarks") {
                 BookmarksScreen(container, onBack = { nav.popBackStack() }, onOpen = { nav.navigate("browse?chapter=${it.chapter}&verse=${it.verse}") })

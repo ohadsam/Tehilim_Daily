@@ -12,6 +12,12 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Monotonic version code = number of commits, so every CI build is a valid in-place update of the previous one.
+val gitCommitCount: Int = runCatching {
+    ProcessBuilder("git", "rev-list", "--count", "HEAD").directory(rootDir).redirectErrorStream(true).start()
+        .inputStream.bufferedReader().readText().trim().toInt()
+}.getOrDefault(1)
+
 android {
     namespace = "com.ohadsam.tehilim"
     compileSdk = 35
@@ -20,13 +26,21 @@ android {
         applicationId = "com.ohadsam.tehilim"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
+        versionCode = 100 + gitCommitCount
         versionName = "0.9.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     // Release signing comes from CI secrets (see .github/workflows/release.yml); without them the release build is unsigned.
+    // One fixed key signs debug AND release builds: Android only updates an installed app in place when the signature matches,
+    // so users never have to uninstall. (Override with real secrets for store releases; see release.yml.)
     signingConfigs {
+        create("sideload") {
+            storeFile = rootProject.file("app/sideload.jks")
+            storePassword = "tehilim-sideload"
+            keyAlias = "tehilim"
+            keyPassword = "tehilim-sideload"
+        }
         create("release") {
             val ks = System.getenv("KEYSTORE_FILE")
             if (ks != null) {
@@ -38,8 +52,11 @@ android {
         }
     }
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("sideload")
+        }
         release {
-            signingConfig = signingConfigs.getByName("release").takeIf { System.getenv("KEYSTORE_FILE") != null }
+            signingConfig = if (System.getenv("KEYSTORE_FILE") != null) signingConfigs.getByName("release") else signingConfigs.getByName("sideload")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
