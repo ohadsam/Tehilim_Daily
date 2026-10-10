@@ -53,14 +53,23 @@ fun DayReader(
     onToggleStar: ((PsalmRef) -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
     bookmarks: BookmarkHooks? = null,
+    positions: com.ohadsam.tehilim.data.prefs.PositionStore? = null,
+    positionKey: String? = null,
 ) {
     if (chapters.isEmpty()) return
-    val pager = rememberPagerState(initialPage = if (startAtEnd) chapters.lastIndex else 0, pageCount = { chapters.size })
+    val saved = if (positions != null && positionKey != null) positions.get(positionKey) else 0
+    val pager = rememberPagerState(
+        initialPage = if (startAtEnd) chapters.lastIndex else saved.coerceIn(0, chapters.lastIndex),
+        pageCount = { chapters.size },
+    )
     val scope = rememberCoroutineScope()
     val current = pager.currentPage
 
     LaunchedEffect(pager) {
-        snapshotFlow { pager.settledPage }.collect { onPageSettled(it) }
+        snapshotFlow { pager.settledPage }.collect {
+            if (positions != null && positionKey != null) positions.set(positionKey, it)
+            onPageSettled(it)
+        }
     }
 
     Column(modifier.fillMaxSize()) {

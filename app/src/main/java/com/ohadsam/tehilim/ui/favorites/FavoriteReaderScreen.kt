@@ -83,6 +83,10 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                 BookmarkHost(container, Modifier.weight(1f)) { hooks ->
                 DayReader(
                     bookmarks = hooks,
+                    positions = container.positions,
+                    positionKey = com.ohadsam.tehilim.data.prefs.PositionStore.key(
+                        if (favoriteId != null) "f" else "p", favoriteId ?: personId ?: 0L, container.locations.logicalToday(),
+                    ),
                     repo = container.psalms,
                     chapters = chapters,
                     settings = settings,

@@ -15,6 +15,7 @@ import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
 import com.ohadsam.tehilim.backup.BackupRepository
 import com.ohadsam.tehilim.data.prefs.LogPrefs
+import com.ohadsam.tehilim.data.prefs.PositionStore
 import com.ohadsam.tehilim.data.prefs.PrayerPrefs
 import com.ohadsam.tehilim.data.prefs.ReaderPrefs
 import com.ohadsam.tehilim.data.prefs.ThemePrefs
@@ -41,6 +42,8 @@ class AppContainer(context: Context) {
     )
 
     val readerPrefs: ReaderPrefs = ReaderPrefs(context.applicationContext)
+
+    val positions: PositionStore = PositionStore(context.applicationContext)
 
     val themePrefs: ThemePrefs = ThemePrefs(context.applicationContext)
 

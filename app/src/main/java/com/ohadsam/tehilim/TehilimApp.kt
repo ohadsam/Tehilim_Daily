@@ -41,7 +41,7 @@ class TehilimApp : Application() {
     private fun watchDataForWidgets() {
         val c = container
         appScope.launch {
-            combine(c.favorites.state, c.bookmarks.bookmarks, c.said.entries, c.reminders.reminders) { _, _, _, _ -> Unit }
+            combine(c.favorites.state, c.bookmarks.bookmarks, c.said.entries, c.reminders.reminders, c.positions.version) { _, _, _, _, _ -> Unit }
                 .debounce(WIDGET_DEBOUNCE_MS)
                 .collect { runCatching { com.ohadsam.tehilim.widget.WidgetUpdater.updateAll(this@TehilimApp) } }
         }

@@ -139,6 +139,11 @@ fun TodayScreen(container: AppContainer, initialWeek: Boolean = false, onContinu
             BookmarkHost(container, Modifier.weight(1f)) { hooks ->
             DayReader(
                 bookmarks = hooks,
+                positions = container.positions,
+                positionKey = when (mode) {
+                    DayMode.MONTH -> com.ohadsam.tehilim.data.prefs.PositionStore.key("m", 0, selected)
+                    DayMode.WEEK -> com.ohadsam.tehilim.data.prefs.PositionStore.key("w", 0, selected)
+                },
                 repo = container.psalms,
                 chapters = chapters,
                 settings = settings,
