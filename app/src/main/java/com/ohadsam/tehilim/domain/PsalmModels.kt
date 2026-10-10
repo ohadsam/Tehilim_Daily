@@ -2,6 +2,20 @@ package com.ohadsam.tehilim.domain
 
 const val PSALMS_COUNT = 150
 
+/** Inverse of [PsalmRef.compact]; null when malformed or out of range. */
+fun parsePsalmRef(compact: String): PsalmRef? = runCatching {
+    val parts = compact.trim().split(":")
+    val chapter = parts[0].toInt()
+    when (parts.size) {
+        1 -> PsalmRef(chapter)
+        2 -> {
+            val (from, to) = parts[1].split("-").map { it.toInt() }
+            PsalmRef(chapter, from, to)
+        }
+        else -> null
+    }
+}.getOrNull()
+
 /** A chapter, or a verse range inside one (e.g. the two halves of chapter 119 in the monthly schedule). */
 data class PsalmRef(val chapter: Int, val fromVerse: Int? = null, val toVerse: Int? = null) {
     init {
@@ -11,6 +25,9 @@ data class PsalmRef(val chapter: Int, val fromVerse: Int? = null, val toVerse: I
     }
 
     val isWhole: Boolean get() = fromVerse == null
+
+    /** Compact form without the "Psalms." prefix: "23" or "119:1-88" (used in storage and deep links). */
+    val compact: String get() = key.removePrefix("Psalms.")
 
     /** Canonical Sefaria-style reference, also usable as a stable key. */
     val key: String get() = if (isWhole) "Psalms.$chapter" else "Psalms.$chapter:$fromVerse-$toVerse"

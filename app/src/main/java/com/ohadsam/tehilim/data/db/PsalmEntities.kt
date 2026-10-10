@@ -33,7 +33,13 @@ interface ChapterDao {
     suspend fun clear()
 }
 
-@Database(entities = [ChapterEntity::class], version = 1, exportSchema = true)
+@Database(
+    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class],
+    version = 1,
+    exportSchema = true,
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chapterDao(): ChapterDao
+
+    abstract fun favoriteDao(): FavoriteDao
 }
