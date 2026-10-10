@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +60,7 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                     Column(Modifier.fillMaxWidth().padding(top = 24.dp)) {
                         Text("מה להציג בווידג'ט?", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(16.dp))
                         LazyColumn {
-                            androidx.compose.foundation.lazy.items(choices) { c ->
+                            items(choices) { c ->
                                 ListItem(
                                     headlineContent = { Text(c.title) },
                                     supportingContent = c.subtitle?.let { { Text(it) } },

@@ -156,30 +156,30 @@ class ReaderWidget : GlanceAppWidget() {
             }
             if (m.chapters.isEmpty()) {
                 Text("אין פרקים להצגה", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp), modifier = GlanceModifier.padding(8.dp))
-                return
-            }
-            Row(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("‹", style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 28.sp), modifier = GlanceModifier.padding(horizontal = 12.dp).clickable(actionRunCallback<ReaderStep>(androidx.glance.action.actionParametersOf(ReaderKeys.StepKey to -1))))
-                Text(
-                    "${m.chapters[m.index].shortLabel()}  (${HebrewNumerals.toHebrew(m.index + 1)}/${HebrewNumerals.toHebrew(m.chapters.size)})",
-                    style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center),
-                    modifier = GlanceModifier.defaultWeight(),
-                )
-                Text("›", style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 28.sp), modifier = GlanceModifier.padding(horizontal = 12.dp).clickable(actionRunCallback<ReaderStep>(androidx.glance.action.actionParametersOf(ReaderKeys.StepKey to 1))))
-            }
-            Column(GlanceModifier.defaultWeight().fillMaxWidth()) {
-                val verses = m.verses
-                when {
-                    verses != null -> LazyColumn {
-                        items(verses) { v ->
-                            Text(
-                                "${HebrewNumerals.toHebrew(v.number, punctuation = false)}  ${v.text}",
-                                style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
-                                modifier = GlanceModifier.fillMaxWidth().padding(vertical = 3.dp),
-                            )
+            } else {
+                Row(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("‹", style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 28.sp), modifier = GlanceModifier.padding(horizontal = 12.dp).clickable(actionRunCallback<ReaderStep>(androidx.glance.action.actionParametersOf(ReaderKeys.StepKey to -1))))
+                    Text(
+                        "${m.chapters[m.index].shortLabel()}  (${HebrewNumerals.toHebrew(m.index + 1)}/${HebrewNumerals.toHebrew(m.chapters.size)})",
+                        style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center),
+                        modifier = GlanceModifier.defaultWeight(),
+                    )
+                    Text("›", style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 28.sp), modifier = GlanceModifier.padding(horizontal = 12.dp).clickable(actionRunCallback<ReaderStep>(androidx.glance.action.actionParametersOf(ReaderKeys.StepKey to 1))))
+                }
+                Column(GlanceModifier.defaultWeight().fillMaxWidth()) {
+                    val verses = m.verses
+                    when {
+                        verses != null -> LazyColumn {
+                            items(verses) { v ->
+                                Text(
+                                    "${HebrewNumerals.toHebrew(v.number, punctuation = false)}  ${v.text}",
+                                    style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 16.sp),
+                                    modifier = GlanceModifier.fillMaxWidth().padding(vertical = 3.dp),
+                                )
+                            }
                         }
+                        m.error != null -> Text(m.error, style = TextStyle(color = GlanceTheme.colors.error, fontSize = 12.sp), modifier = GlanceModifier.padding(8.dp))
                     }
-                    m.error != null -> Text(m.error, style = TextStyle(color = GlanceTheme.colors.error, fontSize = 12.sp), modifier = GlanceModifier.padding(8.dp))
                 }
             }
             if (m.saidContext != null) {
