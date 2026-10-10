@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0
+- In-place updates: one fixed signing key (`app/sideload.jks`) signs debug and release; versionCode = 100 + commit count, so every build upgrades the previous one without uninstalling.
+- Share the app (APK + Hebrew install/update instructions) via WhatsApp, e-mail (optional zip for mail apps that block .apk) or any app.
+- Settings → permission check (notifications, channels, exact alarms, battery optimisation, location) with one-tap fixes; re-checks on return.
+- Reader widget: per-widget font size / colours / nikud / ta'amim / verse numbers or follow-the-app; ⚙ reconfigure; tap a verse number to bookmark; chapter position remembered per date and shared with the app; said + bookmarks synced.
+
 ## 0.9.0 — first feature-complete build
 - Reading: monthly (Hebrew day, with the 29-day-month "כ״ט + ל׳" rule), weekly and sequential views; date navigation; swipe between chapters; chapter picker; full-text search; 119 split into its two schedule halves.
 - Local-first psalms: Sefaria → Room cache, integrity-checked, prefetch-all, offline use.

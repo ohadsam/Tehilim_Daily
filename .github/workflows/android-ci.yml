@@ -21,6 +21,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew ktlintCheck detekt testDebugUnitTest compileDebugAndroidTestKotlin assembleDebug assembleRelease --stacktrace
+      - name: Signing certificate of the debug APK (must stay identical across builds)
+        if: steps.has.outputs.ok == 'true'
+        run: keytool -printcert -jarfile app/build/outputs/apk/debug/app-debug.apk | grep -E 'SHA256|Owner' || true
       - uses: actions/upload-artifact@v4
         if: steps.has.outputs.ok == 'true'
         with:

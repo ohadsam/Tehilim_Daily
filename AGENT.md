@@ -7,6 +7,7 @@ Read order: CLAUDE.md → docs/PLAN.md → STRUCTURE.md → the batch's section 
 - v0.9.0: everything in docs/CHANGELOG.md. CI (Android CI + Sefaria probe) is the only build/test gate (sandbox has no SDK/network).
 
 ## Known issues / open items (need the owner)
+- **Signing key:** `app/sideload.jks` (password in app/build.gradle.kts) is committed on purpose so every CI build is an in-place update. It is NOT a store key: anyone with repo access can sign updates. For Play/store releases set `KEYSTORE_*` secrets (release.yml) — but then users must reinstall once, because the signature changes. Never change/delete the sideload key once users have installed it.
 - **Prayers (יהי רצון):** mechanism + settings are in place, but `assets/prayers.json` has NO verified texts. Supply wording + source per nusach, then set `verified=true`.
 - **Name-letter / "נשמה" stanzas of Psalm 119:** widespread custom, implemented as an optional helper — confirm before release.
 - **Tzeit / candle-lighting defaults:** 8.5° and 18 min (40 in Jerusalem area) — confirm minhag; both are user-configurable.
