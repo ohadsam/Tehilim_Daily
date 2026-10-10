@@ -22,6 +22,8 @@ import com.ohadsam.tehilim.ui.common.PlaceholderScreen
 import com.ohadsam.tehilim.ui.browse.BrowseScreen
 import com.ohadsam.tehilim.ui.favorites.FavoriteReaderScreen
 import com.ohadsam.tehilim.ui.favorites.FavoritesScreen
+import com.ohadsam.tehilim.ui.history.HistoryScreen
+import com.ohadsam.tehilim.ui.search.SearchScreen
 import com.ohadsam.tehilim.ui.more.MoreScreen
 import com.ohadsam.tehilim.ui.today.TodayScreen
 
@@ -36,7 +38,7 @@ fun AppRoot(container: AppContainer) {
                 Destination.entries.forEach { d ->
                     val label = stringResource(d.label)
                     NavigationBarItem(
-                        selected = current == d.route || (d == Destination.FAVORITES && current.isFavoritesDetail()),
+                        selected = current?.substringBefore('?') == d.route || (d == Destination.FAVORITES && current.isFavoritesDetail()),
                         onClick = {
                             nav.navigate(d.route) {
                                 popUpTo(nav.graph.findStartDestination().id) { saveState = true }
@@ -53,7 +55,20 @@ fun AppRoot(container: AppContainer) {
     ) { padding ->
         NavHost(nav, startDestination = Destination.TODAY.route, modifier = Modifier.padding(padding)) {
             composable(Destination.TODAY.route) { TodayScreen(container) }
-            composable(Destination.BROWSE.route) { BrowseScreen(container) }
+            composable(
+                "browse?chapter={chapter}&verse={verse}",
+                listOf(
+                    navArgument("chapter") { type = NavType.IntType; defaultValue = 1 },
+                    navArgument("verse") { type = NavType.IntType; defaultValue = 0 },
+                ),
+            ) { entry ->
+                BrowseScreen(
+                    container,
+                    initialChapter = entry.arguments?.getInt("chapter") ?: 1,
+                    initialVerse = entry.arguments?.getInt("verse") ?: 0,
+                    onOpenSearch = { nav.navigate("search") },
+                )
+            }
             composable(Destination.FAVORITES.route) {
                 FavoritesScreen(
                     container,
@@ -68,7 +83,11 @@ fun AppRoot(container: AppContainer) {
                 FavoriteReaderScreen(container, null, entry.arguments?.getLong("id"), onBack = { nav.popBackStack() })
             }
             composable(Destination.REMINDERS.route) { PlaceholderScreen(stringResource(Destination.REMINDERS.label)) }
-            composable(Destination.MORE.route) { MoreScreen(container) }
+            composable(Destination.MORE.route) { MoreScreen(container, onOpenHistory = { nav.navigate("history") }) }
+            composable("history") { HistoryScreen(container, onBack = { nav.popBackStack() }) }
+            composable("search") {
+                SearchScreen(container, onBack = { nav.popBackStack() }, onOpen = { ch, v -> nav.navigate("browse?chapter=$ch&verse=$v") })
+            }
         }
     }
 }

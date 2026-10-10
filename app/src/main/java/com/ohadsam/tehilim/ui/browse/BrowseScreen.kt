@@ -11,7 +11,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -52,8 +56,8 @@ fun parseChapterQuery(query: String): Int? {
 /** All 150 chapters in order: swipe between them, jump via a letter grid or search, and see what was visited this session. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BrowseScreen(container: AppContainer) {
-    val pager = rememberPagerState(initialPage = 0, pageCount = { PSALMS_COUNT })
+fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse: Int = 0, onOpenSearch: () -> Unit = {}) {
+    val pager = rememberPagerState(initialPage = (initialChapter - 1).coerceIn(0, PSALMS_COUNT - 1), pageCount = { PSALMS_COUNT })
     val scope = rememberCoroutineScope()
     val settings by container.readerPrefs.settings.collectAsState()
     var showPicker by remember { mutableStateOf(false) }
@@ -75,8 +79,13 @@ fun BrowseScreen(container: AppContainer) {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(stringResource(R.string.tab_browse), style = MaterialTheme.typography.titleLarge)
-            FilledTonalButton(onClick = { showPicker = true }) {
-                Text(stringResource(R.string.browse_pick_chapter))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onOpenSearch) {
+                    Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.browse_search_text))
+                }
+                FilledTonalButton(onClick = { showPicker = true }) {
+                    Text(stringResource(R.string.browse_pick_chapter))
+                }
             }
         }
         if (visited.size > 1) {
@@ -92,6 +101,7 @@ fun BrowseScreen(container: AppContainer) {
                 container.psalms, ref, settings,
                 starred = favState.starFor(ref) != null,
                 onToggleStar = { scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
+                highlightVerse = if (ref.chapter == initialChapter) initialVerse else 0,
             )
         }
     }

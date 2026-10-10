@@ -1,5 +1,6 @@
 package com.ohadsam.tehilim.ui.reader
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -21,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +53,7 @@ fun ChapterPage(
     modifier: Modifier = Modifier,
     starred: Boolean = false,
     onToggleStar: (() -> Unit)? = null,
+    highlightVerse: Int = 0,
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -57,7 +61,7 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse)
         }
     }
 }
@@ -69,8 +73,15 @@ private fun ChapterText(
     settings: ReaderSettings,
     starred: Boolean,
     onToggleStar: (() -> Unit)?,
+    highlightVerse: Int,
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(highlightVerse, text) {
+        val i = text.verses.indexOfFirst { it.number == highlightVerse }
+        if (highlightVerse > 0 && i >= 0) listState.animateScrollToItem(i + 1) // +1: the title is item 0
+    }
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -96,7 +107,11 @@ private fun ChapterText(
             }
         }
         items(text.verses, key = { it.number }) { v ->
-            Row(verticalAlignment = Alignment.Top) {
+            val marked = v.number == highlightVerse
+            Row(
+                Modifier.fillMaxWidth().background(if (marked) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent),
+                verticalAlignment = Alignment.Top,
+            ) {
                 if (settings.showVerseNumbers) {
                     Text(
                         HebrewNumerals.toHebrew(v.number, punctuation = false),

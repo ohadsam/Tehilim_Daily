@@ -24,13 +24,18 @@ import com.ohadsam.tehilim.R
 import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.favorites.FavoritesState
 import com.ohadsam.tehilim.favorites.Person
+import com.ohadsam.tehilim.said.SaidContext
 import com.ohadsam.tehilim.ui.reader.DayReader
+import com.ohadsam.tehilim.ui.reader.SaidBar
+import kotlinx.coroutines.launch
 
 /** Reads one favorite (its people are shown highlighted above the text) or all chapters linked to one person. */
 @Composable
 fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: Long?, onBack: () -> Unit) {
     val state by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
     val settings by container.readerPrefs.settings.collectAsState()
+    val saidEntries by container.said.entries.collectAsState(initial = emptyList())
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     val favorite = favoriteId?.let { id -> state.favorites.firstOrNull { it.id == id } }
     val person = personId?.let { state.person(it) }
@@ -78,6 +83,14 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                     startAtEnd = false,
                     onPreviousDay = null,
                     onNextDay = null,
+                    footer = {
+                        val today = java.time.LocalDate.now()
+                        val ctx = if (favoriteId != null) SaidContext.favorite(favoriteId) else SaidContext.person(personId ?: 0L)
+                        SaidBar(
+                            said = saidEntries.any { it.date == today && it.context == ctx },
+                            onToggle = { scope.launch { container.said.toggle(today, ctx) } },
+                        )
+                    },
                 )
             }
         }

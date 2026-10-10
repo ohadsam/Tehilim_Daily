@@ -78,4 +78,22 @@
     <string name="person_yahrzeit">תאריך פטירה (יום הזכרון)</string>
     <string name="person_day">יום</string>
     <string name="person_month">חודש</string>
+
+    <string name="said_mark">סימון: נאמר</string>
+    <string name="said_done">נאמר ✓ (לחצו לביטול)</string>
+    <string name="history_title">היסטוריית אמירה</string>
+    <string name="history_search">חיפוש (תאריך, יום, שם מועדף…)</string>
+    <string name="history_all">הכל</string>
+    <string name="history_said">נאמר</string>
+    <string name="history_not_said">לא נאמר</string>
+    <string name="history_empty">אין תוצאות</string>
+    <string name="more_history">היסטוריית אמירה</string>
+    <string name="more_history_sub">מה נאמר ב-30 הימים האחרונים</string>
+    <string name="search_title">חיפוש בתהילים</string>
+    <string name="search_hint">מילה או ביטוי (ללא ניקוד)</string>
+    <string name="search_incomplete">במכשיר שמורים %1$d מתוך %2$d פרקים. החיפוש מתבצע רק בפרקים השמורים.</string>
+    <string name="search_download_all">הורדת כל התהילים</string>
+    <string name="search_no_results">לא נמצאו תוצאות</string>
+    <string name="search_count">נמצאו %1$d פסוקים</string>
+    <string name="browse_search_text">חיפוש בטקסט</string>
 </resources>

@@ -32,10 +32,10 @@ class PsalmSearchTest {
 
     @Test
     fun highlightRangesPointIntoTheOriginalText() {
-        val hit = PsalmSearch.search(listOf(ps23), "רועי").single()
+        val hit = PsalmSearch.search(listOf(ps23), "רעי").single()
         val shown = hit.matches.map { hit.text.substring(it) }
         assertEquals(1, shown.size)
-        assertTrue(PsalmSearch.normalize(shown[0]).text == "רועי")
+        assertTrue(PsalmSearch.normalize(shown[0]).text == "רעי")
     }
 
     @Test

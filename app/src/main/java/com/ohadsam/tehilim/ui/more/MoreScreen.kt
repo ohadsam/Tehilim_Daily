@@ -27,7 +27,7 @@ import com.ohadsam.tehilim.BuildConfig
 import com.ohadsam.tehilim.R
 
 @Composable
-fun MoreScreen(container: AppContainer) {
+fun MoreScreen(container: AppContainer, onOpenHistory: () -> Unit = {}) {
     val context = LocalContext.current
     val store = remember { WhatsNewStore(context) }
     val whatsNew = remember { store.load() }
@@ -43,6 +43,12 @@ fun MoreScreen(container: AppContainer) {
             headlineContent = { Text(stringResource(R.string.more_whats_new)) },
             supportingContent = { Text(stringResource(R.string.more_version, BuildConfig.VERSION_NAME)) },
             modifier = Modifier.fillMaxWidth().clickable { showWhatsNew = true },
+        )
+        HorizontalDivider()
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.more_history)) },
+            supportingContent = { Text(stringResource(R.string.more_history_sub)) },
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenHistory),
         )
         HorizontalDivider()
         ListItem(

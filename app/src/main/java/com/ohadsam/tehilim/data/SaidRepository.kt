@@ -16,7 +16,7 @@ class SaidRepository(
     private val dao: SaidDao,
     private val logger: AppLogger,
     private val clock: () -> Long = System::currentTimeMillis,
-    private val today: () -> LocalDate = LocalDate::now,
+    private val today: () -> LocalDate = { LocalDate.now() },
 ) {
     val entries: Flow<List<SaidEntry>> = dao.since(today().minusDays(HISTORY_DAYS.toLong()).toEpochDay()).map { rows ->
         rows.mapNotNull { r ->

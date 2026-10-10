@@ -43,7 +43,9 @@ import kotlinx.coroutines.launch
 import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.ui.reader.ChipStrip
+import com.ohadsam.tehilim.said.SaidContext
 import com.ohadsam.tehilim.ui.reader.DayReader
+import com.ohadsam.tehilim.ui.reader.SaidBar
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -77,6 +79,7 @@ fun TodayScreen(container: AppContainer) {
     val isToday = selectedEpoch == todayEpoch
     val favState by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
     val scope = rememberCoroutineScope()
+    val saidEntries by container.said.entries.collectAsState(initial = emptyList())
 
     fun goTo(date: LocalDate, atEnd: Boolean = false) {
         startAtEnd = atEnd
@@ -104,6 +107,12 @@ fun TodayScreen(container: AppContainer) {
             DayMode.WEEK -> PsalmSchedules.weekly(selected.dayOfWeek)
         }
         // A new key (date + mode) rebuilds the pager so it starts on the right chapter.
+        val saidContext = when (mode) {
+            DayMode.MONTH -> SaidContext.monthDay(hebrew.day)
+            DayMode.WEEK -> SaidContext.weekday(selected)
+        }
+        val realToday = LocalDate.ofEpochDay(todayEpoch)
+        val said = saidEntries.any { it.date == realToday && it.context == saidContext }
         androidx.compose.runtime.key(selectedEpoch, mode, startAtEnd) {
             DayReader(
                 repo = container.psalms,
@@ -112,6 +121,7 @@ fun TodayScreen(container: AppContainer) {
                 startAtEnd = startAtEnd,
                 onPreviousDay = { goTo(selected.minusDays(1), atEnd = true) },
                 onNextDay = { goTo(selected.plusDays(1)) },
+                footer = { SaidBar(said, onToggle = { scope.launch { container.said.toggle(realToday, saidContext) } }) },
                 isStarred = { favState.starFor(it) != null },
                 onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
             )
