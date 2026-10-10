@@ -33,6 +33,7 @@ fun BookmarkHost(container: AppContainer, modifier: Modifier = Modifier, content
     var editing by remember { mutableStateOf<Bookmark?>(null) }
     val savedMsg = stringResource(R.string.bm_saved)
     val undo = stringResource(R.string.action_undo)
+    val deletedMsg = stringResource(R.string.bm_cleared)
 
     val hooks = remember(all) {
         val byChapter = all.groupBy { it.chapter }
@@ -67,7 +68,7 @@ fun BookmarkHost(container: AppContainer, modifier: Modifier = Modifier, content
             onDelete = {
                 scope.launch {
                     container.bookmarks.delete(b.id)
-                    if (snackbar.showSnackbar(savedMsg.let { _ -> "הסימניה נמחקה" }, undo) == SnackbarResult.ActionPerformed) {
+                    if (snackbar.showSnackbar(deletedMsg, undo) == SnackbarResult.ActionPerformed) {
                         container.bookmarks.restore(b)
                     }
                 }
