@@ -6,7 +6,11 @@ import android.util.Log
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.and
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onRoot
@@ -26,6 +30,8 @@ class SmokeTest {
     val rule = createAndroidComposeRule<MainActivity>()
 
     private fun text(res: Int) = rule.activity.getString(res)
+
+    private fun text(res: Int, arg: String) = rule.activity.getString(res, arg)
 
     @Test
     fun bottomNavigationShowsAllTabs() {
@@ -124,8 +130,11 @@ class SmokeTest {
         rule.waitForIdle()
         shot2("09_reminder_editor")
         rule.onAllNodesWithText(text(R.string.rem_section_target)).onFirst().assertExists()
-        rule.onAllNodesWithText(text(R.string.action_save)).onFirst().performClick()
-        rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_off)).fetchSemanticsNodes().isEmpty() && rule.onAllNodesWithText("תהילים", substring = true).fetchSemanticsNodes().isNotEmpty() }
+        rule.onNode(hasText(text(R.string.action_save)) and hasClickAction()).performScrollTo().performClick()
+        // The sheet closes once the reminder is saved and scheduled; the list then shows its card.
+        rule.waitUntil(8_000) { rule.onAllNodesWithText(text(R.string.rem_section_target)).fetchSemanticsNodes().isEmpty() }
+        rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_next, ""), substring = true).fetchSemanticsNodes().isNotEmpty() ||
+            rule.onAllNodesWithText(text(R.string.rem_no_next)).fetchSemanticsNodes().isNotEmpty() }
         shot2("10_reminder_saved")
     }
 }
