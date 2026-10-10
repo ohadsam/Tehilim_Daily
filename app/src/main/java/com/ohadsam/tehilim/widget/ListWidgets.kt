@@ -69,11 +69,11 @@ abstract class ListWidget(private val kind: Kind, private val heading: String) :
     }
 }
 
-class FavoritesListWidget : ListWidget(Kind.FAVORITES, "מועדפים")
+class FavoritesListWidget : ListWidget(ListWidget.Kind.FAVORITES, "מועדפים")
 
-class RefuahListWidget : ListWidget(Kind.REFUAH, "לרפואה")
+class RefuahListWidget : ListWidget(ListWidget.Kind.REFUAH, "לרפואה")
 
-class IluiListWidget : ListWidget(Kind.ILUI, "לעילוי נשמת")
+class IluiListWidget : ListWidget(ListWidget.Kind.ILUI, "לעילוי נשמת")
 
 class FavoritesListWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = FavoritesListWidget()
