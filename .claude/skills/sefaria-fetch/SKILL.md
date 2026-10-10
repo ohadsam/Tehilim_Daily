@@ -7,6 +7,8 @@ description: Verified Sefaria Psalms fetching behavior (URL, ref format, respons
 - `he` shape is unstable: a string, a flat list, or list-of-lists (`he[0]` is a list). Flatten recursively, drop blanks. v3 fallback: `versions[]` entry with `language=="he"`.
 - Sefaria may return the WHOLE chapter for a mid-chapter range: read `sections`/`toSections` for the true verse span, and slice locally if needed.
 - Text contains HTML (`<b>`, `<i>`, `<small>`, `&nbsp;`, `&thinsp;`): clean to plain text/AnnotatedString; keep nikud; strip tags.
+- **`length` in the response is the number of chapters in the book (150), NOT the verses of this chapter.** Never validate against it (found by the live probe; it would have rejected every chapter). Verse counts are validated against the golden table `PsalmVerseCounts` (2,527 verses total, captured from the `Sefaria probe` workflow; version "Miqra according to the Masorah").
+- Always fetch the WHOLE chapter (`Psalms.N`) and slice ranges locally (`PsalmChapter.slice`); one cache row per chapter.
 - Empty `he` or HTTP error ⇒ NOT cached, show a Hebrew error with Retry. Never persist empty/error bodies.
 - Repository contract: `get(chapter, range?)` → Room hit ⇒ return; miss ⇒ API ⇒ store (key = canonical ref) ⇒ return; API failure with no row ⇒ typed error. Offer "prefetch all 150" (WorkManager, throttled ~350ms between calls, resumable) and "clear cache".
 - Chapter 119 is split in the daily schedule as `119:1-88` and `119:89-176`.
