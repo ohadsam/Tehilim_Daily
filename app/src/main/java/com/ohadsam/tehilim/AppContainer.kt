@@ -51,7 +51,10 @@ class AppContainer(context: Context) {
     val prayers: List<com.ohadsam.tehilim.prayers.PrayerText> by lazy { com.ohadsam.tehilim.prayers.PrayerCatalog.load(context.applicationContext) }
 
     private val database: AppDatabase by lazy {
-        Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db").build()
+        Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db")
+            // Pre-release debug builds may change the schema between installs; release builds never wipe data (add migrations instead).
+            .apply { if (com.ohadsam.tehilim.BuildConfig.DEBUG) fallbackToDestructiveMigration(dropAllTables = true) }
+            .build()
     }
 
     private val httpClient: OkHttpClient by lazy {
