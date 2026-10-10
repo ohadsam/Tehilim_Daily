@@ -22,6 +22,7 @@ private class FakeLocal : PsalmsLocal {
         rows[chapter.chapter] = chapter
     }
     override suspend fun cachedChapters() = rows.keys.toSet()
+    override suspend fun all() = rows.values.toList()
     override suspend fun clear() = rows.clear()
 }
 

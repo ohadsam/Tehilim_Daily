@@ -7,6 +7,7 @@ import com.ohadsam.tehilim.log.LogLevel
 import androidx.room.Room
 import com.ohadsam.tehilim.data.FavoritesRepository
 import com.ohadsam.tehilim.data.PsalmsRepository
+import com.ohadsam.tehilim.data.SaidRepository
 import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
 import com.ohadsam.tehilim.data.prefs.ReaderPrefs
@@ -47,4 +48,6 @@ class AppContainer(context: Context) {
     }
 
     val favorites: FavoritesRepository by lazy { FavoritesRepository(database.favoriteDao(), logger) }
+
+    val said: SaidRepository by lazy { SaidRepository(database.saidDao(), logger) }
 }

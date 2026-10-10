@@ -26,6 +26,9 @@ interface ChapterDao {
     @Upsert
     suspend fun put(entity: ChapterEntity)
 
+    @Query("SELECT * FROM psalm_chapter")
+    suspend fun all(): List<ChapterEntity>
+
     @Query("SELECT chapter FROM psalm_chapter")
     suspend fun chapters(): List<Int>
 
@@ -34,7 +37,7 @@ interface ChapterDao {
 }
 
 @Database(
-    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class],
+    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class, SaidEntity::class],
     version = 1,
     exportSchema = true,
 )
@@ -42,4 +45,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun chapterDao(): ChapterDao
 
     abstract fun favoriteDao(): FavoriteDao
+
+    abstract fun saidDao(): SaidDao
 }

@@ -19,6 +19,7 @@ interface PsalmsLocal {
     suspend fun get(chapter: Int): PsalmChapter?
     suspend fun put(chapter: PsalmChapter)
     suspend fun cachedChapters(): Set<Int>
+    suspend fun all(): List<PsalmChapter>
     suspend fun clear()
 }
 
@@ -44,6 +45,9 @@ class PsalmsRepository(
     }
 
     suspend fun cachedChapters(): Set<Int> = local.cachedChapters()
+
+    /** Everything stored locally (used by full-text search, which never touches the network). */
+    suspend fun allCached(): List<PsalmChapter> = local.all()
 
     suspend fun clearCache() {
         local.clear()

@@ -31,6 +31,12 @@ class RoomPsalmsLocal(private val dao: ChapterDao) : PsalmsLocal {
         )
     }
 
+    override suspend fun all(): List<PsalmChapter> = dao.all().mapNotNull { e ->
+        val texts = runCatching { Json.decodeFromString(versesSerializer, e.versesJson) }.getOrNull() ?: return@mapNotNull null
+        if (texts.size != e.verseCount || texts.isEmpty()) null
+        else PsalmChapter(e.chapter, texts.mapIndexed { i, t -> Verse(i + 1, t) }, e.versionTitle, e.fetchedAt)
+    }
+
     override suspend fun cachedChapters(): Set<Int> = dao.chapters().toSet()
 
     override suspend fun clear() = dao.clear()
