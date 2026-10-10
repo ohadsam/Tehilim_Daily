@@ -8,10 +8,6 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
-}
-
 // Monotonic version code = number of commits, so every CI build is a valid in-place update of the previous one.
 val gitCommitCount: Int = runCatching {
     ProcessBuilder("git", "rev-list", "--count", "HEAD").directory(rootDir).redirectErrorStream(true).start()
