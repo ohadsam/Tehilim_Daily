@@ -46,6 +46,18 @@ class LocationStore(context: Context) {
         }
     }
 
+    /** The next moment the "psalms of today" can change: the sunset/nightfall boundary if still ahead, else the next midnight. */
+    fun nextRollover(now: java.time.Instant = java.time.Instant.now()): java.time.Instant {
+        val place = resolved().place
+        val civil = now.atZone(place.zone).toLocalDate()
+        val midnight = civil.plusDays(1).atStartOfDay(place.zone).toInstant()
+        val mode = dayRollover
+        if (mode == com.ohadsam.tehilim.calendar.DayRollover.MIDNIGHT) return midnight.plusSeconds(30)
+        val holy = com.ohadsam.tehilim.calendar.ZmanimHolyTimes(place, tzeit)
+        val boundary = if (mode == com.ohadsam.tehilim.calendar.DayRollover.SUNSET) holy.sunset(civil) else holy.havdalah(civil)
+        return (if (boundary != null && now.isBefore(boundary)) boundary else midnight).plusSeconds(30)
+    }
+
     var tzeit: TzeitMethod
         get() = runCatching { TzeitMethod.valueOf(prefs.getString(KEY_TZEIT, null) ?: "") }.getOrDefault(TzeitMethod.DEGREES_8_5)
         set(value) = prefs.edit().putString(KEY_TZEIT, value.name).apply()

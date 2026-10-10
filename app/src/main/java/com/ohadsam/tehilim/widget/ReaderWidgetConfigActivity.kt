@@ -71,7 +71,7 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                                                 it[ReaderKeys.SOURCE] = c.source
                                                 it[ReaderKeys.SOURCE_ID] = c.id
                                                 it[ReaderKeys.INDEX] = 0
-                                                it[ReaderKeys.INDEX_DAY] = LocalDate.now().toEpochDay()
+                                                it[ReaderKeys.INDEX_DAY] = applicationContext.container.locations.logicalToday().toEpochDay()
                                             }
                                             ReaderWidget().update(this@ReaderWidgetConfigActivity, glanceId)
                                             setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))

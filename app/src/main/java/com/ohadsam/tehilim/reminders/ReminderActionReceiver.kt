@@ -26,7 +26,7 @@ class ReminderActionReceiver : BroadcastReceiver() {
                     ACTION_SAID -> {
                         val type = intent.getStringExtra(EXTRA_SAID_TYPE)?.let { runCatching { SaidType.valueOf(it) }.getOrNull() }
                         val sid = intent.getStringExtra(EXTRA_SAID_ID)
-                        if (type != null && sid != null) c.said.mark(LocalDate.now(), SaidContext(type, sid))
+                        if (type != null && sid != null) c.said.mark(c.locations.logicalToday(), SaidContext(type, sid))
                     }
                     ACTION_SNOOZE -> {
                         val r = c.reminders.get(id) ?: return@launch

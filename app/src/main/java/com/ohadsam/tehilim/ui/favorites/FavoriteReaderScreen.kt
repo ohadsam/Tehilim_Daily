@@ -90,7 +90,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                     onPreviousDay = null,
                     onNextDay = null,
                     footer = {
-                        val today = java.time.LocalDate.now()
+                        val today = container.locations.logicalToday()
                         val ctx = if (favoriteId != null) SaidContext.favorite(favoriteId) else SaidContext.person(personId ?: 0L)
                         SaidBar(
                             said = saidEntries.any { it.date == today && it.context == ctx },

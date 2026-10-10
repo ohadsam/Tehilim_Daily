@@ -39,7 +39,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val intended = if (dayBased && shift == Shift.NONE) c.locations.logicalToday(Instant.ofEpochMilli(intent.getLongExtra(EXTRA_FIRE_AT, System.currentTimeMillis()))) else scheduledDate
         val snoozeCount = intent.getIntExtra(EXTRA_SNOOZE_COUNT, 0)
         val occurrence = Occurrence(intent.getLongExtra(EXTRA_FIRE_AT, System.currentTimeMillis()), intended, shift)
-        val today = LocalDate.now()
+        val today = c.locations.logicalToday()
 
         val message = ReminderContent.build(
             reminder, intended, today, shift,

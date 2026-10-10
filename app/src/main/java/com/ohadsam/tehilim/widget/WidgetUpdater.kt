@@ -11,8 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.ZoneId
 
 object WidgetUpdater {
     suspend fun updateAll(context: Context) {
@@ -28,7 +26,7 @@ object WidgetUpdater {
     /** Fires shortly after local midnight so date-based widgets roll over even if the system broadcast is missed. */
     fun scheduleMidnight(context: Context) {
         val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val next = LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() + 30_000L
+        val next = context.container.locations.nextRollover().toEpochMilli()
         val pi = PendingIntent.getBroadcast(
             context, 7001, Intent(context, DateChangeReceiver::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )

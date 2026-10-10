@@ -46,7 +46,7 @@ fun HistoryScreen(container: AppContainer, onBack: () -> Unit) {
     var query by remember { mutableStateOf("") }
     var status by remember { mutableStateOf<Boolean?>(null) }
     val scope = rememberCoroutineScope()
-    val today = remember { LocalDate.now() }
+    val today = remember { container.locations.logicalToday() }
 
     val days = remember(entries, favState, query, status) {
         HistoryBuilder.filter(HistoryBuilder.build(today, entries, favState), query, status)

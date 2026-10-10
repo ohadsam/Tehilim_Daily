@@ -196,7 +196,7 @@ class ReaderWidget : GlanceAppWidget() {
 class ReaderStep : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val step = parameters[ReaderKeys.StepKey] ?: 0
-        val today = LocalDate.now().toEpochDay()
+        val today = context.container.locations.logicalToday().toEpochDay()
         updateAppWidgetState(context, glanceId) { p ->
             val base = if (p[ReaderKeys.INDEX_DAY] == today) (p[ReaderKeys.INDEX] ?: 0) else 0
             p[ReaderKeys.INDEX] = (base + step).coerceAtLeast(0) // upper bound is clamped when the content is loaded
@@ -209,7 +209,7 @@ class ReaderStep : ActionCallback {
 class ToggleSaid : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val prefs = getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, glanceId)
-        val today = LocalDate.now()
+        val today = context.container.locations.logicalToday()
         val hebrew = HebrewCalendar.fromLocalDate(today)
         val ctx = when (prefs[ReaderKeys.SOURCE] ?: ReaderKeys.MONTH) {
             ReaderKeys.FAVORITE -> SaidContext.favorite(prefs[ReaderKeys.SOURCE_ID] ?: 0L)
