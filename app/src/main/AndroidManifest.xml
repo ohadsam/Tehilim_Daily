@@ -38,5 +38,60 @@
                 <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".widget.HebrewDateWidgetReceiver" android:exported="true" android:label="@string/widget_hebrew_date_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_hebrew_date" />
+        </receiver>
+        <receiver android:name=".widget.WeekdayWidgetReceiver" android:exported="true" android:label="@string/widget_weekday_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_weekday" />
+        </receiver>
+        <receiver android:name=".widget.ReaderWidgetReceiver" android:exported="true" android:label="@string/widget_reader_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reader" />
+        </receiver>
+        <receiver android:name=".widget.FavoritesListWidgetReceiver" android:exported="true" android:label="@string/widget_favorites_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_favorites" />
+        </receiver>
+        <receiver android:name=".widget.RefuahListWidgetReceiver" android:exported="true" android:label="@string/widget_refuah_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_refuah" />
+        </receiver>
+        <receiver android:name=".widget.IluiListWidgetReceiver" android:exported="true" android:label="@string/widget_ilui_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_ilui" />
+        </receiver>
+        <receiver android:name=".widget.BookmarkWidgetReceiver" android:exported="true" android:label="@string/widget_bookmark_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_bookmark" />
+        </receiver>
+        <activity android:name=".widget.ReaderWidgetConfigActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <receiver android:name=".widget.DateChangeReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.serialization.json)
     implementation(libs.coroutines.android)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
     debugImplementation(libs.compose.ui.tooling)
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)

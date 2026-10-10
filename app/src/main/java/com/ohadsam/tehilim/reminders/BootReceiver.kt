@@ -18,6 +18,8 @@ class BootReceiver : BroadcastReceiver() {
             try {
                 app.container.logger.i("BootReceiver", "reschedule after ${intent.action}")
                 app.container.reminderScheduler.rescheduleAll()
+                com.ohadsam.tehilim.widget.WidgetUpdater.scheduleMidnight(context.applicationContext)
+                com.ohadsam.tehilim.widget.WidgetUpdater.updateAll(context.applicationContext)
             } catch (e: Exception) {
                 app.container.logger.e("BootReceiver", "reschedule failed", e)
             } finally {

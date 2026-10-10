@@ -205,4 +205,19 @@
     <string name="tzeit_7_083">צאת הכוכבים — 7.083°</string>
     <string name="tzeit_42">42 דקות אחרי השקיעה</string>
     <string name="tzeit_72">72 דקות אחרי השקיעה</string>
+
+    <string name="widget_hebrew_date_name">תאריך עברי</string>
+    <string name="widget_hebrew_date_desc">התאריך העברי והפרקים של היום בחודש; לחיצה פותחת את התצוגה החודשית</string>
+    <string name="widget_weekday_name">יום בשבוע</string>
+    <string name="widget_weekday_desc">היום בשבוע והפרקים שלו; לחיצה פותחת את התצוגה השבועית</string>
+    <string name="widget_reader_name">קריאת תהילים</string>
+    <string name="widget_reader_desc">טקסט הפרקים עם ניווט בין פרקים וסימון נאמר</string>
+    <string name="widget_favorites_name">רשימת מועדפים</string>
+    <string name="widget_favorites_desc">כל המועדפים; לחיצה פותחת את המועדף באפליקציה</string>
+    <string name="widget_refuah_name">רשימת לרפואה</string>
+    <string name="widget_refuah_desc">השמות שנוספו לרפואה</string>
+    <string name="widget_ilui_name">רשימת לעילוי נשמת</string>
+    <string name="widget_ilui_desc">השמות שנוספו לעילוי נשמת</string>
+    <string name="widget_bookmark_name">סימניות והמשך קריאה</string>
+    <string name="widget_bookmark_desc">הסימניה שלכם עם ניווט בין סימניות והמשך מהמקום שבו הפסקתם</string>
 </resources>
