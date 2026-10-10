@@ -6,7 +6,9 @@ import android.util.Log
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
@@ -88,5 +90,42 @@ class SmokeTest {
         }
         rule.onAllNodesWithText(text(R.string.set_title)).onFirst().performClick()
         shot("06_settings")
+    }
+
+    private fun shot2(name: String) {
+        rule.waitForIdle()
+        val full = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
+        val small = Bitmap.createScaledBitmap(full, full.width / 2, full.height / 2, true)
+        val out = ByteArrayOutputStream()
+        small.compress(Bitmap.CompressFormat.JPEG, 75, out)
+        Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP).chunked(3000).forEachIndexed { i, chunk -> Log.i("TehilimShot", "$name|$i|$chunk") }
+    }
+
+    /** Creates a favorite with a chapter range, then a reminder for it — exercises both editor sheets end to end. */
+    @Test
+    fun createFavoriteThenReminder() {
+        // Dismiss the What's New dialog if it is showing (first launch of a version).
+        rule.onAllNodesWithText(text(R.string.tab_more)).onFirst().performClick()
+        runCatching { rule.onAllNodesWithText(text(R.string.whats_new_close)).onFirst().performClick() }
+
+        rule.onAllNodesWithText(text(R.string.tab_favorites)).onFirst().performClick()
+        rule.onAllNodesWithText(text(R.string.action_add), useUnmergedTree = true).onFirst().performClick()
+        rule.onAllNodesWithText(text(R.string.fav_new_favorite)).onFirst().performClick()
+        rule.waitForIdle()
+        rule.onAllNodes(hasSetTextAction())[0].performTextInput("ישועה")
+        rule.onAllNodes(hasSetTextAction())[1].performTextInput("20-24")
+        shot2("07_favorite_editor")
+        rule.onAllNodesWithText(text(R.string.action_save)).onFirst().performClick()
+        rule.waitUntil(5_000) { rule.onAllNodesWithText("ישועה").fetchSemanticsNodes().isNotEmpty() }
+        shot2("08_favorite_saved")
+
+        rule.onAllNodesWithText(text(R.string.tab_reminders)).onFirst().performClick()
+        rule.onAllNodesWithText(text(R.string.rem_new), useUnmergedTree = true).onFirst().performClick()
+        rule.waitForIdle()
+        shot2("09_reminder_editor")
+        rule.onAllNodesWithText(text(R.string.rem_section_target)).onFirst().assertExists()
+        rule.onAllNodesWithText(text(R.string.action_save)).onFirst().performClick()
+        rule.waitUntil(5_000) { rule.onAllNodesWithText(text(R.string.rem_off)).fetchSemanticsNodes().isEmpty() && rule.onAllNodesWithText("תהילים", substring = true).fetchSemanticsNodes().isNotEmpty() }
+        shot2("10_reminder_saved")
     }
 }
