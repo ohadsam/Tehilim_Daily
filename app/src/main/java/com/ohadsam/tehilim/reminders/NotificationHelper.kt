@@ -58,6 +58,15 @@ class NotificationHelper(private val context: Context) {
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            // Names of people (refuah / ilui nishmat) are private: on the lock screen show only a generic line.
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(
+                NotificationCompat.Builder(context, channelId(reminder.alert.channelKey))
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle(context.getString(R.string.notif_public_title))
+                    .setContentText(context.getString(R.string.notif_public_text))
+                    .build(),
+            )
         message.saidContext?.let { b.addAction(0, context.getString(R.string.notif_said), actionIntent(reminder, occurrence, ReminderActionReceiver.ACTION_SAID, message.saidContext, snoozeCount)) }
         if (reminder.snooze.enabled && snoozeCount < reminder.snooze.maxCount) {
             b.addAction(

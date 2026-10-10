@@ -287,4 +287,7 @@
     <string name="prefetch_running">מוריד את התהילים… %1$d מתוך %2$d</string>
     <string name="prefetch_later">לא עכשיו</string>
     <string name="prefetch_download">הורדה</string>
+
+    <string name="notif_public_title">תהילים יומי</string>
+    <string name="notif_public_text">יש תזכורת לקריאת תהילים</string>
 </resources>
