@@ -20,7 +20,7 @@ class TehilimApp : Application() {
         super.onCreate()
         container = AppContainer(this)
         val log = container.logger
-        log.purgeOlderThanDays(AppLogger.DEFAULT_RETENTION_DAYS)
+        container.logPrefs.retentionDays.takeIf { it > 0 }?.let { log.purgeOlderThanDays(it) }
         log.i("App", "start v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
         container.notifications.createChannels()
         com.ohadsam.tehilim.widget.WidgetUpdater.scheduleMidnight(this)

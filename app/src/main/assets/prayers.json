@@ -1,0 +1,14 @@
+{
+  "texts": [
+    {
+      "id": "placeholder-before-general",
+      "kind": "before",
+      "audience": "general",
+      "nusach": "ashkenaz",
+      "title": "תפילה לפני אמירת תהילים (טרם אומת)",
+      "text": "",
+      "source": "יש להוסיף נוסח מאומת ממקור מוסמך (סידור/ספר תהילים מוכר) ולסמן verified=true",
+      "verified": false
+    }
+  ]
+}

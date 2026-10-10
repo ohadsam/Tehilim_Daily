@@ -8,8 +8,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "favorite")
+@Serializable
 data class FavoriteEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
@@ -21,6 +23,7 @@ data class FavoriteEntity(
 )
 
 @Entity(tableName = "person")
+@Serializable
 data class PersonEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
@@ -34,6 +37,7 @@ data class PersonEntity(
 )
 
 @Entity(tableName = "favorite_person", primaryKeys = ["favoriteId", "personId"])
+@Serializable
 data class FavoritePersonEntity(val favoriteId: Long, val personId: Long)
 
 @Dao
@@ -46,6 +50,33 @@ interface FavoriteDao {
 
     @Query("SELECT * FROM favorite_person")
     fun links(): Flow<List<FavoritePersonEntity>>
+
+    @Query("SELECT * FROM favorite ORDER BY sortOrder, id")
+    suspend fun favoritesNow(): List<FavoriteEntity>
+
+    @Query("SELECT * FROM person ORDER BY name")
+    suspend fun personsNow(): List<PersonEntity>
+
+    @Query("SELECT * FROM favorite_person")
+    suspend fun linksNow(): List<FavoritePersonEntity>
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun putFavorites(items: List<FavoriteEntity>)
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun putPersons(items: List<PersonEntity>)
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun putLinks(items: List<FavoritePersonEntity>)
+
+    @Query("DELETE FROM favorite")
+    suspend fun clearFavorites()
+
+    @Query("DELETE FROM person")
+    suspend fun clearPersons()
+
+    @Query("DELETE FROM favorite_person")
+    suspend fun clearAllLinks()
 
     @Insert
     suspend fun insertFavorite(entity: FavoriteEntity): Long

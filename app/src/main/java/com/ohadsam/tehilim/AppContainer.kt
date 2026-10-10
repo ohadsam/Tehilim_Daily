@@ -12,6 +12,9 @@ import com.ohadsam.tehilim.data.RemindersRepository
 import com.ohadsam.tehilim.data.SaidRepository
 import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
+import com.ohadsam.tehilim.backup.BackupRepository
+import com.ohadsam.tehilim.data.prefs.LogPrefs
+import com.ohadsam.tehilim.data.prefs.PrayerPrefs
 import com.ohadsam.tehilim.data.prefs.ReaderPrefs
 import com.ohadsam.tehilim.data.prefs.ThemePrefs
 import com.ohadsam.tehilim.data.sefaria.SefariaApi
@@ -39,6 +42,12 @@ class AppContainer(context: Context) {
     val readerPrefs: ReaderPrefs = ReaderPrefs(context.applicationContext)
 
     val themePrefs: ThemePrefs = ThemePrefs(context.applicationContext)
+
+    val prayerPrefs: PrayerPrefs = PrayerPrefs(context.applicationContext)
+
+    val logPrefs: LogPrefs = LogPrefs(context.applicationContext)
+
+    val prayers: List<com.ohadsam.tehilim.prayers.PrayerText> by lazy { com.ohadsam.tehilim.prayers.PrayerCatalog.load(context.applicationContext) }
 
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db").build()
@@ -70,4 +79,6 @@ class AppContainer(context: Context) {
     val reminderScheduler: ReminderScheduler by lazy {
         ReminderScheduler(context.applicationContext, reminders, locations, logger)
     }
+
+    val backup: BackupRepository by lazy { BackupRepository(database, logger) }
 }

@@ -7,8 +7,10 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "reminder")
+@Serializable
 data class ReminderEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String?,
@@ -41,6 +43,12 @@ interface ReminderDao {
 
     @Query("SELECT * FROM reminder WHERE id = :id")
     suspend fun get(id: Long): ReminderEntity?
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun putAll(items: List<ReminderEntity>)
+
+    @Query("DELETE FROM reminder")
+    suspend fun clearAll()
 
     @Insert
     suspend fun insert(entity: ReminderEntity): Long

@@ -7,8 +7,10 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "bookmark")
+@Serializable
 data class BookmarkEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val chapter: Int,
@@ -25,6 +27,12 @@ data class BookmarkEntity(
 interface BookmarkDao {
     @Query("SELECT * FROM bookmark")
     fun all(): Flow<List<BookmarkEntity>>
+
+    @Query("SELECT * FROM bookmark")
+    suspend fun allNow(): List<BookmarkEntity>
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun putAll(items: List<BookmarkEntity>)
 
     @Insert
     suspend fun insert(entity: BookmarkEntity): Long
