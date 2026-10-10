@@ -22,7 +22,8 @@ class ReminderPlanner(
     /** Up to [limit] occurrences strictly after [after], earliest first. */
     fun next(reminder: Reminder, after: Instant, limit: Int = 1, horizonDays: Int = DEFAULT_HORIZON_DAYS): List<Occurrence> {
         if (!reminder.enabled) return emptyList()
-        val startDay = after.atZone(zone).toLocalDate().minusDays(1)
+        // Look back far enough that an occurrence intended for the first day of a 3-day holy run can still shift past [after].
+        val startDay = after.atZone(zone).toLocalDate().minusDays(4)
         val out = sortedSetOf<Occurrence>(compareBy({ it.fireAtMillis }, { it.intendedDate }))
         for (offset in 0..horizonDays) {
             val date = startDay.plusDays(offset.toLong())
@@ -31,7 +32,7 @@ class ReminderPlanner(
                 val base = ZonedDateTime.of(date, time, zone).toInstant()
                 expand(reminder.holyDayRule, base, date).filter { it.fireAtMillis > after.toEpochMilli() }.forEach { out += it }
             }
-            if (out.size >= limit && offset > 4) break // enough found, and shifted ones near the horizon cannot sort earlier
+            if (out.size >= limit && offset > 8) break // enough found, and shifted ones near the horizon cannot sort earlier
         }
         return out.take(limit)
     }

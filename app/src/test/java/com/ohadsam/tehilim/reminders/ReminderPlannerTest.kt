@@ -37,7 +37,7 @@ class ReminderPlannerTest {
 
     @Test
     fun shabbatMorningMovesBeforeCandleLightingMinusThirty() {
-        val o = planner.next(reminder(HolyDayRule.BEFORE), at(2026, 10, 10, 0, 5)).first() // Shabbat 10:00 -> Friday
+        val o = planner.next(reminder(HolyDayRule.BEFORE, Repeat.Once(LocalDate.of(2026, 10, 10))), at(2026, 10, 8, 0, 0)).first() // Shabbat 10:00 -> Friday
         val l = local(o)
         assertEquals(DayOfWeek.FRIDAY, l.dayOfWeek)
         assertEquals(Shift.BEFORE_HOLY, o.shift)
@@ -49,7 +49,7 @@ class ReminderPlannerTest {
 
     @Test
     fun shabbatMorningMovesAfterHavdalahPlusThirty() {
-        val o = planner.next(reminder(HolyDayRule.AFTER), at(2026, 10, 10, 0, 5)).first()
+        val o = planner.next(reminder(HolyDayRule.AFTER, Repeat.Once(LocalDate.of(2026, 10, 10))), at(2026, 10, 8, 0, 0)).first()
         val l = local(o)
         assertEquals(DayOfWeek.SATURDAY, l.dayOfWeek)
         assertEquals(Shift.AFTER_HOLY, o.shift)
@@ -59,7 +59,7 @@ class ReminderPlannerTest {
 
     @Test
     fun bothGivesTwoOccurrencesAndSkipGivesNone() {
-        val both = planner.next(reminder(HolyDayRule.BOTH, Repeat.Once(LocalDate.of(2026, 10, 10))), at(2026, 10, 9, 0, 0), limit = 5)
+        val both = planner.next(reminder(HolyDayRule.BOTH, Repeat.Once(LocalDate.of(2026, 10, 10))), at(2026, 10, 8, 0, 0), limit = 5)
         assertEquals(listOf(Shift.BEFORE_HOLY, Shift.AFTER_HOLY), both.map { it.shift })
         assertTrue(planner.next(reminder(HolyDayRule.SKIP, Repeat.Once(LocalDate.of(2026, 10, 10))), at(2026, 10, 9, 0, 0), limit = 5).isEmpty())
     }
