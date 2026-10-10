@@ -19,7 +19,7 @@ jobs:
         if: steps.has.outputs.ok == 'true'
         run: |
           chmod +x gradlew
-          ./gradlew ktlintCheck detekt testDebugUnitTest assembleDebug assembleRelease --stacktrace
+          ./gradlew ktlintCheck detekt testDebugUnitTest compileDebugAndroidTestKotlin assembleDebug assembleRelease --stacktrace
       - uses: actions/upload-artifact@v4
         if: steps.has.outputs.ok == 'true'
         with:
