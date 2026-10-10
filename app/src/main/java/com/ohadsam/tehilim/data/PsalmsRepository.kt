@@ -6,6 +6,7 @@ import com.ohadsam.tehilim.domain.PsalmChapter
 import com.ohadsam.tehilim.domain.PsalmErrorKind
 import com.ohadsam.tehilim.domain.PsalmException
 import com.ohadsam.tehilim.domain.PsalmRef
+import com.ohadsam.tehilim.domain.PsalmVerseCounts
 import com.ohadsam.tehilim.domain.PsalmText
 import com.ohadsam.tehilim.domain.Verse
 import com.ohadsam.tehilim.domain.slice
@@ -86,6 +87,13 @@ class PsalmsRepository(
             local.get(chapter)?.let { return@withLock it to true }
             logger.d(TAG, "cache miss Psalms.$chapter → Sefaria")
             val fetched = remote.fetchChapter(chapter)
+            val expected = PsalmVerseCounts.of(chapter)
+            if (fetched.verses.size != expected) {
+                throw PsalmException(
+                    PsalmErrorKind.INVALID_DATA,
+                    "Psalms.$chapter has ${fetched.verses.size} verses, expected $expected — not stored",
+                )
+            }
             val stored = PsalmChapter(
                 chapter = chapter,
                 verses = fetched.verses.mapIndexed { i, t -> Verse(i + 1, t) },

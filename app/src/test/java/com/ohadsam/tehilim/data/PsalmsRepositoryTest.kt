@@ -6,6 +6,7 @@ import com.ohadsam.tehilim.domain.PsalmChapter
 import com.ohadsam.tehilim.domain.PsalmErrorKind
 import com.ohadsam.tehilim.domain.PsalmException
 import com.ohadsam.tehilim.domain.PsalmRef
+import com.ohadsam.tehilim.domain.PsalmVerseCounts
 import com.ohadsam.tehilim.log.AppLogger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -26,7 +27,7 @@ private class FakeLocal : PsalmsLocal {
     override suspend fun clear() = rows.clear()
 }
 
-private class FakeRemote(val size: (Int) -> Int = { 6 }) : PsalmsRemote {
+private class FakeRemote(val size: (Int) -> Int = { PsalmVerseCounts.of(it) }) : PsalmsRemote {
     var calls = 0
     var failure: PsalmException? = null
     override suspend fun fetchChapter(chapter: Int): RemoteChapter {
@@ -38,14 +39,14 @@ private class FakeRemote(val size: (Int) -> Int = { 6 }) : PsalmsRemote {
 
 class PsalmsRepositoryTest {
     private val local = FakeLocal()
-    private val remote = FakeRemote { if (it == 119) 176 else 6 }
+    private val remote = FakeRemote()
     private val repo = PsalmsRepository(local, remote, AppLogger(file = null), clock = { 1000L }, prefetchDelayMs = 0)
 
     @Test
     fun missFetchesAndStoresThenHitSkipsNetwork() = runTest {
         val first = repo.get(PsalmRef(1)).getOrThrow()
         assertFalse(first.fromCache)
-        assertEquals(6, first.verses.size)
+        assertEquals(PsalmVerseCounts.of(1), first.verses.size)
         val second = repo.get(PsalmRef(1)).getOrThrow()
         assertTrue(second.fromCache)
         assertEquals(1, remote.calls)
@@ -99,5 +100,14 @@ class PsalmsRepositoryTest {
         val q = repo.prefetchAll()
         assertEquals(0, q.done)
         assertEquals(1, remote.calls)
+    }
+
+    @Test
+    fun chapterWithWrongVerseCountIsRejectedAndNotStored() = runTest {
+        val shortRemote = FakeRemote { PsalmVerseCounts.of(it) - 1 }
+        val r = PsalmsRepository(local, shortRemote, AppLogger(file = null), clock = { 1L }, prefetchDelayMs = 0)
+        val e = r.get(PsalmRef(23)).exceptionOrNull() as PsalmException
+        assertEquals(PsalmErrorKind.INVALID_DATA, e.kind)
+        assertTrue(local.rows.isEmpty())
     }
 }
