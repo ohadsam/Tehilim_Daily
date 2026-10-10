@@ -36,7 +36,6 @@ fun MoreScreen(
 ) {
     val context = LocalContext.current
     val store = remember { WhatsNewStore(context) }
-    val whatsNew = remember { store.load() }
     var showWhatsNew by remember { mutableStateOf(store.shouldAutoShow(BuildConfig.VERSION_NAME)) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(top = 8.dp)) {
@@ -75,25 +74,5 @@ fun MoreScreen(
         )
     }
 
-    if (showWhatsNew) {
-        AlertDialog(
-            onDismissRequest = {
-                store.markSeen(BuildConfig.VERSION_NAME)
-                showWhatsNew = false
-            },
-            title = { Text(stringResource(R.string.whats_new_title, whatsNew.version.ifEmpty { BuildConfig.VERSION_NAME })) },
-            text = {
-                Column {
-                    if (whatsNew.items.isEmpty()) Text(stringResource(R.string.whats_new_empty))
-                    whatsNew.items.forEach { Text("• $it", modifier = Modifier.padding(vertical = 2.dp)) }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    store.markSeen(BuildConfig.VERSION_NAME)
-                    showWhatsNew = false
-                }) { Text(stringResource(R.string.whats_new_close)) }
-            },
-        )
-    }
+    if (showWhatsNew) WhatsNewDialog(store) { showWhatsNew = false }
 }

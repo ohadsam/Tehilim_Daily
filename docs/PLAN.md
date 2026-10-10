@@ -4,18 +4,18 @@ Constraint: no local Gradle (see CLAUDE.md); CI is the gate. Keep batches small 
 
 | # | Batch | Spec | Version | Status |
 |---|---|---|---|---|
-| 0 | Foundation: Gradle project, version catalog, CI workflow, theme, nav shell (RTL), AppLogger skeleton, What's New + version display | S0 | 0.1.0 | [ ] |
-| 1 | Local-first psalms: Sefaria client, Room, `PsalmsRepository`, prefetch-all, cache settings | S1 | 0.2.0 | [ ] |
-| 2 | Hebrew calendar + schedules (sequential/weekly/monthly, 29-day rule) + location (auto/manual, A1) — pure Kotlin + unit tests | S2 | 0.3.0 | [ ] |
-| 3 | Reader UI + day views (chips, prev/next, date navigation, picker, manual history) | S2,S3 | 0.4.0 | [ ] |
-| 4 | Favorites + persons (refuah / ilui nishmat) + links | S4 | 0.5.0 | [ ] |
-| 5 | Search + said-tracking + history screen (30 days, search) | S3,S5 | 0.6.0 | [ ] |
-| 5b | Bookmarks (סימניות) + continue-reading (spec A4) | A4 | 0.6.5 | [ ] |
-| 6 | Reminder engine: scheduling, receivers, notification actions, snooze, boot/TZ repair, Shabbat/YT shifting (zmanim) | S6 | 0.7.0 | [ ] |
-| 7 | Reminders UI + "from reminder" browse source + permission health | S7 | 0.8.0 | [ ] |
-| 8 | Widgets (reader, lists, Hebrew date, weekday, bookmark, continue-reading + extras), deep links, auto-update | S8 | 0.9.0 | [ ] |
-| 9 | Settings home, appearance (fonts, sizes, light/dark colors), logs UI (view/copy/download/clear/auto-clear), backup/restore | S9 | 0.10.0 | [ ] |
-| 10 | Polish & hardening: a11y, perf (baseline profile), security review, shortcuts/tile, UI tests on emulator, release signing + artifacts | S10 | 1.0.0 | [ ] |
+| 0 | Foundation: Gradle project, version catalog, CI workflow, theme, nav shell (RTL), AppLogger skeleton, What's New + version display | S0 | 0.1.0 | [x] |
+| 1 | Local-first psalms: Sefaria client, Room, `PsalmsRepository`, prefetch-all, cache settings | S1 | 0.2.0 | [x] |
+| 2 | Hebrew calendar + schedules (sequential/weekly/monthly, 29-day rule) + location (auto/manual, A1) — pure Kotlin + unit tests | S2 | 0.3.0 | [x] |
+| 3 | Reader UI + day views (chips, prev/next, date navigation, picker, manual history) | S2,S3 | 0.4.0 | [x] |
+| 4 | Favorites + persons (refuah / ilui nishmat) + links | S4 | 0.5.0 | [x] |
+| 5 | Search + said-tracking + history screen (30 days, search) | S3,S5 | 0.6.0 | [x] |
+| 5b | Bookmarks (סימניות) + continue-reading (spec A4) | A4 | 0.6.5 | [x] |
+| 6 | Reminder engine: scheduling, receivers, notification actions, snooze, boot/TZ repair, Shabbat/YT shifting (zmanim) | S6 | 0.7.0 | [x] |
+| 7 | Reminders UI + "from reminder" browse source + permission health | S7 | 0.8.0 | [x] |
+| 8 | Widgets (reader, lists, Hebrew date, weekday, bookmark, continue-reading + extras), deep links, auto-update | S8 | 0.9.0 | [x] |
+| 9 | Settings home, appearance (fonts, sizes, light/dark colors), logs UI (view/copy/download/clear/auto-clear), backup/restore | S9 | 0.10.0 | [x] |
+| 10 | Polish & hardening: a11y, perf (baseline profile), security review, shortcuts/tile, UI tests on emulator, release signing + artifacts | S10 | 1.0.0 | [~] |
 
 ## Per-batch routine (also in skill `batch-workflow`)
 1) read spec slice 2) implement + unit tests 3) push, CI green 4) 4-persona review (`release-checklist`) 5) version + What's New + docs 6) merge.

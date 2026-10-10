@@ -1,0 +1,14 @@
+# Code map (read this instead of scanning the tree)
+`app/src/main/java/com/ohadsam/tehilim/`
+- `TehilimApp`, `AppContainer` — application + manual DI (repositories, prefs, scheduler, notifications).
+- `MainActivity` — RTL root, theme from `ThemePrefs`, deep-link `route` extra → `AppRoot`.
+- `domain/` — `PsalmModels` (PsalmRef/Verse/errors), `HebrewNumerals`, `TextDisplay` (nikud/ta'amim view), `RefLabels`, `schedule/PsalmSchedules` (monthly/weekly/sequential data).
+- `calendar/` — `HebrewCalendar` (pure arithmetic calendar), `Holidays`, `SunCalc`, `HolyTimes` (candle lighting/havdalah, holy periods).
+- `location/` — `Places`, `LocationResolver`, `LocationStore`, `DeviceLocation`.
+- `data/` — `PsalmsRepository` (Room first, Sefaria fallback), `sefaria/SefariaApi+SefariaParser`, `FavoritesRepository`, `SaidRepository`, `BookmarksRepository`, `RemindersRepository`+`ReminderCodec`, `db/` (Room entities/DAOs), `prefs/` (Reader/Theme/Prayer/Log prefs).
+- `favorites/` models, `ChapterSetParser`, `NameLetters`, `ChapterSummary`. `bookmarks/` model. `said/` models + `HistoryBuilder`. `search/PsalmSearch`.
+- `reminders/` — `ReminderModels`, `ReminderPlanner` (pure; Shabbat/Yom Tov shifting), `ReminderContent`, `ReminderScheduler` (AlarmManager), receivers, `NotificationHelper`.
+- `backup/` — `Backup` + `BackupRepository`. `prayers/` — verified-only prayer catalog (`assets/prayers.json`). `log/` — `AppLogger` ring buffer + file.
+- `widget/` — Glance widgets, receivers, `WidgetUpdater` (+ midnight alarm), reader config activity.
+- `ui/` — `nav/AppRoot`, `today/`, `browse/`, `reader/` (`ChapterPage`, `DayReader`, `ChipStrip`, `SaidBar`), `favorites/`, `bookmarks/`, `reminders/`, `location/`, `history/`, `search/`, `settings/`, `logs/`, `more/`, `theme/`.
+`tools/sefaria_probe.py` — live API contract check (CI). `docs/` — PLAN, SPEC, CHANGELOG.

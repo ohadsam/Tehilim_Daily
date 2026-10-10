@@ -94,6 +94,7 @@ fun SettingsScreen(
     var confirmImport by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<Int?>(null) }
     var showLicenses by remember { mutableStateOf(false) }
+    var showWhatsNew by remember { mutableStateOf(false) }
 
     LaunchedEffect(progress) { cached = container.psalms.cachedChapters().size }
 
@@ -214,7 +215,7 @@ fun SettingsScreen(
 
         Section(R.string.more_about) {
             Text(stringResource(R.string.more_version, BuildConfig.VERSION_NAME))
-            NavRow(R.string.more_whats_new, onShowWhatsNew)
+            NavRow(R.string.more_whats_new) { showWhatsNew = true }
             NavRow(R.string.set_licenses) { showLicenses = true }
             Text(stringResource(R.string.set_sefaria), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -259,6 +260,7 @@ fun SettingsScreen(
         )
     }
     if (showLicenses) LicensesDialog(context) { showLicenses = false }
+    if (showWhatsNew) com.ohadsam.tehilim.ui.more.WhatsNewDialog(remember { com.ohadsam.tehilim.ui.more.WhatsNewStore(context) }) { showWhatsNew = false }
 }
 
 @Composable
