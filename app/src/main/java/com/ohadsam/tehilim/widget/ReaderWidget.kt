@@ -90,7 +90,7 @@ class ReaderWidget : GlanceAppWidget() {
 
     private suspend fun load(context: Context, prefs: Preferences): ReaderModel {
         val c = context.container
-        val today = LocalDate.now()
+        val today = c.locations.logicalToday()
         val source = prefs[ReaderKeys.SOURCE] ?: ReaderKeys.MONTH
         val sourceId = prefs[ReaderKeys.SOURCE_ID] ?: 0L
         val favs = c.favorites.state.first()

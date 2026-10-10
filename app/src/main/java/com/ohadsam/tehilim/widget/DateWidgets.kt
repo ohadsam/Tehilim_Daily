@@ -30,7 +30,7 @@ import java.time.LocalDate
 /** Small widget: the Hebrew date. Tap opens the month view. */
 class HebrewDateWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val today = LocalDate.now()
+        val today = context.container.locations.logicalToday()
         val h = HebrewCalendar.fromLocalDate(today)
         val chapters = summarizeChapters(PsalmSchedules.monthly(h.day.coerceAtMost(h.daysInMonth), h.daysInMonth))
         provideContent {
@@ -57,7 +57,7 @@ class HebrewDateWidgetReceiver : GlanceAppWidgetReceiver() {
 /** Small widget: today's weekday and its chapters. Tap opens the weekday view. */
 class WeekdayWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val today = LocalDate.now()
+        val today = context.container.locations.logicalToday()
         val chapters = summarizeChapters(PsalmSchedules.weekly(today.dayOfWeek))
         provideContent {
             GlanceTheme(colors = widgetColors(context)) {

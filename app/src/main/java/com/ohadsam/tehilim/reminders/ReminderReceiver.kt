@@ -32,8 +32,11 @@ class ReminderReceiver : BroadcastReceiver() {
         val c = app.container
         val id = intent.getLongExtra(EXTRA_ID, 0)
         val reminder = c.reminders.get(id) ?: return
-        val intended = LocalDate.ofEpochDay(intent.getLongExtra(EXTRA_INTENDED, LocalDate.now().toEpochDay()))
         val shift = Shift.entries.getOrElse(intent.getIntExtra(EXTRA_SHIFT, 0)) { Shift.NONE }
+        val scheduledDate = LocalDate.ofEpochDay(intent.getLongExtra(EXTRA_INTENDED, LocalDate.now().toEpochDay()))
+        // For "today's psalms" reminders fired after sunset/nightfall (when the user chose that), the content is the next day's.
+        val dayBased = reminder.target is ReminderTarget.MonthDayToday || reminder.target is ReminderTarget.WeekdayToday
+        val intended = if (dayBased && shift == Shift.NONE) c.locations.logicalToday(Instant.ofEpochMilli(intent.getLongExtra(EXTRA_FIRE_AT, System.currentTimeMillis()))) else scheduledDate
         val snoozeCount = intent.getIntExtra(EXTRA_SNOOZE_COUNT, 0)
         val occurrence = Occurrence(intent.getLongExtra(EXTRA_FIRE_AT, System.currentTimeMillis()), intended, shift)
         val today = LocalDate.now()

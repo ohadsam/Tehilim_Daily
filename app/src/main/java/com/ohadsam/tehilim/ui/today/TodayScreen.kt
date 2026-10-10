@@ -63,18 +63,29 @@ private val gregorianFormat = DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", Loc
 @Composable
 fun TodayScreen(container: AppContainer, initialWeek: Boolean = false, onContinue: (Int) -> Unit = {}) {
     var mode by rememberSaveable { mutableStateOf(if (initialWeek) DayMode.WEEK else DayMode.MONTH) }
-    var todayEpoch by rememberSaveable { mutableLongStateOf(LocalDate.now().toEpochDay()) }
+    var todayEpoch by rememberSaveable { mutableLongStateOf(container.locations.logicalToday().toEpochDay()) }
     var selectedEpoch by rememberSaveable { mutableLongStateOf(todayEpoch) }
     var startAtEnd by rememberSaveable { mutableStateOf(false) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        val now = LocalDate.now().toEpochDay()
+        val now = container.locations.logicalToday().toEpochDay()
         if (now != todayEpoch) {
             if (selectedEpoch == todayEpoch) selectedEpoch = now // was following "today": keep following
             todayEpoch = now
         }
     }
 
+    // The Hebrew day can turn over at sunset / nightfall while the screen is open, so re-check once a minute.
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(60_000)
+            val now = container.locations.logicalToday().toEpochDay()
+            if (now != todayEpoch) {
+                if (selectedEpoch == todayEpoch) selectedEpoch = now
+                todayEpoch = now
+            }
+        }
+    }
     val selected = LocalDate.ofEpochDay(selectedEpoch)
     val hebrew = HebrewCalendar.fromLocalDate(selected)
     val settings by container.readerPrefs.settings.collectAsState()

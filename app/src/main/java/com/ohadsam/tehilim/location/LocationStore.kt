@@ -31,6 +31,21 @@ class LocationStore(context: Context) {
             e.apply()
         }
 
+    var dayRollover: com.ohadsam.tehilim.calendar.DayRollover
+        get() = runCatching { com.ohadsam.tehilim.calendar.DayRollover.valueOf(prefs.getString(KEY_ROLLOVER, "") ?: "") }
+            .getOrDefault(com.ohadsam.tehilim.calendar.DayRollover.MIDNIGHT)
+        set(value) = prefs.edit().putString(KEY_ROLLOVER, value.name).apply()
+
+    /** The date whose psalms are "today" right now, honouring the user's choice of when the Hebrew day turns over. */
+    fun logicalToday(now: java.time.Instant = java.time.Instant.now()): java.time.LocalDate {
+        val place = resolved().place
+        val holy = com.ohadsam.tehilim.calendar.ZmanimHolyTimes(place, tzeit)
+        val mode = dayRollover
+        return com.ohadsam.tehilim.calendar.HebrewDay.logicalDate(now, place.zone, mode) { d ->
+            if (mode == com.ohadsam.tehilim.calendar.DayRollover.SUNSET) holy.sunset(d) else holy.havdalah(d)
+        }
+    }
+
     var tzeit: TzeitMethod
         get() = runCatching { TzeitMethod.valueOf(prefs.getString(KEY_TZEIT, null) ?: "") }.getOrDefault(TzeitMethod.DEGREES_8_5)
         set(value) = prefs.edit().putString(KEY_TZEIT, value.name).apply()
@@ -54,6 +69,7 @@ class LocationStore(context: Context) {
         const val KEY_ELEV = "elev"
         const val KEY_TIME = "time"
         const val KEY_TZEIT = "tzeit"
+        const val KEY_ROLLOVER = "day_rollover"
         const val KEY_CANDLE = "candle_minutes"
 
         fun encodeChoice(c: LocationChoice): String = when (c) {

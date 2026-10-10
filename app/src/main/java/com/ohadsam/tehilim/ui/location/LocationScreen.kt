@@ -71,6 +71,7 @@ fun LocationScreen(container: AppContainer, onBack: () -> Unit) {
     var customName by remember { mutableStateOf("") }
     var candle by remember { mutableStateOf(store.candleMinutesOverride) }
     var tzeit by remember { mutableStateOf(store.tzeit) }
+    var rollover by remember { mutableStateOf(store.dayRollover) }
 
     fun refreshFix() {
         scope.launch {
@@ -184,6 +185,13 @@ fun LocationScreen(container: AppContainer, onBack: () -> Unit) {
                     FilterChip(candle == m, { candle = m; store.candleMinutesOverride = m }, { Text(stringResource(R.string.rem_minutes, m)) })
                 }
             }
+            Text(stringResource(R.string.loc_rollover_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
+            Text(stringResource(R.string.loc_rollover_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.ohadsam.tehilim.calendar.DayRollover.entries.forEach { r ->
+                    FilterChip(rollover == r, { rollover = r; store.dayRollover = r }, { Text(stringResource(rolloverLabel(r))) })
+                }
+            }
             Text(stringResource(R.string.loc_tzeit_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
             TzeitMethod.entries.forEach { m ->
                 Row(Modifier.fillMaxWidth().clickable { tzeit = m; store.tzeit = m }, verticalAlignment = Alignment.CenterVertically) {
@@ -216,4 +224,10 @@ private fun tzeitLabel(m: TzeitMethod) = when (m) {
     TzeitMethod.DEGREES_7_083 -> R.string.tzeit_7_083
     TzeitMethod.MINUTES_42 -> R.string.tzeit_42
     TzeitMethod.MINUTES_72 -> R.string.tzeit_72
+}
+
+private fun rolloverLabel(r: com.ohadsam.tehilim.calendar.DayRollover) = when (r) {
+    com.ohadsam.tehilim.calendar.DayRollover.MIDNIGHT -> R.string.loc_rollover_midnight
+    com.ohadsam.tehilim.calendar.DayRollover.SUNSET -> R.string.loc_rollover_sunset
+    com.ohadsam.tehilim.calendar.DayRollover.TZEIT -> R.string.loc_rollover_tzeit
 }

@@ -290,4 +290,10 @@
 
     <string name="notif_public_title">תהילים יומי</string>
     <string name="notif_public_text">יש תזכורת לקריאת תהילים</string>
+
+    <string name="loc_rollover_title">מתי מתחלף היום (לקביעת פרקי היום)</string>
+    <string name="loc_rollover_hint">כשהיום העברי מתחיל בלילה, פרקי היום הבא יוצגו כבר מהשקיעה או מצאת הכוכבים.</string>
+    <string name="loc_rollover_midnight">בחצות (תאריך לועזי)</string>
+    <string name="loc_rollover_sunset">בשקיעה</string>
+    <string name="loc_rollover_tzeit">בצאת הכוכבים</string>
 </resources>
