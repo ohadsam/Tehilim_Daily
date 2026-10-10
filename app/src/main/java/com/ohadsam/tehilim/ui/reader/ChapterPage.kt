@@ -11,7 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,6 +48,8 @@ fun ChapterPage(
     ref: PsalmRef,
     settings: ReaderSettings,
     modifier: Modifier = Modifier,
+    starred: Boolean = false,
+    onToggleStar: (() -> Unit)? = null,
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -50,26 +57,43 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar)
         }
     }
 }
 
 @Composable
-private fun ChapterText(ref: PsalmRef, text: PsalmText, settings: ReaderSettings) {
+private fun ChapterText(
+    ref: PsalmRef,
+    text: PsalmText,
+    settings: ReaderSettings,
+    starred: Boolean,
+    onToggleStar: (() -> Unit)?,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         item(key = "title") {
-            Text(
-                ref.title(),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                textAlign = TextAlign.Center,
-            )
+            Box(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                Text(
+                    ref.title(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 48.dp),
+                    textAlign = TextAlign.Center,
+                )
+                if (onToggleStar != null) {
+                    IconButton(onClick = onToggleStar, modifier = Modifier.align(Alignment.CenterEnd)) {
+                        Icon(
+                            if (starred) Icons.Filled.Star else Icons.Filled.StarBorder,
+                            contentDescription = stringResource(if (starred) R.string.action_unstar else R.string.action_star),
+                            tint = MaterialTheme.colorScheme.secondary,
+                        )
+                    }
+                }
+            }
         }
         items(text.verses, key = { it.number }) { v ->
             Row(verticalAlignment = Alignment.Top) {

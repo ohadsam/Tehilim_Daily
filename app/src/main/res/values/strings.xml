@@ -66,7 +66,7 @@
     <string name="fav_add_name_letters">הוספת אותיות השם</string>
     <string name="fav_add_neshama">הוספת \"נשמה\"</string>
     <string name="fav_deleted">המועדף נמחק</string>
-    <string name="fav_empty_all">עדיין אין מועדפים.\nלחצו על ★ בפרק, או על "הוספה", כדי ליצור מועדף עם פרק אחד או כמה פרקים וטווחים.</string>
+    <string name="fav_empty_all">עדיין אין מועדפים.\nלחצו על ★ בפרק, או על \"הוספה\", כדי ליצור מועדף עם פרק אחד או כמה פרקים וטווחים.</string>
     <string name="fav_empty_refuah">עדיין לא הוספתם שמות לרפואה.</string>
     <string name="fav_empty_ilui">עדיין לא הוספתם שמות לעילוי נשמת.</string>
     <string name="fav_person_no_links">עדיין אין מועדף מקושר. ניתן לקשר מתוך עריכת מועדף.</string>

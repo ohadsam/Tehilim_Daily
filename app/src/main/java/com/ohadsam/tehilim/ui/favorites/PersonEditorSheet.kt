@@ -31,7 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.R
-import com.ohadsam.tehilim.calendar.HebrewCalendar
 import com.ohadsam.tehilim.favorites.Person
 import com.ohadsam.tehilim.favorites.PersonKind
 import kotlinx.coroutines.launch
@@ -104,8 +103,7 @@ fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKi
                     enabled = name.isNotBlank() && dayValid,
                     onClick = {
                         scope.launch {
-                            val hasYahrzeit = isIlui && dayNumber != null && month != null &&
-                                dayNumber <= HebrewCalendar.daysInMonth(5784, month!!.coerceAtMost(13)).coerceAtLeast(29)
+                            val hasYahrzeit = isIlui && dayNumber != null && month != null && dayNumber <= maxDayOf(month!!)
                             container.favorites.savePerson(
                                 (existing ?: Person(name = name.trim(), kind = kind)).copy(
                                     name = name.trim(),
@@ -123,3 +121,6 @@ fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKi
         }
     }
 }
+
+/** Longest possible length of a Hebrew month in any year (Adar I and the variable Cheshvan/Kislev can have 30 days). */
+private fun maxDayOf(month: Int): Int = if (month in intArrayOf(2, 4, 6, 10, 13)) 29 else 30

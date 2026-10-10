@@ -36,6 +36,8 @@ import com.ohadsam.tehilim.R
 import com.ohadsam.tehilim.domain.HebrewNumerals
 import com.ohadsam.tehilim.domain.PSALMS_COUNT
 import com.ohadsam.tehilim.domain.PsalmRef
+import com.ohadsam.tehilim.domain.title
+import com.ohadsam.tehilim.favorites.FavoritesState
 import com.ohadsam.tehilim.ui.reader.ChapterPage
 import com.ohadsam.tehilim.ui.reader.ChipStrip
 import kotlinx.coroutines.launch
@@ -55,6 +57,7 @@ fun BrowseScreen(container: AppContainer) {
     val scope = rememberCoroutineScope()
     val settings by container.readerPrefs.settings.collectAsState()
     var showPicker by remember { mutableStateOf(false) }
+    val favState by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
     // In-memory only: dies with this screen when the user leaves the tab (see docs/SPEC.md S3).
     var visited by remember { mutableStateOf(listOf<Int>()) }
 
@@ -84,7 +87,12 @@ fun BrowseScreen(container: AppContainer) {
             )
         }
         HorizontalPager(state = pager, modifier = Modifier.weight(1f).fillMaxWidth(), key = { it }, beyondViewportPageCount = 1) { page ->
-            ChapterPage(container.psalms, PsalmRef(page + 1), settings)
+            val ref = PsalmRef(page + 1)
+            ChapterPage(
+                container.psalms, ref, settings,
+                starred = favState.starFor(ref) != null,
+                onToggleStar = { scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
+            )
         }
     }
 

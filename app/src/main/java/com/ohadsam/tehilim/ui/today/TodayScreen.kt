@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,6 +37,9 @@ import com.ohadsam.tehilim.R
 import com.ohadsam.tehilim.calendar.HebrewCalendar
 import com.ohadsam.tehilim.calendar.HebrewDate
 import com.ohadsam.tehilim.domain.HebrewNumerals
+import com.ohadsam.tehilim.domain.title
+import com.ohadsam.tehilim.favorites.FavoritesState
+import kotlinx.coroutines.launch
 import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.ui.reader.ChipStrip
@@ -71,6 +75,8 @@ fun TodayScreen(container: AppContainer) {
     val hebrew = HebrewCalendar.fromLocalDate(selected)
     val settings by container.readerPrefs.settings.collectAsState()
     val isToday = selectedEpoch == todayEpoch
+    val favState by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
+    val scope = rememberCoroutineScope()
 
     fun goTo(date: LocalDate, atEnd: Boolean = false) {
         startAtEnd = atEnd
@@ -106,6 +112,8 @@ fun TodayScreen(container: AppContainer) {
                 startAtEnd = startAtEnd,
                 onPreviousDay = { goTo(selected.minusDays(1), atEnd = true) },
                 onNextDay = { goTo(selected.plusDays(1)) },
+                isStarred = { favState.starFor(it) != null },
+                onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
             )
         }
     }

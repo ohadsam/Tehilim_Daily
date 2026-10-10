@@ -48,6 +48,8 @@ fun DayReader(
     onNextDay: (() -> Unit)?,
     modifier: Modifier = Modifier,
     onPageSettled: (Int) -> Unit = {},
+    isStarred: (PsalmRef) -> Boolean = { false },
+    onToggleStar: ((PsalmRef) -> Unit)? = null,
 ) {
     if (chapters.isEmpty()) return
     val pager = rememberPagerState(initialPage = if (startAtEnd) chapters.lastIndex else 0, pageCount = { chapters.size })
@@ -79,7 +81,8 @@ fun DayReader(
             key = { chapters[it].key },
             beyondViewportPageCount = 1,
         ) { page ->
-            ChapterPage(repo, chapters[page], settings)
+            val ref = chapters[page]
+            ChapterPage(repo, ref, settings, starred = isStarred(ref), onToggleStar = onToggleStar?.let { toggle -> { toggle(ref) } })
         }
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
