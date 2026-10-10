@@ -19,4 +19,24 @@
     <string name="whats_new_title">מה חדש בגרסה %1$s</string>
     <string name="whats_new_close">הבנתי</string>
     <string name="whats_new_empty">אין חדשות לגרסה זו</string>
+
+    <string name="mode_month_day">יום בחודש</string>
+    <string name="mode_weekday">יום בשבוע</string>
+    <string name="action_today">היום</string>
+    <string name="action_retry">נסה שוב</string>
+    <string name="nav_previous_chapter">הפרק הקודם</string>
+    <string name="nav_next_chapter">הפרק הבא</string>
+    <string name="nav_previous_day">היום הקודם</string>
+    <string name="nav_next_day">היום הבא</string>
+    <string name="nav_previous_month">החודש הקודם</string>
+    <string name="nav_next_month">החודש הבא</string>
+    <string name="reader_position">פרק %1$s מתוך %2$s</string>
+    <string name="reader_source">מקור הטקסט: ספריא · %1$s</string>
+    <string name="error_offline">אין חיבור לאינטרנט, והפרק עדיין לא נשמר במכשיר.</string>
+    <string name="error_server">שרת הטקסטים אינו זמין כרגע. נסה שוב בעוד רגע.</string>
+    <string name="error_not_found">הפרק לא נמצא בשרת.</string>
+    <string name="error_invalid">התקבל טקסט שלא עבר בדיקת תקינות, ולכן לא נשמר. נסה שוב.</string>
+    <string name="browse_pick_chapter">בחירת פרק</string>
+    <string name="browse_search_hint">מספר או אות (למשל 23 או כג)</string>
+    <string name="browse_go_to">עבור לפרק %1$s</string>
 </resources>

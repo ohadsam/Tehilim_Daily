@@ -17,7 +17,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.ui.common.PlaceholderScreen
+import com.ohadsam.tehilim.ui.browse.BrowseScreen
 import com.ohadsam.tehilim.ui.more.MoreScreen
+import com.ohadsam.tehilim.ui.today.TodayScreen
 
 @Composable
 fun AppRoot(container: AppContainer) {
@@ -46,8 +48,8 @@ fun AppRoot(container: AppContainer) {
         },
     ) { padding ->
         NavHost(nav, startDestination = Destination.TODAY.route, modifier = Modifier.padding(padding)) {
-            composable(Destination.TODAY.route) { PlaceholderScreen(stringResource(Destination.TODAY.label)) }
-            composable(Destination.BROWSE.route) { PlaceholderScreen(stringResource(Destination.BROWSE.label)) }
+            composable(Destination.TODAY.route) { TodayScreen(container) }
+            composable(Destination.BROWSE.route) { BrowseScreen(container) }
             composable(Destination.FAVORITES.route) { PlaceholderScreen(stringResource(Destination.FAVORITES.label)) }
             composable(Destination.REMINDERS.route) { PlaceholderScreen(stringResource(Destination.REMINDERS.label)) }
             composable(Destination.MORE.route) { MoreScreen(container) }

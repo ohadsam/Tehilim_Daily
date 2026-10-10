@@ -18,6 +18,19 @@ data class HebrewDate(val year: Int, val month: Int, val day: Int) {
     }
 
     fun toLocalDate(): LocalDate = HebrewCalendar.toLocalDate(this)
+
+    fun plusDays(n: Long): HebrewDate = HebrewCalendar.fromLocalDate(toLocalDate().plusDays(n))
+
+    /** First day of the next / previous month in calendar order (crossing the Tishrei year boundary correctly). */
+    fun firstOfNextMonth(): HebrewDate = HebrewCalendar.shiftMonth(this, 1)
+
+    fun firstOfPreviousMonth(): HebrewDate = HebrewCalendar.shiftMonth(this, -1)
+
+    /** Same day-of-month in the adjacent month, clamped to that month's length. */
+    fun sameDayInAdjacentMonth(delta: Int): HebrewDate {
+        val first = HebrewCalendar.shiftMonth(this, delta)
+        return first.copy(day = day.coerceAtMost(first.daysInMonth))
+    }
 }
 
 /** Pure-Kotlin Hebrew calendar (arithmetical calendar, identical to the published algorithm; verified by tests). */
@@ -112,6 +125,22 @@ object HebrewCalendar {
             if (rd < first + daysInMonth(year, m)) return HebrewDate(year, m, (rd - first + 1).toInt())
         }
         error("unreachable: $date")
+    }
+
+    fun shiftMonth(from: HebrewDate, delta: Int): HebrewDate {
+        require(delta == 1 || delta == -1) { "delta must be ±1" }
+        val order = monthsInOrder(from.year)
+        val idx = order.indexOf(from.month)
+        val next = idx + delta
+        return when {
+            next in order.indices -> HebrewDate(from.year, order[next], 1)
+            next < 0 -> {
+                // Before Tishrei → last month (Elul) of the previous year number.
+                val y = from.year - 1
+                HebrewDate(y, monthsInOrder(y).last(), 1)
+            }
+            else -> HebrewDate(from.year + 1, TISHREI, 1) // after Elul comes Tishrei of the next year
+        }
     }
 
     fun today(clock: java.time.Clock = java.time.Clock.systemDefaultZone()): HebrewDate = fromLocalDate(LocalDate.now(clock))

@@ -8,6 +8,7 @@ import androidx.room.Room
 import com.ohadsam.tehilim.data.PsalmsRepository
 import com.ohadsam.tehilim.data.db.AppDatabase
 import com.ohadsam.tehilim.data.db.RoomPsalmsLocal
+import com.ohadsam.tehilim.data.prefs.ReaderPrefs
 import com.ohadsam.tehilim.data.sefaria.SefariaApi
 import okhttp3.OkHttpClient
 import java.io.File
@@ -26,6 +27,8 @@ class AppContainer(context: Context) {
             }
         },
     )
+
+    val readerPrefs: ReaderPrefs = ReaderPrefs(context.applicationContext)
 
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db").build()
