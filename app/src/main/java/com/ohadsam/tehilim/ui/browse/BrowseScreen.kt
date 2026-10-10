@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +43,7 @@ import com.ohadsam.tehilim.domain.PSALMS_COUNT
 import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.domain.title
 import com.ohadsam.tehilim.favorites.FavoritesState
+import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.ChapterPage
 import com.ohadsam.tehilim.ui.reader.ChipStrip
 import kotlinx.coroutines.launch
@@ -56,7 +58,7 @@ fun parseChapterQuery(query: String): Int? {
 /** All 150 chapters in order: swipe between them, jump via a letter grid or search, and see what was visited this session. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse: Int = 0, onOpenSearch: () -> Unit = {}) {
+fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse: Int = 0, onOpenSearch: () -> Unit = {}, onOpenBookmarks: () -> Unit = {}) {
     val pager = rememberPagerState(initialPage = (initialChapter - 1).coerceIn(0, PSALMS_COUNT - 1), pageCount = { PSALMS_COUNT })
     val scope = rememberCoroutineScope()
     val settings by container.readerPrefs.settings.collectAsState()
@@ -68,10 +70,12 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
     LaunchedEffect(pager) {
         snapshotFlow { pager.settledPage }.collect { page ->
             val ch = page + 1
+            container.readerPrefs.lastChapter = ch
             if (ch !in visited) visited = (visited + ch).sorted()
         }
     }
 
+    BookmarkHost(container) { hooks ->
     Column(Modifier.fillMaxSize()) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
@@ -80,6 +84,9 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
         ) {
             Text(stringResource(R.string.tab_browse), style = MaterialTheme.typography.titleLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onOpenBookmarks) {
+                    Icon(Icons.Filled.Bookmarks, contentDescription = stringResource(R.string.bm_title))
+                }
                 IconButton(onClick = onOpenSearch) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.browse_search_text))
                 }
@@ -102,8 +109,10 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
                 starred = favState.starFor(ref) != null,
                 onToggleStar = { scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
                 highlightVerse = if (ref.chapter == initialChapter) initialVerse else 0,
+                bookmarks = hooks,
             )
         }
+    }
     }
 
     if (showPicker) {

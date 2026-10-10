@@ -96,4 +96,17 @@
     <string name="search_no_results">לא נמצאו תוצאות</string>
     <string name="search_count">נמצאו %1$d פסוקים</string>
     <string name="browse_search_text">חיפוש בטקסט</string>
+
+    <string name="bm_title">סימניות</string>
+    <string name="bm_saved">נשמרה סימניה</string>
+    <string name="bm_cleared">הסימניה נמחקה</string>
+    <string name="bm_edit">עריכת סימניה</string>
+    <string name="bm_label">שם</string>
+    <string name="bm_note">הערה</string>
+    <string name="bm_pin">נעוץ בראש הרשימה</string>
+    <string name="bm_marker">סימניה</string>
+    <string name="bm_empty">עדיין אין סימניות.\nהחזיקו לחיצה על פסוק כדי לשמור סימניה במקום המדויק.</string>
+    <string name="bm_search">חיפוש בסימניות</string>
+    <string name="bm_clear_all">מחיקת כל הסימניות</string>
+    <string name="bm_clear_confirm">למחוק את כל %1$d הסימניות? ניתן יהיה לבטל מיד אחרי המחיקה.</string>
 </resources>

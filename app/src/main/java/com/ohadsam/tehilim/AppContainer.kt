@@ -5,6 +5,7 @@ import android.util.Log
 import com.ohadsam.tehilim.log.AppLogger
 import com.ohadsam.tehilim.log.LogLevel
 import androidx.room.Room
+import com.ohadsam.tehilim.data.BookmarksRepository
 import com.ohadsam.tehilim.data.FavoritesRepository
 import com.ohadsam.tehilim.data.PsalmsRepository
 import com.ohadsam.tehilim.data.SaidRepository
@@ -50,4 +51,6 @@ class AppContainer(context: Context) {
     val favorites: FavoritesRepository by lazy { FavoritesRepository(database.favoriteDao(), logger) }
 
     val said: SaidRepository by lazy { SaidRepository(database.saidDao(), logger) }
+
+    val bookmarks: BookmarksRepository by lazy { BookmarksRepository(database.bookmarkDao(), logger) }
 }

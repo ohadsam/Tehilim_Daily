@@ -25,6 +25,7 @@ import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.favorites.FavoritesState
 import com.ohadsam.tehilim.favorites.Person
 import com.ohadsam.tehilim.said.SaidContext
+import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.DayReader
 import com.ohadsam.tehilim.ui.reader.SaidBar
 import kotlinx.coroutines.launch
@@ -76,7 +77,9 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
             )
         } else {
             androidx.compose.runtime.key(favoriteId, personId, chapters) {
+                BookmarkHost(container, Modifier.weight(1f)) { hooks ->
                 DayReader(
+                    bookmarks = hooks,
                     repo = container.psalms,
                     chapters = chapters,
                     settings = settings,
@@ -92,6 +95,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                         )
                     },
                 )
+                }
             }
         }
     }

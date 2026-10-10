@@ -31,6 +31,7 @@ import com.ohadsam.tehilim.data.prefs.ReaderSettings
 import com.ohadsam.tehilim.domain.HebrewNumerals
 import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.domain.shortLabel
+import com.ohadsam.tehilim.ui.bookmarks.BookmarkHooks
 import kotlinx.coroutines.launch
 
 /**
@@ -51,6 +52,7 @@ fun DayReader(
     isStarred: (PsalmRef) -> Boolean = { false },
     onToggleStar: ((PsalmRef) -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
+    bookmarks: BookmarkHooks? = null,
 ) {
     if (chapters.isEmpty()) return
     val pager = rememberPagerState(initialPage = if (startAtEnd) chapters.lastIndex else 0, pageCount = { chapters.size })
@@ -83,7 +85,7 @@ fun DayReader(
             beyondViewportPageCount = 1,
         ) { page ->
             val ref = chapters[page]
-            ChapterPage(repo, ref, settings, starred = isStarred(ref), onToggleStar = onToggleStar?.let { toggle -> { toggle(ref) } })
+            ChapterPage(repo, ref, settings, starred = isStarred(ref), onToggleStar = onToggleStar?.let { toggle -> { toggle(ref) } }, bookmarks = bookmarks)
         }
         footer?.invoke()
         Row(

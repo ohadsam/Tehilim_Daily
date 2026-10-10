@@ -37,7 +37,7 @@ interface ChapterDao {
 }
 
 @Database(
-    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class, SaidEntity::class],
+    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class, SaidEntity::class, BookmarkEntity::class],
     version = 1,
     exportSchema = true,
 )
@@ -47,4 +47,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteDao
 
     abstract fun saidDao(): SaidDao
+
+    abstract fun bookmarkDao(): BookmarkDao
 }

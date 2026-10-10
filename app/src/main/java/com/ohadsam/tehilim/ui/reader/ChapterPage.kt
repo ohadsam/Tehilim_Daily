@@ -1,6 +1,8 @@
 package com.ohadsam.tehilim.ui.reader
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +11,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
@@ -26,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +47,8 @@ import com.ohadsam.tehilim.domain.PsalmErrorKind
 import com.ohadsam.tehilim.domain.PsalmRef
 import com.ohadsam.tehilim.domain.PsalmText
 import com.ohadsam.tehilim.domain.title
+import com.ohadsam.tehilim.ui.bookmarks.BookmarkHooks
+import com.ohadsam.tehilim.ui.favorites.FavoriteColors
 import com.ohadsam.tehilim.ui.theme.ReaderTextStyle
 
 /** One chapter (or chapter slice): heading, verses, and loading / error-with-retry states. */
@@ -54,6 +61,7 @@ fun ChapterPage(
     starred: Boolean = false,
     onToggleStar: (() -> Unit)? = null,
     highlightVerse: Int = 0,
+    bookmarks: BookmarkHooks? = null,
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -61,7 +69,7 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks)
         }
     }
 }
@@ -74,7 +82,9 @@ private fun ChapterText(
     starred: Boolean,
     onToggleStar: (() -> Unit)?,
     highlightVerse: Int,
+    bookmarks: BookmarkHooks?,
 ) {
+    val marks = remember(bookmarks, ref.chapter) { bookmarks?.forChapter?.invoke(ref.chapter).orEmpty() }
     val listState = rememberLazyListState()
     LaunchedEffect(highlightVerse, text) {
         val i = text.verses.indexOfFirst { it.number == highlightVerse }
@@ -108,10 +118,27 @@ private fun ChapterText(
         }
         items(text.verses, key = { it.number }) { v ->
             val marked = v.number == highlightVerse
+            val mark = marks[v.number]
             Row(
-                Modifier.fillMaxWidth().background(if (marked) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent),
+                Modifier.fillMaxWidth()
+                    .background(if (marked) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent)
+                    .then(
+                        if (bookmarks != null) {
+                            Modifier.combinedClickable(onClick = {}, onLongClick = { bookmarks.onVerseLongPress(ref.chapter, v) })
+                        } else {
+                            Modifier
+                        },
+                    ),
                 verticalAlignment = Alignment.Top,
             ) {
+                if (mark != null) {
+                    Icon(
+                        Icons.Filled.Bookmark,
+                        contentDescription = stringResource(R.string.bm_marker),
+                        tint = FavoriteColors[mark.colorIndex.mod(FavoriteColors.size)],
+                        modifier = Modifier.padding(top = 4.dp, end = 4.dp).size(18.dp).clickable { bookmarks?.onMarkerClick?.invoke(mark) },
+                    )
+                }
                 if (settings.showVerseNumbers) {
                     Text(
                         HebrewNumerals.toHebrew(v.number, punctuation = false),

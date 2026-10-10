@@ -42,6 +42,7 @@ import com.ohadsam.tehilim.favorites.FavoritesState
 import kotlinx.coroutines.launch
 import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
+import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.ChipStrip
 import com.ohadsam.tehilim.said.SaidContext
 import com.ohadsam.tehilim.ui.reader.DayReader
@@ -114,7 +115,9 @@ fun TodayScreen(container: AppContainer) {
         val realToday = LocalDate.ofEpochDay(todayEpoch)
         val said = saidEntries.any { it.date == realToday && it.context == saidContext }
         androidx.compose.runtime.key(selectedEpoch, mode, startAtEnd) {
+            BookmarkHost(container, Modifier.weight(1f)) { hooks ->
             DayReader(
+                bookmarks = hooks,
                 repo = container.psalms,
                 chapters = chapters,
                 settings = settings,
@@ -125,6 +128,7 @@ fun TodayScreen(container: AppContainer) {
                 isStarred = { favState.starFor(it) != null },
                 onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
             )
+            }
         }
     }
 }

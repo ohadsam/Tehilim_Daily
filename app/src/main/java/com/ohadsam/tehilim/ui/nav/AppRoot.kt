@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.ui.common.PlaceholderScreen
 import com.ohadsam.tehilim.ui.browse.BrowseScreen
+import com.ohadsam.tehilim.ui.bookmarks.BookmarksScreen
 import com.ohadsam.tehilim.ui.favorites.FavoriteReaderScreen
 import com.ohadsam.tehilim.ui.favorites.FavoritesScreen
 import com.ohadsam.tehilim.ui.history.HistoryScreen
@@ -67,6 +68,7 @@ fun AppRoot(container: AppContainer) {
                     initialChapter = entry.arguments?.getInt("chapter") ?: 1,
                     initialVerse = entry.arguments?.getInt("verse") ?: 0,
                     onOpenSearch = { nav.navigate("search") },
+                    onOpenBookmarks = { nav.navigate("bookmarks") },
                 )
             }
             composable(Destination.FAVORITES.route) {
@@ -84,6 +86,9 @@ fun AppRoot(container: AppContainer) {
             }
             composable(Destination.REMINDERS.route) { PlaceholderScreen(stringResource(Destination.REMINDERS.label)) }
             composable(Destination.MORE.route) { MoreScreen(container, onOpenHistory = { nav.navigate("history") }) }
+            composable("bookmarks") {
+                BookmarksScreen(container, onBack = { nav.popBackStack() }, onOpen = { nav.navigate("browse?chapter=${it.chapter}&verse=${it.verse}") })
+            }
             composable("history") { HistoryScreen(container, onBack = { nav.popBackStack() }) }
             composable("search") {
                 SearchScreen(container, onBack = { nav.popBackStack() }, onOpen = { ch, v -> nav.navigate("browse?chapter=$ch&verse=$v") })
