@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.0
+- Name letters: full name(s) → Psalm 119 stanzas of each distinct letter (in order), then the four stanzas of נשמה; the reader shows the name above each stanza with its letter(s) highlighted. Saved as a favorite for a person (refuah / ilui nishmat).
+- Yearly Hebrew-date reminders (yahrzeit; Adar → Adar II in leap years) that open the reading; also available in the reminder editor.
+- DB v2 (migration `favorite.nameSpec`) — release builds never wipe data.
+
 ## 0.10.0
 - In-place updates: one fixed signing key (`app/sideload.jks`) signs debug and release; versionCode = 100 + commit count, so every build upgrades the previous one without uninstalling.
 - Share the app (APK + Hebrew install/update instructions) via WhatsApp, e-mail (optional zip for mail apps that block .apk) or any app.

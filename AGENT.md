@@ -9,7 +9,7 @@ Read order: CLAUDE.md → docs/PLAN.md → STRUCTURE.md → the batch's section 
 ## Known issues / open items (need the owner)
 - **Signing key:** `app/sideload.jks` (password in app/build.gradle.kts) is committed on purpose so every CI build is an in-place update. It is NOT a store key: anyone with repo access can sign updates. For Play/store releases set `KEYSTORE_*` secrets (release.yml) — but then users must reinstall once, because the signature changes. Never change/delete the sideload key once users have installed it.
 - **Prayers (יהי רצון):** mechanism + settings are in place, but `assets/prayers.json` has NO verified texts. Supply wording + source per nusach, then set `verified=true`.
-- **Name-letter / "נשמה" stanzas of Psalm 119:** widespread custom, implemented as an optional helper — confirm before release.
+- Name-letter / "נשמה" stanzas: confirmed by the owner (2026-10-11), see SPEC B1. A person's stored name is not re-synced into an existing name-letters favorite when edited.
 - **Tzeit / candle-lighting defaults:** 8.5° and 18 min (40 in Jerusalem area) — confirm minhag; both are user-configurable.
 - **Day rollover default = midnight** (matches kodesh-app); choose sunset/nightfall in Location settings. Said marks are keyed by the *logical* date, so switching the mode mid-way can make an old day look unmarked.
 - Room schema is v1 and frozen at the first public release (debug builds wipe on mismatch; release must use migrations).
