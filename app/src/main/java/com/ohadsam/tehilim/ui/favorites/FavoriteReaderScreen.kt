@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +50,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
         favorite != null -> {
             title = favorite.name
             people = state.personsOf(favorite)
-            chapters = favorite.chapters
+            chapters = favorite.nameSpec?.let { com.ohadsam.tehilim.favorites.NameLetterPlan.refs(it) } ?: favorite.chapters
         }
         person != null -> {
             title = person.name
@@ -60,6 +61,15 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
             title = ""
             people = emptyList()
             chapters = emptyList()
+        }
+    }
+
+    val scheme = MaterialTheme.colorScheme
+    val headings = remember(favorite?.nameSpec, scheme) {
+        favorite?.nameSpec?.let { spec ->
+            com.ohadsam.tehilim.favorites.NameLetterPlan.build(spec).map { seg ->
+                listOf(nameHeading(seg, scheme.onSurfaceVariant, scheme.secondary, scheme.secondaryContainer))
+            }
         }
     }
 
@@ -83,6 +93,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                 BookmarkHost(container, Modifier.weight(1f)) { hooks ->
                 DayReader(
                     bookmarks = hooks,
+                    headings = headings,
                     positions = container.positions,
                     positionKey = com.ohadsam.tehilim.data.prefs.PositionStore.key(
                         if (favoriteId != null) "f" else "p", favoriteId ?: personId ?: 0L, container.locations.logicalToday(),

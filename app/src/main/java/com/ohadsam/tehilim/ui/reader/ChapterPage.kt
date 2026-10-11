@@ -64,6 +64,7 @@ fun ChapterPage(
     onToggleStar: (() -> Unit)? = null,
     highlightVerse: Int = 0,
     bookmarks: BookmarkHooks? = null,
+    headingLines: List<androidx.compose.ui.text.AnnotatedString> = emptyList(),
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -71,7 +72,7 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks, headingLines)
         }
     }
 }
@@ -85,6 +86,7 @@ private fun ChapterText(
     onToggleStar: (() -> Unit)?,
     highlightVerse: Int,
     bookmarks: BookmarkHooks?,
+    headingLines: List<androidx.compose.ui.text.AnnotatedString>,
 ) {
     val shown: (String) -> String = { TextDisplay.apply(it, settings.showNikud, settings.showTaamim) }
     val view = androidx.compose.ui.platform.LocalView.current
@@ -104,6 +106,16 @@ private fun ChapterText(
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
+        if (headingLines.isNotEmpty()) {
+            item(key = "name-heading") {
+                // The name (or "נשמה") shown above its stanza with the stanza's letter(s) highlighted.
+                Column(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    headingLines.forEach { line ->
+                        Text(line, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        }
         item(key = "title") {
             Box(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                 Text(

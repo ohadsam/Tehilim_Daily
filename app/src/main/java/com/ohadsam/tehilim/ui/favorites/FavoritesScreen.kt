@@ -66,7 +66,12 @@ private sealed interface Editor {
 }
 
 @Composable
-fun FavoritesScreen(container: AppContainer, onOpenFavorite: (Long) -> Unit, onOpenPerson: (Long) -> Unit) {
+fun FavoritesScreen(
+    container: AppContainer,
+    onOpenFavorite: (Long) -> Unit,
+    onOpenPerson: (Long) -> Unit,
+    onOpenNameLetters: (Long?) -> Unit = {},
+) {
     val state by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
     var tab by rememberSaveable { mutableStateOf(FavTab.ALL) }
     var editor by remember { mutableStateOf<Editor?>(null) }
@@ -124,6 +129,7 @@ fun FavoritesScreen(container: AppContainer, onOpenFavorite: (Long) -> Unit, onO
                                 p, state,
                                 onOpen = { onOpenPerson(p.id) },
                                 onEdit = { editor = Editor.OfPerson(p, p.kind) },
+                                onNameLetters = { onOpenNameLetters(p.id) },
                                 onOpenFavorite = onOpenFavorite,
                                 onDelete = { scope.launch { container.favorites.deletePerson(p.id) } },
                             )
@@ -142,6 +148,10 @@ fun FavoritesScreen(container: AppContainer, onOpenFavorite: (Long) -> Unit, onO
                 DropdownMenuItem(text = { Text(stringResource(R.string.fav_new_favorite)) }, onClick = {
                     menuOpen = false
                     editor = Editor.OfFavorite(null)
+                })
+                DropdownMenuItem(text = { Text(stringResource(R.string.nl_menu)) }, onClick = {
+                    menuOpen = false
+                    onOpenNameLetters(null)
                 })
                 DropdownMenuItem(text = { Text(stringResource(R.string.fav_new_refuah)) }, onClick = {
                     menuOpen = false
@@ -204,6 +214,7 @@ private fun PersonCard(
     onEdit: () -> Unit,
     onOpenFavorite: (Long) -> Unit,
     onDelete: () -> Unit,
+    onNameLetters: () -> Unit = {},
 ) {
     var confirm by remember { mutableStateOf(false) }
     val linked = state.favoritesOf(p)
@@ -211,7 +222,7 @@ private fun PersonCard(
         Column(Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PersonTag(p, Modifier.weight(1f))
-                CardMenu(onEdit, onDelete = { confirm = true })
+                CardMenu(onEdit, onDelete = { confirm = true }, extraLabel = R.string.nl_menu, onExtra = onNameLetters)
             }
             if (linked.isEmpty()) {
                 Text(stringResource(R.string.fav_person_no_links), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -256,7 +267,7 @@ fun PersonTag(p: Person, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit) {
+private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit, extraLabel: Int? = null, onExtra: () -> Unit = {}) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) { Icon(Icons.Filled.MoreVert, stringResource(R.string.action_more)) }
@@ -265,6 +276,12 @@ private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit) {
                 open = false
                 onEdit()
             })
+            if (extraLabel != null) {
+                DropdownMenuItem(text = { Text(stringResource(extraLabel)) }, onClick = {
+                    open = false
+                    onExtra()
+                })
+            }
             DropdownMenuItem(text = { Text(stringResource(R.string.action_delete)) }, onClick = {
                 open = false
                 onDelete()

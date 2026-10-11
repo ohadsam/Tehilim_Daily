@@ -55,6 +55,7 @@ fun DayReader(
     bookmarks: BookmarkHooks? = null,
     positions: com.ohadsam.tehilim.data.prefs.PositionStore? = null,
     positionKey: String? = null,
+    headings: List<List<androidx.compose.ui.text.AnnotatedString>>? = null,
 ) {
     if (chapters.isEmpty()) return
     val saved = if (positions != null && positionKey != null) positions.get(positionKey) else 0
@@ -90,11 +91,11 @@ fun DayReader(
         HorizontalPager(
             state = pager,
             modifier = Modifier.weight(1f).fillMaxWidth(),
-            key = { chapters[it].key },
+            key = { "$it:${chapters[it].key}" }, // index included: a name-letters reading can repeat a stanza
             beyondViewportPageCount = 1,
         ) { page ->
             val ref = chapters[page]
-            ChapterPage(repo, ref, settings, starred = isStarred(ref), onToggleStar = onToggleStar?.let { toggle -> { toggle(ref) } }, bookmarks = bookmarks)
+            ChapterPage(repo, ref, settings, starred = isStarred(ref), onToggleStar = onToggleStar?.let { toggle -> { toggle(ref) } }, bookmarks = bookmarks, headingLines = headings?.getOrNull(page).orEmpty())
         }
         footer?.invoke()
         Row(

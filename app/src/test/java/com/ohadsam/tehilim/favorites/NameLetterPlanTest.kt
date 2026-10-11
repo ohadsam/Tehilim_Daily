@@ -31,7 +31,8 @@ class NameLetterPlanTest {
     @Test
     fun neshamaStaysCompleteEvenIfNameSharesLetters() {
         val plan = NameLetterPlan.build(NameSpec(listOf("נעמי"), neshama = true))
-        assertEquals(2, plan.count { it.ref == NameLetters.stanza('מ') } .coerceAtLeast(2)) // מ in name and in נשמה
+        assertEquals(2, plan.count { it.ref == NameLetters.stanza('מ') }) // מ in the name and again in נשמה
+        assertEquals(2, plan.count { it.ref == NameLetters.stanza('נ') })
         assertEquals(4, plan.count { it.section == NameSection.NESHAMA })
     }
 

@@ -93,4 +93,9 @@ class AppContainer(context: Context) {
     private val appScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
     val prefetch: PrefetchController by lazy { PrefetchController(psalms, appScope) }
+
+    private val appContext = context.applicationContext
+
+    /** A string resource formatted with [args], for places outside composables. */
+    fun appString(res: Int, vararg args: Any): String = appContext.getString(res, *args)
 }

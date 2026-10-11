@@ -24,6 +24,7 @@ import com.ohadsam.tehilim.ui.browse.BrowseScreen
 import com.ohadsam.tehilim.ui.bookmarks.BookmarksScreen
 import com.ohadsam.tehilim.ui.favorites.FavoriteReaderScreen
 import com.ohadsam.tehilim.ui.favorites.FavoritesScreen
+import com.ohadsam.tehilim.ui.favorites.NameLettersScreen
 import com.ohadsam.tehilim.ui.history.HistoryScreen
 import com.ohadsam.tehilim.ui.search.SearchScreen
 import com.ohadsam.tehilim.ui.location.LocationScreen
@@ -97,6 +98,17 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     container,
                     onOpenFavorite = { nav.navigate("favorite/$it") },
                     onOpenPerson = { nav.navigate("person/$it") },
+                    onOpenNameLetters = { nav.navigate("nameletters?person=${it ?: -1L}") },
+                )
+            }
+            composable(
+                "nameletters?person={person}",
+                listOf(navArgument("person") { type = NavType.LongType; defaultValue = -1L }),
+            ) { entry ->
+                val pid = entry.arguments?.getLong("person")?.takeIf { it > 0 }
+                NameLettersScreen(
+                    container, pid, onBack = { nav.popBackStack() },
+                    onSaved = { fid -> nav.popBackStack(); nav.navigate("favorite/$fid") },
                 )
             }
             composable("favorite/{id}", listOf(navArgument("id") { type = NavType.LongType })) { entry ->

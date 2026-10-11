@@ -327,4 +327,21 @@
     <string name="set_share_failed">לא ניתן היה להכין את הקובץ לשיתוף</string>
 
     <string name="rem_repeat_yearly">כל שנה (תאריך עברי / אזכרה)</string>
+
+    <string name="nl_menu">אותיות שם ונשמה</string>
+    <string name="nl_title">אותיות השם ונשמה</string>
+    <string name="nl_intro">מזינים את השם המלא (אפשר כמה שמות) ומקבלים את הפסוקים של פרק קי״ט לפי אותיות השם, ואחריהם אותיות ״נשמה״. מעל כל קטע מוצג השם והאות המתאימה מודגשת.</string>
+    <string name="nl_names">שמות</string>
+    <string name="nl_add_name_hint">שם (למשל: יוסף)</string>
+    <string name="nl_add_name">הוספת שם</string>
+    <string name="nl_neshama">להוסיף את אותיות ״נשמה״ בסוף</string>
+    <string name="nl_for">עבור</string>
+    <string name="nl_remind">יצירת תזכורת שנתית ביום האזכרה</string>
+    <string name="nl_remind_time">שעת התזכורת: %1$s</string>
+    <string name="nl_preview">מה ייקרא</string>
+    <string name="nl_empty">הזינו שם כדי לראות את האותיות והפסוקים.</string>
+    <string name="nl_stanza">פסוקים %1$s–%2$s</string>
+    <string name="nl_stanza_neshama">נשמה · פסוקים %1$s–%2$s</string>
+    <string name="nl_save">שמירה כמועדף</string>
+    <string name="nl_favorite_name">אותיות השם — %1$s</string>
 </resources>
