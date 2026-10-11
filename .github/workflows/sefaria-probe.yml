@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - 'tools/sefaria_probe.py'
+      - '.claude/skills/sefaria-api/**'
       - '.github/workflows/sefaria-probe.yml'
 jobs:
   probe:
@@ -20,6 +21,8 @@ jobs:
         run: |
           set -o pipefail
           python3 tools/sefaria_probe.py | tee probe.txt
+      - name: sefaria-api skill probe (shape + Hebrew check, sample refs)
+        run: python3 .claude/skills/sefaria-api/scripts/sefaria_probe.py text "Psalms.1" "Psalms.23" "Psalms.119" "Psalms.150" | tee -a probe.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: sefaria-probe, path: probe.txt }

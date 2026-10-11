@@ -13,3 +13,8 @@ description: Verified Sefaria Psalms fetching behavior (URL, ref format, respons
 - Repository contract: `get(chapter, range?)` → Room hit ⇒ return; miss ⇒ API ⇒ store (key = canonical ref) ⇒ return; API failure with no row ⇒ typed error. Offer "prefetch all 150" (WorkManager, throttled ~350ms between calls, resumable) and "clear cache".
 - Chapter 119 is split in the daily schedule as `119:1-88` and `119:89-176`.
 - The sandbox cannot reach sefaria.org: verify refs on CI (a scheduled/manual "sefaria-probe" job) and add `// verified YYYY-MM-DD` next to each ref family.
+
+## Audit against `sefaria-api` skill (copied from kodesh-app)
+Checked: endpoint/params identical (`texts/Psalms.N?lang=he&commentary=0&context=0`); `he` string/flat/nested handled; v3 `versions[]` fallback;
+empty `he` with HTTP 200 = failure; only non-empty text cached; serial prefetch with 350 ms delay; whole chapter fetched, ranges sliced locally
+(avoids the "mid-chapter range returns whole chapter" pitfall); `length` not used. Live verification runs in CI (`sefaria-probe.yml`, both probes) since the sandbox blocks sefaria.org.
