@@ -98,4 +98,8 @@ class AppContainer(context: Context) {
 
     /** A string resource formatted with [args], for places outside composables. */
     fun appString(res: Int, vararg args: Any): String = appContext.getString(res, *args)
+
+    val nameLetters: com.ohadsam.tehilim.favorites.NameLettersService by lazy {
+        com.ohadsam.tehilim.favorites.NameLettersService(favorites, reminders, reminderScheduler)
+    }
 }

@@ -163,28 +163,12 @@ fun NameLettersScreen(container: AppContainer, personId: Long?, onBack: () -> Un
                 onClick = {
                     saving = true
                     scope.launch {
-                        val full = spec.fullName
-                        val person = (existing ?: Person(name = full, kind = kind)).copy(
-                            name = full.ifBlank { existing?.name.orEmpty() }, kind = kind, motherName = mother.trim().ifBlank { null },
-                            yahrzeitDay = if (yahrzeitOk) dayNumber else existing?.yahrzeitDay,
-                            yahrzeitMonth = if (yahrzeitOk) month else existing?.yahrzeitMonth,
+                        val fid = container.nameLetters.save(
+                            spec = spec, existing = existing, kind = kind, motherName = mother,
+                            yahrzeit = if (yahrzeitOk) com.ohadsam.tehilim.favorites.YahrzeitDate(month!!, dayNumber!!) else null,
+                            reminderTime = if (remind && yahrzeitOk) time else null,
+                            favoriteName = container.appString(R.string.nl_favorite_name, spec.fullName),
                         )
-                        val pid = container.favorites.savePerson(person)
-                        val fid = container.favorites.saveFavorite(
-                            Favorite(
-                                name = container.appString(R.string.nl_favorite_name, full), chapters = NameLetterPlan.refs(spec),
-                                colorIndex = 0, personIds = listOf(pid), nameSpec = spec,
-                            ),
-                        )
-                        if (remind && yahrzeitOk) {
-                            val rid = container.reminders.save(
-                                Reminder(
-                                    target = ReminderTarget.Group(fid, pid), times = listOf(time), repeat = Repeat.YearlyHebrew(month!!, dayNumber!!),
-                                    holyDayRule = HolyDayRule.BOTH,
-                                ),
-                            )
-                            container.reminders.get(rid)?.let { container.reminderScheduler.schedule(it) }
-                        }
                         // Navigation touches lifecycle state, which must happen on the main thread (also under Compose test dispatchers).
                         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { onSaved(fid) }
                     }

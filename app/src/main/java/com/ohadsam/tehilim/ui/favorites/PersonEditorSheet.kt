@@ -35,12 +35,6 @@ import com.ohadsam.tehilim.favorites.Person
 import com.ohadsam.tehilim.favorites.PersonKind
 import kotlinx.coroutines.launch
 
-/** Month choices for a yahrzeit; "אדר" (12) also covers Adar I in leap years, 13 is Adar II. */
-private val yahrzeitMonths: List<Pair<Int, String>> = listOf(
-    7 to "תשרי", 8 to "חשוון", 9 to "כסלו", 10 to "טבת", 11 to "שבט", 12 to "אדר", 13 to "אדר ב׳",
-    1 to "ניסן", 2 to "אייר", 3 to "סיוון", 4 to "תמוז", 5 to "אב", 6 to "אלול",
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKind, onDismiss: () -> Unit) {
@@ -50,7 +44,6 @@ fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKi
     var mother by remember { mutableStateOf(existing?.motherName.orEmpty()) }
     var day by remember { mutableStateOf(existing?.yahrzeitDay?.toString().orEmpty()) }
     var month by remember { mutableStateOf(existing?.yahrzeitMonth) }
-    var monthMenu by remember { mutableStateOf(false) }
 
     val dayNumber = day.toIntOrNull()
     val dayValid = day.isBlank() || (dayNumber != null && dayNumber in 1..30)
@@ -82,19 +75,7 @@ fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKi
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.weight(1f),
                     )
-                    androidx.compose.foundation.layout.Box(Modifier.weight(2f)) {
-                        OutlinedButton(onClick = { monthMenu = true }, modifier = Modifier.fillMaxWidth()) {
-                            Text(yahrzeitMonths.firstOrNull { it.first == month }?.second ?: stringResource(R.string.person_month))
-                        }
-                        DropdownMenu(expanded = monthMenu, onDismissRequest = { monthMenu = false }) {
-                            yahrzeitMonths.forEach { (m, label) ->
-                                DropdownMenuItem(text = { Text(label) }, onClick = {
-                                    month = m
-                                    monthMenu = false
-                                })
-                            }
-                        }
-                    }
+                    com.ohadsam.tehilim.ui.common.HebrewMonthPicker(month, stringResource(R.string.person_month), { month = it }, Modifier.weight(2f))
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {

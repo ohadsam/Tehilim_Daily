@@ -39,6 +39,12 @@ Add/extend unit tests with the code. The sandbox cannot run Gradle: "tests pass"
 ## 7. Skills & this checklist
 Do `.claude/skills/*` need updating? **Then ask explicitly whether this checklist itself needs a new/changed step** (a real gotcha, a recurring miss). Add concrete entries only for real incidents; otherwise say "no change".
 
+Real incidents so far (keep concrete):
+- A Room schema change needs `version` bump + a `Migrations` entry in the SAME commit (release builds never wipe data).
+- Navigation/lifecycle calls after a `suspend` repository call must run on `Dispatchers.Main` — under Compose test dispatchers the continuation resumes off-main and crashes (`setCurrentState`).
+- Any external-API assumption (e.g. Sefaria `length`) must be checked by the live probe, not by reading docs/memory.
+- Sealed-class additions (e.g. `Repeat.YearlyHebrew`) must be handled in every `when` (planner, codec, list text, editor) — grep before pushing.
+
 ## 8. Merge
 Feature branch → push → PR → CI green → merge to `main`. Resolve conflicts for real; never force-push over others' work.
 
