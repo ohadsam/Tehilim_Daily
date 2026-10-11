@@ -185,7 +185,8 @@ fun NameLettersScreen(container: AppContainer, personId: Long?, onBack: () -> Un
                             )
                             container.reminders.get(rid)?.let { container.reminderScheduler.schedule(it) }
                         }
-                        onSaved(fid)
+                        // Navigation touches lifecycle state, which must happen on the main thread (also under Compose test dispatchers).
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { onSaved(fid) }
                     }
                 },
             ) { Text(stringResource(R.string.nl_save)) }
