@@ -74,7 +74,7 @@ Settings → תפילות: show before/after reading on/off (separately for befo
 ### A3 Content accuracy (global, critical)
 - Source of truth for text = Sefaria Hebrew (Miqra according to the Masorah / default `he` version); record `versionTitle` and `fetchedAt` with each cached row. Show the source on the About screen.
 - Integrity checks on every fetch: non-empty; verse count == Sefaria's reported `length` for whole chapters; range requests return exactly the requested verses (slice locally if Sefaria returns the whole chapter); no HTML residue; Hebrew letters present. A failed check ⇒ not cached, retry, user-visible error — never silently show partial text.
-- Schedules are data with **golden tests**: monthly = 30 days covering chapters 1–150 each exactly once (119 split 1–88 / 89–176); weekly = 7 days covering 1–150 each once. Weekly split used: Sun 1–29, Mon 30–50, Tue 51–72, Wed 73–89, Thu 90–106, Fri 107–119, Shabbat 120–150 (cross-checked against the common Perek-Yomi/Tehillim weekly table; also verified against Sefaria in the CI probe).
+- Schedules are data with **golden tests**: monthly = 30 days covering chapters 1–150 each exactly once (119 split 1–96 (א–ל) / 97–176 (מ–ת)); weekly = 7 days covering 1–150 each once. Weekly split used: Sun 1–29, Mon 30–50, Tue 51–72, Wed 73–89, Thu 90–106, Fri 107–119, Shabbat 120–150 (cross-checked against the common Perek-Yomi/Tehillim weekly table; also verified against Sefaria in the CI probe).
 - Never edit/normalize letters of the text beyond tag stripping and whitespace; nikud/ta'amim display is a *view* option, not a data change.
 - CI job `sefaria-probe` fetches all 150 chapters, checks the above and uploads a report.
 ### A4 Bookmarks (סימניות) — ported from kodesh-app, extended (S11, batch 5b)

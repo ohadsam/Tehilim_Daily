@@ -19,7 +19,7 @@ class PsalmSchedulesTest {
         assertEquals((1..150).toList(), c.keys.sorted())
         (1..150).filter { it != 119 }.forEach { assertEquals("chapter $it", 1, c.getValue(it)) }
         val p119 = days.flatten().filter { it.chapter == 119 }
-        assertEquals(listOf(PsalmRef(119, 1, 88), PsalmRef(119, 89, 176)).sortedBy { it.fromVerse }, p119.sortedBy { it.fromVerse })
+        assertEquals(listOf(PsalmRef(119, 1, 96), PsalmRef(119, 97, 176)).sortedBy { it.fromVerse }, p119.sortedBy { it.fromVerse })
     }
 
     @Test
@@ -65,7 +65,7 @@ class PsalmSchedulesTest {
 
     @Test
     fun day25And26AreTheTwoHalvesOf119() {
-        assertEquals(listOf(PsalmRef(119, 1, 88)), PsalmSchedules.monthly(25, 30))
-        assertEquals(listOf(PsalmRef(119, 89, 176)), PsalmSchedules.monthly(26, 30))
+        assertEquals(listOf(PsalmRef(119, 1, 96)), PsalmSchedules.monthly(25, 30))
+        assertEquals(listOf(PsalmRef(119, 97, 176)), PsalmSchedules.monthly(26, 30))
     }
 }

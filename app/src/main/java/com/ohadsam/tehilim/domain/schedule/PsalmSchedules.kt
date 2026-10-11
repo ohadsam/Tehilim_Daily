@@ -6,7 +6,7 @@ import java.time.DayOfWeek
 
 /**
  * The three ways of dividing Tehilim. Data only — covered by golden tests (every chapter exactly once).
- * Monthly: the standard 30-day division; chapter 119 is split into two days (verses 1–88 / 89–176).
+ * Monthly: the standard 30-day division; chapter 119 is split into two days (verses 1–96 (א–ל) / 97–176 (מ–ת)).
  * Weekly: Sun 1–29, Mon 30–50, Tue 51–72, Wed 73–89, Thu 90–106, Fri 107–119, Shabbat 120–150.
  */
 object PsalmSchedules {
@@ -21,8 +21,8 @@ object PsalmSchedules {
     /** Index 0 = day 1 of the Hebrew month … index 29 = day 30. */
     val MONTHLY: List<List<PsalmRef>> = monthlyRanges.mapIndexed { i, r ->
         when (i + 1) {
-            25 -> listOf(PsalmRef(119, 1, 88))
-            26 -> listOf(PsalmRef(119, 89, 176))
+            25 -> listOf(PsalmRef(119, 1, 96))
+            26 -> listOf(PsalmRef(119, 97, 176))
             else -> chapters(r)
         }
     }

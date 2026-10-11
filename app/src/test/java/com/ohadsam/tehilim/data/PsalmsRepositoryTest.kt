@@ -55,11 +55,11 @@ class PsalmsRepositoryTest {
 
     @Test
     fun rangesAreSlicedFromTheWholeChapterWithRealVerseNumbers() = runTest {
-        val a = repo.get(PsalmRef(119, 1, 88)).getOrThrow()
-        val b = repo.get(PsalmRef(119, 89, 176)).getOrThrow()
-        assertEquals((1..88).toList(), a.verses.map { it.number })
-        assertEquals((89..176).toList(), b.verses.map { it.number })
-        assertEquals("פסוק 89", b.verses.first().text)
+        val a = repo.get(PsalmRef(119, 1, 96)).getOrThrow()
+        val b = repo.get(PsalmRef(119, 97, 176)).getOrThrow()
+        assertEquals((1..96).toList(), a.verses.map { it.number })
+        assertEquals((97..176).toList(), b.verses.map { it.number })
+        assertEquals("פסוק 97", b.verses.first().text)
         assertEquals(1, remote.calls)
     }
 

@@ -9,8 +9,8 @@ import org.junit.Test
 class ChapterSetParserTest {
     @Test
     fun parsesRangesSinglesAndVerseRanges() {
-        val r = ChapterSetParser.parse("20-24, 91 119:1-88")
-        assertEquals((20..24).map { PsalmRef(it) } + PsalmRef(91) + PsalmRef(119, 1, 88), r.refs)
+        val r = ChapterSetParser.parse("20-24, 91 119:1-96")
+        assertEquals((20..24).map { PsalmRef(it) } + PsalmRef(91) + PsalmRef(119, 1, 96), r.refs)
         assertEquals(emptyList<String>(), r.invalidTokens)
     }
 
@@ -29,7 +29,7 @@ class ChapterSetParserTest {
 
     @Test
     fun compactFormRoundTrips() {
-        listOf(PsalmRef(1), PsalmRef(119, 89, 176), PsalmRef(150)).forEach { assertEquals(it, parsePsalmRef(it.compact)) }
+        listOf(PsalmRef(1), PsalmRef(119, 97, 176), PsalmRef(150)).forEach { assertEquals(it, parsePsalmRef(it.compact)) }
         assertNull(parsePsalmRef("x"))
         assertNull(parsePsalmRef("119:5"))
         assertNull(parsePsalmRef("151"))

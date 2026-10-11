@@ -26,7 +26,7 @@ data class PsalmRef(val chapter: Int, val fromVerse: Int? = null, val toVerse: I
 
     val isWhole: Boolean get() = fromVerse == null
 
-    /** Compact form without the "Psalms." prefix: "23" or "119:1-88" (used in storage and deep links). */
+    /** Compact form without the "Psalms." prefix: "23" or "119:1-96" (used in storage and deep links). */
     val compact: String get() = key.removePrefix("Psalms.")
 
     /** Canonical Sefaria-style reference, also usable as a stable key. */

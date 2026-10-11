@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.1
+- Fix: monthly division of Psalm 119 is verses 1–96 (stanzas א–ל) on day 25 and 97–176 (מ–ת) on day 26 (was 1–88 / 89–176). Schedule, golden tests, spec and skills updated.
+
 ## 0.11.0
 - Name letters: full name(s) → Psalm 119 stanzas of each distinct letter (in order), then the four stanzas of נשמה; the reader shows the name above each stanza with its letter(s) highlighted. Saved as a favorite for a person (refuah / ilui nishmat).
 - Yearly Hebrew-date reminders (yahrzeit; Adar → Adar II in leap years) that open the reading; also available in the reminder editor.

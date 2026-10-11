@@ -7,7 +7,7 @@ import com.ohadsam.tehilim.domain.PsalmRef
 data class ParsedChapters(val refs: List<PsalmRef>, val invalidTokens: List<String>)
 
 /**
- * Parses free-form chapter lists: "20-24, 91", "כ-כד, צא", "119:1-88". Order is kept, exact duplicates dropped.
+ * Parses free-form chapter lists: "20-24, 91", "כ-כד, צא", "119:1-96". Order is kept, exact duplicates dropped.
  * Tokens that cannot be understood are reported instead of silently ignored.
  */
 object ChapterSetParser {

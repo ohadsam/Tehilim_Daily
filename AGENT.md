@@ -5,6 +5,7 @@ Read order: CLAUDE.md → docs/PLAN.md → STRUCTURE.md → the batch's section 
 
 ## Recently done
 - v0.9.0: everything in docs/CHANGELOG.md. CI (Android CI + Sefaria probe) is the only build/test gate (sandbox has no SDK/network).
+- v0.11.1: Psalm 119 monthly split fixed to 1–96 (א–ל) / 97–176 (מ–ת) per the owner (was 1–88 / 89–176, which also matched kodesh-app — that app has the same issue). Existing saved refs with old ranges stay valid.
 
 ## Known issues / open items (need the owner)
 - **Signing key:** `app/sideload.jks` (password in app/build.gradle.kts) is committed on purpose so every CI build is an in-place update. It is NOT a store key: anyone with repo access can sign updates. For Play/store releases set `KEYSTORE_*` secrets (release.yml) — but then users must reinstall once, because the signature changes. Never change/delete the sideload key once users have installed it.

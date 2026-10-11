@@ -11,7 +11,7 @@ The sandbox that wrote this skill could not reach sefaria.org (egress policy), s
 Items matched by `title.en`/`title.he` substring: Daf Yomi ([prod][test]), Mishnah Yomi ([prod][test]), Daily Rambam ([prod][test]; ref is a chapter ref, no `:`; may be a range `Book 5-6`), 929 ([prod]; Tanakh chapter ref). Other cycles Sefaria publishes (Halakhah Yomit, Tanya Yomi, Arukh HaShulchan Yomi, Daf-a-Week, Yerushalmi Yomi, Chofetz Chaim Yomi …) are **[unverified]** – list the day's `calendar_items` with `sefaria_probe.py calendar`.
 
 ## Tanakh
-- Tehilim: `Psalms.{1..150}`; Psalm 119 is split in the app into verses 1-88 / 89-176 by slicing the flat verse list [prod]. Day-of-month schedule is static in `js/tehilim.js` (`TEHILIM_SCHEDULE`, 30 days).
+- Tehilim: `Psalms.{1..150}`; Psalm 119 is split in the app into verses 1-96 / 97-176 by slicing the flat verse list [prod]. Day-of-month schedule is static in `js/tehilim.js` (`TEHILIM_SCHEDULE`, 30 days).
 - Torah aliyot: refs come from **Hebcal leyning** (`Leviticus 9:1-9:16`) or the static `PARASHA_ALIYOT` table in `js/content.js` [prod]; text = `Genesis.1` style or the range ref.
 - Haftara: Hebcal `leyning.haftara` (`I Kings 18:46-19:21`) or static `HAFTARA_REFS` (Ashkenaz, Israel) [prod]. Normalise `\s*-\s*` → `-`.
 - Onkelos: `Onkelos_Genesis.{ch}`, `Onkelos_Exodus`, `Onkelos_Leviticus`, `Onkelos_Numbers`, `Onkelos_Deuteronomy` – fetch per chapter, slice verses [prod].

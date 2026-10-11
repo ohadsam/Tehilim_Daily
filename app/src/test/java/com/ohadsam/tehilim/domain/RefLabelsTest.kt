@@ -8,9 +8,9 @@ class RefLabelsTest {
     @Test
     fun chapterLabels() {
         assertEquals("כ״ג", PsalmRef(23).shortLabel())
-        assertEquals("קי״ט (א–פח)", PsalmRef(119, 1, 88).shortLabel())
-        assertEquals("קי״ט (פט–קעו)", PsalmRef(119, 89, 176).shortLabel())
-        assertEquals("פרק קי״ט · פסוקים א׳–פ״ח", PsalmRef(119, 1, 88).title())
+        assertEquals("קי״ט (א–צו)", PsalmRef(119, 1, 96).shortLabel())
+        assertEquals("קי״ט (צז–קעו)", PsalmRef(119, 97, 176).shortLabel())
+        assertEquals("פרק קי״ט · פסוקים א׳–צ״ו", PsalmRef(119, 1, 96).title())
         assertEquals("פרק א׳", PsalmRef(1).title())
     }
 
