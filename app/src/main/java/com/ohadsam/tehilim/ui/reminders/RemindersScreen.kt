@@ -232,5 +232,6 @@ private fun repeatText(r: Repeat): String = when (r) {
     Repeat.Daily -> "כל יום"
     is Repeat.Once -> "פעם אחת · ${r.date}"
     is Repeat.Weekly -> r.days.sortedBy { it.value % 7 }.joinToString(" ") { it.hebrewName.removePrefix("יום ") }
+    is Repeat.YearlyHebrew -> "כל שנה · ${com.ohadsam.tehilim.domain.HebrewNumerals.toHebrew(r.day)} ב${com.ohadsam.tehilim.calendar.HebrewCalendar.monthName(5785, r.month)}"
     is Repeat.MonthlyHebrew -> "כל ${com.ohadsam.tehilim.domain.HebrewNumerals.toHebrew(r.day)} בחודש עברי"
 }

@@ -14,6 +14,12 @@ class FavoriteMappingTest {
     }
 
     @Test
+    fun nameSpecSurvivesTheRoundTrip() {
+        val f = Favorite(1, "אותיות", listOf(PsalmRef(119, 1, 8)), nameSpec = NameSpec(listOf("דוד", "יעקב"), true))
+        assertEquals(f, FavoriteMapping.toDomain(FavoriteMapping.toEntity(f), emptyList()))
+    }
+
+    @Test
     fun personRoundTripsAndUnknownKindFallsBack() {
         val p = Person(3, "דוד", "שרה", PersonKind.ILUI_NISHMAT, 15, 1, 5780, "n", 5)
         val e = FavoriteMapping.toEntity(p)

@@ -20,6 +20,8 @@ data class FavoriteEntity(
     val colorIndex: Int,
     val sortOrder: Int,
     val createdAt: Long,
+    /** Encoded [com.ohadsam.tehilim.favorites.NameSpec] for "name letters" favorites. */
+    val nameSpec: String? = null,
 )
 
 @Entity(tableName = "person")

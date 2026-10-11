@@ -112,4 +112,24 @@ class ReminderPlannerTest {
         val list = planner.next(r, at(2026, 10, 11, 0, 0), limit = 3)
         assertEquals(listOf(9, 21, 9), list.map { local(it).hour })
     }
+
+    @Test
+    fun yearlyHebrewDateFiresOnTheNextOccurrence() {
+        val r = reminder(HolyDayRule.NORMAL, Repeat.YearlyHebrew(7, 29)) // 29 Tishrei
+        val first = planner.next(r, at(2026, 10, 11, 12, 0)).single()
+        assertEquals(com.ohadsam.tehilim.calendar.HebrewDate(5788, 7, 29).toLocalDate(), local(first).toLocalDate())
+    }
+
+    @Test
+    fun adarYahrzeitMovesToAdarIIInALeapYearAndBackToAdarOtherwise() {
+        val adar = reminder(HolyDayRule.NORMAL, Repeat.YearlyHebrew(12, 10))
+        // 5787 is a leap year → 10 Adar II 5787
+        assertEquals(com.ohadsam.tehilim.calendar.HebrewDate(5787, 13, 10).toLocalDate(), local(planner.next(adar, at(2026, 10, 11, 12, 0)).single()).toLocalDate())
+        // 5788 is not a leap year → 10 Adar 5788
+        val after = at(2027, 4, 1, 0, 0)
+        assertEquals(com.ohadsam.tehilim.calendar.HebrewDate(5788, 12, 10).toLocalDate(), local(planner.next(adar, after).single()).toLocalDate())
+        // a yahrzeit stored in Adar II falls in plain Adar in a non-leap year
+        val adar2 = reminder(HolyDayRule.NORMAL, Repeat.YearlyHebrew(13, 10))
+        assertEquals(com.ohadsam.tehilim.calendar.HebrewDate(5788, 12, 10).toLocalDate(), local(planner.next(adar2, after).single()).toLocalDate())
+    }
 }

@@ -56,6 +56,7 @@ class AppContainer(context: Context) {
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db")
             // Pre-release debug builds may change the schema between installs; release builds never wipe data (add migrations instead).
+            .addMigrations(com.ohadsam.tehilim.data.db.Migrations.V1_V2)
             .apply { if (com.ohadsam.tehilim.BuildConfig.DEBUG) fallbackToDestructiveMigration(dropAllTables = true) }
             .build()
     }

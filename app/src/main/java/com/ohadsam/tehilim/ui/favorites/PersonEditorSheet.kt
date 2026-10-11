@@ -103,7 +103,7 @@ fun PersonEditorSheet(container: AppContainer, existing: Person?, kind: PersonKi
                     enabled = name.isNotBlank() && dayValid,
                     onClick = {
                         scope.launch {
-                            val hasYahrzeit = isIlui && dayNumber != null && month != null && dayNumber <= maxDayOf(month!!)
+                            val hasYahrzeit = isIlui && dayNumber != null && month != null && dayNumber <= com.ohadsam.tehilim.ui.common.maxDayOfHebrewMonth(month!!)
                             container.favorites.savePerson(
                                 (existing ?: Person(name = name.trim(), kind = kind)).copy(
                                     name = name.trim(),

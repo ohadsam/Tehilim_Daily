@@ -28,6 +28,8 @@ data class Favorite(
     val sortOrder: Int = 0,
     val personIds: List<Long> = emptyList(),
     val createdAt: Long = 0,
+    /** Set when this favorite is a "name letters" reading: the reader then shows the name above each stanza. */
+    val nameSpec: NameSpec? = null,
 )
 
 data class FavoritesState(val favorites: List<Favorite>, val persons: List<Person>) {

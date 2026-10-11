@@ -55,7 +55,7 @@ import java.time.LocalTime
 
 private enum class TargetKind { FAVORITE, PERSON, GROUP, MONTH_DAY, WEEKDAY, BOOKMARK }
 
-private enum class RepeatKind { DAILY, WEEKLY, MONTHLY, ONCE }
+private enum class RepeatKind { DAILY, WEEKLY, MONTHLY, YEARLY, ONCE }
 
 private fun kindOf(t: ReminderTarget) = when (t) {
     is ReminderTarget.Favorite -> TargetKind.FAVORITE
@@ -90,6 +90,7 @@ fun ReminderEditorSheet(
             when (existing?.repeat) {
                 is Repeat.Weekly -> RepeatKind.WEEKLY
                 is Repeat.MonthlyHebrew -> RepeatKind.MONTHLY
+                is Repeat.YearlyHebrew -> RepeatKind.YEARLY
                 is Repeat.Once -> RepeatKind.ONCE
                 else -> RepeatKind.DAILY
             },
@@ -97,6 +98,8 @@ fun ReminderEditorSheet(
     }
     var weekDays by remember { mutableStateOf((existing?.repeat as? Repeat.Weekly)?.days ?: setOf(DayOfWeek.SUNDAY)) }
     var hebrewDay by remember { mutableStateOf(((existing?.repeat as? Repeat.MonthlyHebrew)?.day ?: 1).toString()) }
+    var yearDay by remember { mutableStateOf(((existing?.repeat as? Repeat.YearlyHebrew)?.day ?: 1).toString()) }
+    var yearMonth by remember { mutableStateOf((existing?.repeat as? Repeat.YearlyHebrew)?.month ?: 7) }
     var onceDate by remember { mutableStateOf((existing?.repeat as? Repeat.Once)?.date ?: LocalDate.now()) }
     var startDate by remember { mutableStateOf(existing?.startDate) }
     var endDate by remember { mutableStateOf(existing?.endDate) }
@@ -122,6 +125,7 @@ fun ReminderEditorSheet(
         RepeatKind.DAILY -> Repeat.Daily
         RepeatKind.WEEKLY -> if (weekDays.isNotEmpty()) Repeat.Weekly(weekDays) else null
         RepeatKind.MONTHLY -> hebrewDay.toIntOrNull()?.takeIf { it in 1..30 }?.let { Repeat.MonthlyHebrew(it) }
+        RepeatKind.YEARLY -> yearDay.toIntOrNull()?.takeIf { it in 1..com.ohadsam.tehilim.ui.common.maxDayOfHebrewMonth(yearMonth) }?.let { Repeat.YearlyHebrew(yearMonth, it) }
         RepeatKind.ONCE -> Repeat.Once(onceDate)
     }
     val draft: Reminder? = if (target != null && repeat != null && times.isNotEmpty()) {
@@ -206,6 +210,13 @@ fun ReminderEditorSheet(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = hebrewDay.toIntOrNull() !in 1..30,
                 )
+                RepeatKind.YEARLY -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        yearDay, { yearDay = it.take(2) }, singleLine = true, label = { Text(stringResource(R.string.rem_hebrew_day)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f),
+                    )
+                    com.ohadsam.tehilim.ui.common.HebrewMonthPicker(yearMonth, stringResource(R.string.person_month), { yearMonth = it }, Modifier.weight(1.5f))
+                }
                 RepeatKind.ONCE -> OutlinedButton(onClick = { dateDialog = "once" }) { Text(onceDate.toString()) }
                 RepeatKind.DAILY -> Unit
             }
@@ -318,6 +329,7 @@ private fun repeatLabel(r: RepeatKind) = when (r) {
     RepeatKind.DAILY -> R.string.rem_repeat_daily
     RepeatKind.WEEKLY -> R.string.rem_repeat_weekly
     RepeatKind.MONTHLY -> R.string.rem_repeat_monthly
+    RepeatKind.YEARLY -> R.string.rem_repeat_yearly
     RepeatKind.ONCE -> R.string.rem_repeat_once
 }
 

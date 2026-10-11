@@ -59,11 +59,23 @@ class ReminderPlanner(
             is Repeat.Once -> date == rep.date
             Repeat.Daily -> true
             is Repeat.Weekly -> date.dayOfWeek in rep.days
+            is Repeat.YearlyHebrew -> {
+                val h = HebrewCalendar.fromLocalDate(date)
+                val month = observedMonth(rep.month, h.year)
+                h.month == month && h.day == rep.day.coerceAtMost(HebrewCalendar.daysInMonth(h.year, month))
+            }
             is Repeat.MonthlyHebrew -> {
                 val h = HebrewCalendar.fromLocalDate(date)
                 h.day == rep.day.coerceAtMost(h.daysInMonth)
             }
         }
+    }
+
+    /** Ashkenazi custom: a yahrzeit in Adar is kept in Adar II in a leap year; Adar II in a non-leap year falls in Adar. */
+    private fun observedMonth(stored: Int, year: Int): Int = when {
+        HebrewCalendar.isLeapYear(year) && stored == 12 -> 13
+        !HebrewCalendar.isLeapYear(year) && stored == 13 -> 12
+        else -> stored
     }
 
     companion object {

@@ -31,7 +31,7 @@ class ReminderCodecAndContentTest {
         )
         val repeats = listOf(
             Repeat.Daily, Repeat.Once(LocalDate.of(2026, 12, 25)),
-            Repeat.Weekly(setOf(DayOfWeek.MONDAY, DayOfWeek.SUNDAY, DayOfWeek.FRIDAY)), Repeat.MonthlyHebrew(15),
+            Repeat.Weekly(setOf(DayOfWeek.MONDAY, DayOfWeek.SUNDAY, DayOfWeek.FRIDAY)), Repeat.MonthlyHebrew(15), Repeat.YearlyHebrew(13, 30),
         )
         for (t in targets) for (r in repeats) {
             val original = sample(t, r)

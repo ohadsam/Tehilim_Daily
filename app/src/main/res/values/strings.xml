@@ -325,4 +325,6 @@
     <string name="set_share_other">אחר…</string>
     <string name="set_share_zip">שליחה כקובץ zip (אם האימייל חוסם APK)</string>
     <string name="set_share_failed">לא ניתן היה להכין את הקובץ לשיתוף</string>
+
+    <string name="rem_repeat_yearly">כל שנה (תאריך עברי / אזכרה)</string>
 </resources>

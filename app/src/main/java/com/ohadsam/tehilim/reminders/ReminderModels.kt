@@ -29,6 +29,9 @@ sealed interface Repeat {
 
     /** Same Hebrew day of every month; day 30 falls on the 29th in 29-day months. */
     data class MonthlyHebrew(val day: Int) : Repeat
+
+    /** Every year on a Hebrew date (yahrzeit). [month] uses HebrewCalendar numbering; Adar (12) moves to Adar II (13) in leap years. */
+    data class YearlyHebrew(val month: Int, val day: Int) : Repeat
 }
 
 /** What to do when a reminder would fire on Shabbat / Yom Tov (or within the buffer around them). */

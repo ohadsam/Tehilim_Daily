@@ -27,6 +27,7 @@ object ReminderCodec {
             Repeat.Daily -> "DAILY" to 0L
             is Repeat.Weekly -> "WEEKLY" to rep.days.fold(0L) { acc, d -> acc or (1L shl (d.value - 1)) }
             is Repeat.MonthlyHebrew -> "MONTHLY_HEBREW" to rep.day.toLong()
+            is Repeat.YearlyHebrew -> "YEARLY_HEBREW" to (rep.month * 100L + rep.day)
         }
         return ReminderEntity(
             id = r.id, name = r.name, targetType = tType, targetId1 = id1, targetId2 = id2,
@@ -54,6 +55,7 @@ object ReminderCodec {
             "DAILY" -> Repeat.Daily
             "WEEKLY" -> Repeat.Weekly(DayOfWeek.entries.filter { e.repeatArg and (1L shl (it.value - 1)) != 0L }.toSet())
             "MONTHLY_HEBREW" -> Repeat.MonthlyHebrew(e.repeatArg.toInt())
+            "YEARLY_HEBREW" -> Repeat.YearlyHebrew((e.repeatArg / 100).toInt(), (e.repeatArg % 100).toInt())
             else -> return null
         }
         Reminder(

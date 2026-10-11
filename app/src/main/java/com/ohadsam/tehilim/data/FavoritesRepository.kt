@@ -19,7 +19,8 @@ object FavoriteMapping {
 
     fun decodeChapters(csv: String): List<PsalmRef> = csv.split(",").mapNotNull { if (it.isBlank()) null else parsePsalmRef(it) }
 
-    fun toEntity(f: Favorite) = FavoriteEntity(f.id, f.name, encodeChapters(f.chapters), f.colorIndex, f.sortOrder, f.createdAt)
+    fun toEntity(f: Favorite) =
+        FavoriteEntity(f.id, f.name, encodeChapters(f.chapters), f.colorIndex, f.sortOrder, f.createdAt, f.nameSpec?.encode())
 
     fun toEntity(p: Person) = PersonEntity(
         p.id, p.name, p.motherName, p.kind.name, p.yahrzeitDay, p.yahrzeitMonth, p.yahrzeitYear, p.note, p.createdAt,
@@ -31,7 +32,7 @@ object FavoriteMapping {
     )
 
     fun toDomain(e: FavoriteEntity, personIds: List<Long>) =
-        Favorite(e.id, e.name, decodeChapters(e.chaptersCsv), e.colorIndex, e.sortOrder, personIds, e.createdAt)
+        Favorite(e.id, e.name, decodeChapters(e.chaptersCsv), e.colorIndex, e.sortOrder, personIds, e.createdAt, com.ohadsam.tehilim.favorites.NameSpec.decode(e.nameSpec))
 }
 
 class FavoritesRepository(
