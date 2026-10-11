@@ -149,4 +149,25 @@ class SmokeTest {
             rule.onAllNodesWithText(text(R.string.rem_no_next)).fetchSemanticsNodes().isNotEmpty() }
         shot2("10_reminder_saved")
     }
+
+    /** Name letters: type a two-word name, preview the stanzas, save, and open the reading with the highlighted-name heading. */
+    @Test
+    fun nameLettersFlow() {
+        rule.onAllNodesWithText(text(R.string.tab_more)).onFirst().performClick()
+        runCatching { rule.onAllNodesWithText(text(R.string.whats_new_close)).onFirst().performClick() }
+        rule.onAllNodesWithText(text(R.string.tab_favorites)).onFirst().performClick()
+        rule.onAllNodesWithText(text(R.string.action_add), useUnmergedTree = true).onFirst().performClick()
+        rule.onAllNodesWithText(text(R.string.nl_menu)).onFirst().performClick()
+        rule.waitForIdle()
+        rule.onAllNodes(hasSetTextAction())[0].performTextInput("דוד חיים")
+        rule.onNode(hasText(text(R.string.nl_add_name)) and hasClickAction()).performClick()
+        rule.waitForIdle()
+        shot2("12_nameletters_form")
+        rule.onNode(hasText(text(R.string.nl_save)) and hasClickAction()).performScrollTo()
+        shot2("13_nameletters_preview")
+        rule.onNode(hasText(text(R.string.nl_save)) and hasClickAction()).performClick()
+        rule.waitUntil(8_000) { rule.onAllNodesWithText("דוד חיים", substring = true).fetchSemanticsNodes().isNotEmpty() }
+        runCatching { rule.waitUntil(15_000) { rule.onAllNodesWithText("פרק קי״ט", substring = true).fetchSemanticsNodes().isNotEmpty() } }
+        shot2("14_nameletters_reader")
+    }
 }
