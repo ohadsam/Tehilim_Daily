@@ -76,6 +76,10 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     container,
                     initialWeek = entry.arguments?.getString("mode") == "week",
                     onContinue = { nav.navigate("browse?chapter=$it&verse=0") },
+                    onOpenChapter = { chapter, verse -> nav.navigate("browse?chapter=$chapter&verse=$verse") },
+                    onOpenBookmarks = { nav.navigate("bookmarks") },
+                    onOpenSearch = { nav.navigate("search") },
+                    onOpenReminders = { nav.navigate(Destination.REMINDERS.route) },
                 )
             }
             composable(
@@ -93,9 +97,13 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenBookmarks = { nav.navigate("bookmarks") },
                 )
             }
-            composable(Destination.FAVORITES.route) {
+            composable(
+                "favorites?add={add}",
+                listOf(navArgument("add") { type = NavType.StringType; defaultValue = "" }),
+            ) { entry ->
                 FavoritesScreen(
                     container,
+                    autoAdd = entry.arguments?.getString("add").orEmpty(),
                     onOpenFavorite = { nav.navigate("favorite/$it") },
                     onOpenPerson = { nav.navigate("person/$it") },
                     onOpenNameLetters = { nav.navigate("nameletters?person=${it ?: -1L}") },

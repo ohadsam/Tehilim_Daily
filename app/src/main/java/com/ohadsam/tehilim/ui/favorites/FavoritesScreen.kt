@@ -71,6 +71,8 @@ fun FavoritesScreen(
     onOpenFavorite: (Long) -> Unit,
     onOpenPerson: (Long) -> Unit,
     onOpenNameLetters: (Long?) -> Unit = {},
+    /** From a widget's ➕: "favorite" | "refuah" | "ilui" opens the matching editor straight away. */
+    autoAdd: String = "",
 ) {
     val state by container.favorites.state.collectAsState(initial = FavoritesState(emptyList(), emptyList()))
     var tab by rememberSaveable { mutableStateOf(FavTab.ALL) }
@@ -78,6 +80,13 @@ fun FavoritesScreen(
     var menuOpen by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    androidx.compose.runtime.LaunchedEffect(autoAdd) {
+        when (autoAdd) {
+            "favorite" -> editor = Editor.OfFavorite(null)
+            "refuah" -> editor = Editor.OfPerson(null, PersonKind.REFUAH)
+            "ilui" -> editor = Editor.OfPerson(null, PersonKind.ILUI_NISHMAT)
+        }
+    }
 
     val undoLabel = stringResource(R.string.action_undo)
     val deletedMsg = stringResource(R.string.fav_deleted)

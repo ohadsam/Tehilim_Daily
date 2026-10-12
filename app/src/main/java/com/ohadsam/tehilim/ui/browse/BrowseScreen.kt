@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,7 +46,12 @@ import com.ohadsam.tehilim.domain.title
 import com.ohadsam.tehilim.favorites.FavoritesState
 import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.ChapterPage
+import com.ohadsam.tehilim.ui.reader.AutoScrollPlayback
+import com.ohadsam.tehilim.ui.reader.AutoScrollToolbar
 import com.ohadsam.tehilim.ui.reader.ChipStrip
+import com.ohadsam.tehilim.ui.reader.ReaderToolbar
+import com.ohadsam.tehilim.ui.reader.ToolbarAction
+import com.ohadsam.tehilim.ui.reader.rememberAutoScrollController
 import kotlinx.coroutines.launch
 
 /** Parses "119", "קיט", "קי״ט" → chapter number in 1..150, or null. */
@@ -75,43 +81,66 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
         }
     }
 
+    val autoScroll = rememberAutoScrollController(container.autoScrollPrefs)
+    var focusMode by remember { mutableStateOf(false) }
+    androidx.compose.runtime.DisposableEffect(autoScroll, pager) {
+        autoScroll.advance = {
+            val now = pager.currentPage
+            if (now < PSALMS_COUNT - 1) { scope.launch { pager.animateScrollToPage(now + 1) }; true } else false
+        }
+        onDispose { autoScroll.advance = null }
+    }
+    AutoScrollPlayback(autoScroll)
+
     BookmarkHost(container) { hooks ->
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize()) {
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(stringResource(R.string.tab_browse), style = MaterialTheme.typography.titleLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onOpenBookmarks) {
-                    Icon(Icons.Filled.Bookmarks, contentDescription = stringResource(R.string.bm_title))
-                }
-                IconButton(onClick = onOpenSearch) {
-                    Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.browse_search_text))
-                }
-                FilledTonalButton(onClick = { showPicker = true }) {
-                    Text(stringResource(R.string.browse_pick_chapter))
-                }
+        if (!focusMode) {
+            ReaderToolbar(
+                title = stringResource(R.string.tab_browse),
+                subtitle = stringResource(R.string.reader_position, HebrewNumerals.toHebrew(pager.currentPage + 1), HebrewNumerals.toHebrew(PSALMS_COUNT)),
+                bookmarks = hooks,
+                onOpenBookmark = { b -> scope.launch { pager.scrollToPage((b.chapter - 1).coerceIn(0, PSALMS_COUNT - 1)) } },
+                onOpenAllBookmarks = onOpenBookmarks,
+                extra = {
+                    FilledTonalButton(onClick = { showPicker = true }) { Text(stringResource(R.string.browse_pick_chapter)) }
+                },
+                actions = listOf(
+                    ToolbarAction(stringResource(R.string.tb_search), onOpenSearch),
+                    ToolbarAction(stringResource(R.string.tb_focus)) { focusMode = true },
+                ),
+            )
+            if (visited.size > 1) {
+                ChipStrip(
+                    labels = visited.map { HebrewNumerals.toHebrew(it) },
+                    selectedIndex = visited.indexOf(pager.currentPage + 1),
+                    onSelect = { scope.launch { pager.animateScrollToPage(visited[it] - 1) } },
+                )
             }
         }
-        if (visited.size > 1) {
-            ChipStrip(
-                labels = visited.map { HebrewNumerals.toHebrew(it) },
-                selectedIndex = visited.indexOf(pager.currentPage + 1),
-                onSelect = { scope.launch { pager.animateScrollToPage(visited[it] - 1) } },
-            )
+        androidx.compose.foundation.layout.Box(Modifier.weight(1f).fillMaxWidth()) {
+            HorizontalPager(state = pager, modifier = Modifier.fillMaxSize(), key = { it }, beyondViewportPageCount = 1) { page ->
+                val ref = PsalmRef(page + 1)
+                ChapterPage(
+                    container.psalms, ref, settings,
+                    starred = favState.starFor(ref) != null,
+                    onToggleStar = { scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
+                    highlightVerse = if (ref.chapter == initialChapter) initialVerse else 0,
+                    bookmarks = hooks,
+                    autoScroll = autoScroll,
+                    active = page == pager.currentPage,
+                )
+            }
+            AutoScrollToolbar(autoScroll, settings.keepScreenOn, Modifier.align(Alignment.BottomStart))
         }
-        HorizontalPager(state = pager, modifier = Modifier.weight(1f).fillMaxWidth(), key = { it }, beyondViewportPageCount = 1) { page ->
-            val ref = PsalmRef(page + 1)
-            ChapterPage(
-                container.psalms, ref, settings,
-                starred = favState.starFor(ref) != null,
-                onToggleStar = { scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
-                highlightVerse = if (ref.chapter == initialChapter) initialVerse else 0,
-                bookmarks = hooks,
-            )
-        }
+    }
+    if (focusMode) {
+        androidx.compose.material3.SmallFloatingActionButton(
+            onClick = { focusMode = false },
+            modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ) { Icon(Icons.Filled.FullscreenExit, stringResource(R.string.tb_exit_focus)) }
+    }
     }
     }
 

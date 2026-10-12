@@ -65,6 +65,9 @@ fun ChapterPage(
     highlightVerse: Int = 0,
     bookmarks: BookmarkHooks? = null,
     headingLines: List<androidx.compose.ui.text.AnnotatedString> = emptyList(),
+    autoScroll: AutoScrollController? = null,
+    /** False for the neighbouring pages a pager keeps composed: only the visible one drives auto-scroll and bookmarks. */
+    active: Boolean = true,
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -72,7 +75,7 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks, headingLines)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks, headingLines, autoScroll, active)
         }
     }
 }
@@ -87,6 +90,8 @@ private fun ChapterText(
     highlightVerse: Int,
     bookmarks: BookmarkHooks?,
     headingLines: List<androidx.compose.ui.text.AnnotatedString>,
+    autoScroll: AutoScrollController?,
+    active: Boolean,
 ) {
     val shown: (String) -> String = { TextDisplay.apply(it, settings.showNikud, settings.showTaamim) }
     val view = androidx.compose.ui.platform.LocalView.current
@@ -100,9 +105,25 @@ private fun ChapterText(
         val i = text.verses.indexOfFirst { it.number == highlightVerse }
         if (highlightVerse > 0 && i >= 0) listState.animateScrollToItem(i + 1) // +1: the title is item 0
     }
+    if (active && autoScroll != null) {
+        androidx.compose.runtime.DisposableEffect(listState, autoScroll) {
+            autoScroll.attach(listState)
+            onDispose { autoScroll.detach(listState) }
+        }
+    }
+    if (active && bookmarks != null) {
+        androidx.compose.runtime.DisposableEffect(listState, bookmarks, text) {
+            // The verse nearest the top of the screen: "add a bookmark where I am" needs no precise long-press.
+            bookmarks.visibleVerse.provider = {
+                val key = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key is Int && it.offset > -it.size / 3 }?.key
+                text.verses.firstOrNull { it.number == key }?.let { ref.chapter to it }
+            }
+            onDispose { bookmarks.visibleVerse.provider = null }
+        }
+    }
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().pauseAutoScrollOnDrag(autoScroll),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {

@@ -102,6 +102,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                     chapters = chapters,
                     settings = settings,
                     startAtEnd = false,
+                    autoScroll = com.ohadsam.tehilim.ui.reader.rememberAutoScrollController(container.autoScrollPrefs),
                     onPreviousDay = null,
                     onNextDay = null,
                     footer = {

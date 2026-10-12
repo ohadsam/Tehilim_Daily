@@ -25,4 +25,15 @@ class WidgetDisplayTest {
         assertEquals(0xFF112233.toInt(), r.background)
         assertNull(r.textColor)
     }
+
+    @Test
+    fun styleOptionsAreIndependentOfFollowAppAndClamped() {
+        val r = WidgetDisplay.resolve(WidgetDisplayPrefs(followApp = true, bold = true, family = "serif", centered = true, spacingDp = 99, bgAlpha = 0f, showTitle = false), app)
+        assertEquals(true, r.bold)
+        assertEquals("serif", r.family)
+        assertEquals(true, r.centered)
+        assertEquals(WidgetDisplay.MAX_SPACING, r.spacingDp)
+        assertEquals(WidgetDisplay.MIN_ALPHA, r.bgAlpha, 0.001f)
+        assertEquals(false, r.showTitle)
+    }
 }

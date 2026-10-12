@@ -35,25 +35,30 @@ fun BookmarkHost(container: AppContainer, modifier: Modifier = Modifier, content
     val undo = stringResource(R.string.action_undo)
     val deletedMsg = stringResource(R.string.bm_cleared)
 
+    val holder = remember { VisibleVerseHolder() }
     val hooks = remember(all) {
         val byChapter = all.groupBy { it.chapter }
-        BookmarkHooks(
-            forChapter = { ch -> byChapter[ch].orEmpty().associateBy { it.verse } },
-            onVerseLongPress = { ch, verse ->
-                val existing = byChapter[ch].orEmpty().firstOrNull { it.verse == verse.number }
-                if (existing != null) {
-                    editing = existing
-                } else {
-                    scope.launch {
-                        val created = container.bookmarks.add(ch, verse.number, verse.text)
-                        if (snackbar.showSnackbar(savedMsg, undo, duration = SnackbarDuration.Short) == SnackbarResult.ActionPerformed) {
-                            // The id returned by add() is the row id, so Undo deletes exactly this bookmark.
-                            container.bookmarks.delete(created.id)
-                        }
+        val addOrEdit: (Int, com.ohadsam.tehilim.domain.Verse) -> Unit = { ch, verse ->
+            val existing = byChapter[ch].orEmpty().firstOrNull { it.verse == verse.number }
+            if (existing != null) {
+                editing = existing
+            } else {
+                scope.launch {
+                    val created = container.bookmarks.add(ch, verse.number, verse.text)
+                    if (snackbar.showSnackbar(savedMsg, undo, duration = SnackbarDuration.Short) == SnackbarResult.ActionPerformed) {
+                        // The id returned by add() is the row id, so Undo deletes exactly this bookmark.
+                        container.bookmarks.delete(created.id)
                     }
                 }
-            },
+            }
+        }
+        BookmarkHooks(
+            forChapter = { ch -> byChapter[ch].orEmpty().associateBy { it.verse } },
+            onVerseLongPress = addOrEdit,
             onMarkerClick = { editing = it },
+            all = all,
+            onAddHere = { holder.current()?.let { (ch, v) -> addOrEdit(ch, v) } },
+            visibleVerse = holder,
         )
     }
 

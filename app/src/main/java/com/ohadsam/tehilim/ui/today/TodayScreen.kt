@@ -1,6 +1,8 @@
 package com.ohadsam.tehilim.ui.today
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +55,9 @@ import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.ChipStrip
+import com.ohadsam.tehilim.ui.reader.ReaderToolbar
+import com.ohadsam.tehilim.ui.reader.ToolbarAction
+import com.ohadsam.tehilim.ui.reader.rememberAutoScrollController
 import com.ohadsam.tehilim.said.SaidContext
 import com.ohadsam.tehilim.ui.reader.DayReader
 import com.ohadsam.tehilim.ui.reader.SaidBar
@@ -60,12 +73,25 @@ private val gregorianFormat = DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", Loc
  * Landing screen: today's chapters by Hebrew day-of-month or by weekday, with free navigation to any other
  * date/day. Follows "today" across midnight as long as the user has not navigated away from it.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodayScreen(container: AppContainer, initialWeek: Boolean = false, onContinue: (Int) -> Unit = {}) {
+fun TodayScreen(
+    container: AppContainer,
+    initialWeek: Boolean = false,
+    onContinue: (Int) -> Unit = {},
+    onOpenChapter: (chapter: Int, verse: Int) -> Unit = { _, _ -> },
+    onOpenBookmarks: () -> Unit = {},
+    onOpenSearch: () -> Unit = {},
+    onOpenReminders: () -> Unit = {},
+) {
     var mode by rememberSaveable { mutableStateOf(if (initialWeek) DayMode.WEEK else DayMode.MONTH) }
     var todayEpoch by rememberSaveable { mutableLongStateOf(container.locations.logicalToday().toEpochDay()) }
     var selectedEpoch by rememberSaveable { mutableLongStateOf(todayEpoch) }
     var startAtEnd by rememberSaveable { mutableStateOf(false) }
+    var panelExpanded by rememberSaveable { mutableStateOf(container.readerPrefs.topPanelExpanded) }
+    var focusMode by rememberSaveable { mutableStateOf(false) }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    val autoScroll = rememberAutoScrollController(container.autoScrollPrefs)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         val now = container.locations.logicalToday().toEpochDay()
@@ -99,82 +125,124 @@ fun TodayScreen(container: AppContainer, initialWeek: Boolean = false, onContinu
         selectedEpoch = date.toEpochDay()
     }
 
-    Column(Modifier.fillMaxSize()) {
-        Header(hebrew, selected, isToday, onToday = { goTo(LocalDate.ofEpochDay(todayEpoch)) })
-        val lastChapter = container.readerPrefs.lastChapter
-        if (lastChapter > 0) {
-            AssistChip(
-                onClick = { onContinue(lastChapter) },
-                label = { Text(stringResource(R.string.continue_reading, HebrewNumerals.toHebrew(lastChapter))) },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-        }
-        PrefetchCard(container)
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-            DayMode.entries.forEachIndexed { i, m ->
-                SegmentedButton(
-                    selected = mode == m,
-                    onClick = { mode = m },
-                    shape = SegmentedButtonDefaults.itemShape(i, DayMode.entries.size),
-                ) { Text(stringResource(if (m == DayMode.MONTH) R.string.mode_month_day else R.string.mode_weekday)) }
-            }
-        }
-        when (mode) {
-            DayMode.MONTH -> MonthStrip(hebrew, onPick = { goTo(it.toLocalDate()) })
-            DayMode.WEEK -> WeekStrip(selected, onPick = { goTo(it) })
-        }
+    val chapters = when (mode) {
+        DayMode.MONTH -> PsalmSchedules.monthly(hebrew.day.coerceAtMost(hebrew.daysInMonth), hebrew.daysInMonth)
+        DayMode.WEEK -> PsalmSchedules.weekly(selected.dayOfWeek)
+    }
+    val saidContext = when (mode) {
+        DayMode.MONTH -> SaidContext.monthDay(hebrew.day)
+        DayMode.WEEK -> SaidContext.weekday(selected)
+    }
+    val realToday = LocalDate.ofEpochDay(todayEpoch)
+    val said = saidEntries.any { it.date == realToday && it.context == saidContext }
+    val modeLabel = stringResource(if (mode == DayMode.MONTH) R.string.mode_month_day else R.string.mode_weekday)
 
-        val chapters = when (mode) {
-            DayMode.MONTH -> PsalmSchedules.monthly(hebrew.day.coerceAtMost(hebrew.daysInMonth), hebrew.daysInMonth)
-            DayMode.WEEK -> PsalmSchedules.weekly(selected.dayOfWeek)
-        }
-        // A new key (date + mode) rebuilds the pager so it starts on the right chapter.
-        val saidContext = when (mode) {
-            DayMode.MONTH -> SaidContext.monthDay(hebrew.day)
-            DayMode.WEEK -> SaidContext.weekday(selected)
-        }
-        val realToday = LocalDate.ofEpochDay(todayEpoch)
-        val said = saidEntries.any { it.date == realToday && it.context == saidContext }
-        androidx.compose.runtime.key(selectedEpoch, mode, startAtEnd) {
-            BookmarkHost(container, Modifier.weight(1f)) { hooks ->
-            DayReader(
-                bookmarks = hooks,
-                positions = container.positions,
-                positionKey = when (mode) {
-                    DayMode.MONTH -> com.ohadsam.tehilim.data.prefs.PositionStore.key("m", 0, selected)
-                    DayMode.WEEK -> com.ohadsam.tehilim.data.prefs.PositionStore.key("w", 0, selected)
-                },
-                repo = container.psalms,
-                chapters = chapters,
-                settings = settings,
-                startAtEnd = startAtEnd,
-                onPreviousDay = { goTo(selected.minusDays(1), atEnd = true) },
-                onNextDay = { goTo(selected.plusDays(1)) },
-                footer = { SaidBar(said, onToggle = { scope.launch { container.said.toggle(realToday, saidContext) } }) },
-                isStarred = { favState.starFor(it) != null },
-                onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
-            )
+    BookmarkHost(container) { hooks ->
+        Box(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize()) {
+                if (!focusMode) {
+                    ReaderToolbar(
+                        title = hebrew.format(),
+                        subtitle = "$modeLabel · ${selected.dayOfWeek.hebrewName} · ${gregorianFormat.format(selected)}",
+                        expanded = panelExpanded,
+                        onToggleExpanded = {
+                            panelExpanded = !panelExpanded
+                            container.readerPrefs.topPanelExpanded = panelExpanded
+                        },
+                        bookmarks = hooks,
+                        onOpenBookmark = { onOpenChapter(it.chapter, it.verse) },
+                        onOpenAllBookmarks = onOpenBookmarks,
+                        extra = {
+                            if (!isToday) TextButton(onClick = { goTo(LocalDate.ofEpochDay(todayEpoch)) }) { Text(stringResource(R.string.action_today)) }
+                        },
+                        actions = listOf(
+                            ToolbarAction(stringResource(R.string.tb_jump_date)) { showDatePicker = true },
+                            ToolbarAction(stringResource(R.string.tb_open_chapters)) { onOpenChapter(container.readerPrefs.lastChapter.coerceAtLeast(1), 0) },
+                            ToolbarAction(stringResource(R.string.tb_search), onOpenSearch),
+                            ToolbarAction(stringResource(R.string.tb_reminders), onOpenReminders),
+                            ToolbarAction(stringResource(R.string.tb_focus)) { focusMode = true },
+                        ),
+                    )
+                    AnimatedVisibility(panelExpanded) {
+                        Column {
+                            val lastChapter = container.readerPrefs.lastChapter
+                            if (lastChapter > 0) {
+                                AssistChip(
+                                    onClick = { onContinue(lastChapter) },
+                                    label = { Text(stringResource(R.string.continue_reading, HebrewNumerals.toHebrew(lastChapter))) },
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                )
+                            }
+                            PrefetchCard(container)
+                            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                                DayMode.entries.forEachIndexed { i, m ->
+                                    SegmentedButton(
+                                        selected = mode == m,
+                                        onClick = { mode = m },
+                                        shape = SegmentedButtonDefaults.itemShape(i, DayMode.entries.size),
+                                    ) { Text(stringResource(if (m == DayMode.MONTH) R.string.mode_month_day else R.string.mode_weekday)) }
+                                }
+                            }
+                            Text(
+                                stringResource(if (mode == DayMode.MONTH) R.string.strip_pick_month_day else R.string.strip_pick_weekday),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
+                            )
+                            when (mode) {
+                                DayMode.MONTH -> MonthStrip(hebrew, onPick = { goTo(it.toLocalDate()) })
+                                DayMode.WEEK -> WeekStrip(selected, onPick = { goTo(it) })
+                            }
+                            HorizontalDivider(Modifier.padding(top = 4.dp))
+                        }
+                    }
+                }
+                // A new key (date + mode) rebuilds the pager so it starts on the right chapter.
+                androidx.compose.runtime.key(selectedEpoch, mode, startAtEnd) {
+                    DayReader(
+                        modifier = Modifier.weight(1f),
+                        bookmarks = hooks,
+                        positions = container.positions,
+                        positionKey = when (mode) {
+                            DayMode.MONTH -> com.ohadsam.tehilim.data.prefs.PositionStore.key("m", 0, selected)
+                            DayMode.WEEK -> com.ohadsam.tehilim.data.prefs.PositionStore.key("w", 0, selected)
+                        },
+                        repo = container.psalms,
+                        chapters = chapters,
+                        settings = settings,
+                        startAtEnd = startAtEnd,
+                        onPreviousDay = { goTo(selected.minusDays(1), atEnd = true) },
+                        onNextDay = { goTo(selected.plusDays(1)) },
+                        footer = { SaidBar(said, onToggle = { scope.launch { container.said.toggle(realToday, saidContext) } }) },
+                        isStarred = { favState.starFor(it) != null },
+                        onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
+                        autoScroll = autoScroll,
+                        focusMode = focusMode,
+                    )
+                }
+            }
+            if (focusMode) {
+                SmallFloatingActionButton(
+                    onClick = { focusMode = false },
+                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                ) { Icon(Icons.Filled.FullscreenExit, stringResource(R.string.tb_exit_focus)) }
             }
         }
     }
-}
 
-@Composable
-private fun Header(hebrew: HebrewDate, date: LocalDate, isToday: Boolean, onToday: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(hebrew.format(), style = MaterialTheme.typography.titleLarge)
-            Text(
-                "${date.dayOfWeek.hebrewName} · ${gregorianFormat.format(date)}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        if (!isToday) AssistChip(onClick = onToday, label = { Text(stringResource(R.string.action_today)) })
+    if (showDatePicker) {
+        val pickerState = rememberDatePickerState(initialSelectedDateMillis = selected.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli())
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    pickerState.selectedDateMillis?.let { goTo(java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate()) }
+                    showDatePicker = false
+                }) { Text(stringResource(R.string.action_ok)) }
+            },
+            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.action_cancel)) } },
+        ) { DatePicker(pickerState) }
     }
 }
 

@@ -43,6 +43,8 @@ class AppContainer(context: Context) {
 
     val readerPrefs: ReaderPrefs = ReaderPrefs(context.applicationContext)
 
+    val autoScrollPrefs: com.ohadsam.tehilim.data.prefs.AutoScrollPrefs = com.ohadsam.tehilim.data.prefs.AutoScrollPrefs(context.applicationContext)
+
     val positions: PositionStore = PositionStore(context.applicationContext)
 
     val themePrefs: ThemePrefs = ThemePrefs(context.applicationContext)

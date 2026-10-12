@@ -56,7 +56,14 @@ class ReaderPrefs(context: Context) {
         get() = prefs.getBoolean(KEY_PREFETCH_DISMISSED, false)
         set(value) = prefs.edit().putBoolean(KEY_PREFETCH_DISMISSED, value).apply()
 
+    /** The date/day navigation panel on the home screen is expanded (default: collapsed so the text gets the room). */
+    var topPanelExpanded: Boolean
+        get() = prefs.getBoolean(KEY_PANEL, false)
+        set(value) = prefs.edit().putBoolean(KEY_PANEL, value).apply()
+
     private companion object {
+        const val KEY_PANEL = "top_panel_expanded"
+
         const val KEY_PREFETCH_DISMISSED = "prefetch_dismissed"
         const val KEY_LAST_CHAPTER = "last_chapter"
         const val KEY_SIZE = "font_size_sp"

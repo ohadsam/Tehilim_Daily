@@ -113,18 +113,8 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                         }
 
                         Text("תצוגה", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
-                        ToggleRow("ללכת לפי הגדרות הקריאה של האפליקציה (גודל, ניקוד, טעמים, מספרי פסוקים)", display.followApp) { display = display.copy(followApp = it) }
-                        if (!display.followApp) {
-                            Text("גודל גופן: ${display.fontSp.toInt()}")
-                            Slider(display.fontSp, { display = display.copy(fontSp = it) }, valueRange = WidgetDisplay.MIN_SP..WidgetDisplay.MAX_SP)
-                            ToggleRow("ניקוד", display.nikud) { display = display.copy(nikud = it) }
-                            ToggleRow("טעמי מקרא", display.taamim) { display = display.copy(taamim = it) }
-                            ToggleRow("מספרי פסוקים", display.numbers) { display = display.copy(numbers = it) }
-                        }
-                        Text("צבע רקע")
-                        Swatches(BACKGROUNDS, display.background) { display = display.copy(background = it) }
-                        Text("צבע טקסט")
-                        Swatches(TEXTS, display.textColor) { display = display.copy(textColor = it) }
+                        StylePreview(display, container.readerPrefs.settings.collectAsState().value)
+                        StyleEditor(display, { display = it })
                         Text("לחיצה על מספר פסוק בווידג'ט שומרת או מסירה סימניה — אותן סימניות כמו באפליקציה. מיקום הפרק והסימון ״נאמר״ משותפים לאפליקציה.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                         Button(enabled = loaded, onClick = {
@@ -133,13 +123,7 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                                 updateAppWidgetState(this@ReaderWidgetConfigActivity, glanceId) {
                                     it[ReaderKeys.SOURCE] = source
                                     it[ReaderKeys.SOURCE_ID] = sourceId
-                                    it[ReaderKeys.FOLLOW_APP] = display.followApp
-                                    it[ReaderKeys.FONT_SP] = display.fontSp
-                                    it[ReaderKeys.NIKUD] = display.nikud
-                                    it[ReaderKeys.TAAMIM] = display.taamim
-                                    it[ReaderKeys.NUMBERS] = display.numbers
-                                    it[ReaderKeys.BACKGROUND] = display.background
-                                    it[ReaderKeys.TEXT_COLOR] = display.textColor
+                                    ReaderKeys.write(it, display)
                                 }
                                 ReaderWidget().update(this@ReaderWidgetConfigActivity, glanceId)
                                 setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
@@ -150,34 +134,5 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    @Composable
-    private fun ToggleRow(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, Modifier.weight(1f))
-            Switch(value, onChange)
-        }
-    }
-
-    @Composable
-    private fun Swatches(colors: List<Color>, selected: Int, onPick: (Int) -> Unit) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { onPick(0) }) { Text("ברירת מחדל") }
-            colors.forEach { c ->
-                val argb = c.toArgb()
-                val sel = selected == argb
-                Box(
-                    Modifier.size(36.dp).clip(CircleShape).background(c)
-                        .border(if (sel) 3.dp else 1.dp, if (sel) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline, CircleShape)
-                        .clickable { onPick(argb) },
-                )
-            }
-        }
-    }
-
-    private companion object {
-        val BACKGROUNDS = listOf(0xFFFBF6EA, 0xFFFFFFFF, 0xFFF4ECD8, 0xFFEAF4EA, 0xFF1C2335, 0xFF0F1420, 0xFF000000).map { Color(it) }
-        val TEXTS = listOf(0xFF1B1B1F, 0xFF000000, 0xFF3E2C00, 0xFFFFFFFF, 0xFFE6E1D6, 0xFFF2C14E).map { Color(it) }
     }
 }

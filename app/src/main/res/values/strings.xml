@@ -344,4 +344,39 @@
     <string name="nl_stanza_neshama">נשמה · פסוקים %1$s–%2$s</string>
     <string name="nl_save">שמירה כמועדף</string>
     <string name="nl_favorite_name">אותיות השם — %1$s</string>
+
+    <!-- Reader chrome, quick navigation, auto-scroll (0.12.0) -->
+    <string name="reader_strip_label">פרקי היום</string>
+    <string name="strip_pick_month_day">בחירת יום בחודש העברי</string>
+    <string name="strip_pick_weekday">בחירת יום בשבוע</string>
+    <string name="action_collapse">כיווץ</string>
+    <string name="action_expand">הרחבה</string>
+    <string name="action_more">עוד פעולות</string>
+    <string name="tb_jump_date">מעבר לתאריך…</string>
+    <string name="tb_open_chapters">עיון בכל הפרקים</string>
+    <string name="tb_search">חיפוש בטקסט</string>
+    <string name="tb_reminders">תזכורות</string>
+    <string name="tb_focus">מצב קריאה (מסך מלא)</string>
+    <string name="tb_exit_focus">יציאה ממצב קריאה</string>
+    <string name="bm_menu">סימניות</string>
+    <string name="bm_add_here">הוסף סימניה במקום שבו אני קורא</string>
+    <string name="bm_all">כל הסימניות…</string>
+    <string name="said_mark_short">נאמר</string>
+    <string name="said_done_short">נאמר</string>
+    <string name="as_start">התחלת גלילה אוטומטית</string>
+    <string name="as_play">המשך גלילה</string>
+    <string name="as_pause">השהיית גלילה</string>
+    <string name="as_stop">עצירת גלילה</string>
+    <string name="as_slower">לאט יותר</string>
+    <string name="as_faster">מהר יותר</string>
+    <string name="as_speed">מהירות %1$d</string>
+    <string name="as_end">הגעת לסוף</string>
+    <string name="as_left">%1$d%% · נותרו %2$s</string>
+    <string name="as_paused_left">מושהה · %1$d%% · נותרו %2$s</string>
+    <string name="set_autoscroll">גלילה אוטומטית</string>
+    <string name="set_as_speed">מהירות ברירת מחדל (%1$d)</string>
+    <string name="set_as_delay">השהיה בתחילת קטע חדש (%1$d שנ׳)</string>
+    <string name="set_as_pause_touch">השהיה כשנוגעים במסך וגוללים</string>
+    <string name="set_as_awake">שמירת המסך דלוק בזמן גלילה</string>
+    <string name="set_as_advance">מעבר אוטומטי לפרק / ליום הבא בסוף הפרק</string>
 </resources>

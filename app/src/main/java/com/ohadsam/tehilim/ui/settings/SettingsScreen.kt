@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.BuildConfig
 import com.ohadsam.tehilim.R
@@ -88,6 +89,7 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val theme by container.themePrefs.settings.collectAsState()
     val reader by container.readerPrefs.settings.collectAsState()
+    val autoScroll by container.autoScrollPrefs.settings.collectAsState()
     val prayer by container.prayerPrefs.settings.collectAsState()
     var cached by remember { mutableIntStateOf(0) }
     val prefetchState by container.prefetch.state.collectAsState()
@@ -168,6 +170,20 @@ fun SettingsScreen(
             SwitchRow(R.string.set_taamim, reader.showTaamim) { v -> container.readerPrefs.update { it.copy(showTaamim = v) } }
             SwitchRow(R.string.set_verse_numbers, reader.showVerseNumbers) { v -> container.readerPrefs.update { it.copy(showVerseNumbers = v) } }
             SwitchRow(R.string.set_keep_screen, reader.keepScreenOn) { v -> container.readerPrefs.update { it.copy(keepScreenOn = v) } }
+        }
+
+        Section(R.string.set_autoscroll) {
+            Label(R.string.set_as_speed, autoScroll.speed)
+            Slider(
+                autoScroll.speed.toFloat(), { v -> container.autoScrollPrefs.update { it.copy(speed = v.roundToInt()) } },
+                valueRange = com.ohadsam.tehilim.domain.AutoScrollMath.MIN_LEVEL.toFloat()..com.ohadsam.tehilim.domain.AutoScrollMath.MAX_LEVEL.toFloat(),
+                steps = com.ohadsam.tehilim.domain.AutoScrollMath.MAX_LEVEL - com.ohadsam.tehilim.domain.AutoScrollMath.MIN_LEVEL - 1,
+            )
+            Label(R.string.set_as_delay, autoScroll.sectionDelaySec)
+            Slider(autoScroll.sectionDelaySec.toFloat(), { v -> container.autoScrollPrefs.update { it.copy(sectionDelaySec = v.roundToInt()) } }, valueRange = 0f..10f, steps = 9)
+            SwitchRow(R.string.set_as_advance, autoScroll.autoAdvance) { v -> container.autoScrollPrefs.update { it.copy(autoAdvance = v) } }
+            SwitchRow(R.string.set_as_pause_touch, autoScroll.pauseOnTouch) { v -> container.autoScrollPrefs.update { it.copy(pauseOnTouch = v) } }
+            SwitchRow(R.string.set_as_awake, autoScroll.keepAwake) { v -> container.autoScrollPrefs.update { it.copy(keepAwake = v) } }
         }
 
         Section(R.string.set_prayers) {
@@ -304,7 +320,7 @@ private fun Section(title: Int, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Label(res: Int) = Text(stringResource(res), style = MaterialTheme.typography.labelLarge)
+private fun Label(res: Int, vararg args: Any) = Text(stringResource(res, *args), style = MaterialTheme.typography.labelLarge)
 
 @Composable
 private fun SwitchRow(label: Int, value: Boolean, onChange: (Boolean) -> Unit) {

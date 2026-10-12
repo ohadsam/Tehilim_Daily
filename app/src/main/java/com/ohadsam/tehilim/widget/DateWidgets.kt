@@ -1,6 +1,8 @@
 package com.ohadsam.tehilim.widget
 
 import android.content.Context
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -34,6 +36,7 @@ class HebrewDateWidget : GlanceAppWidget() {
         val h = HebrewCalendar.fromLocalDate(today)
         val chapters = summarizeChapters(PsalmSchedules.monthly(h.day.coerceAtMost(h.daysInMonth), h.daysInMonth))
         provideContent {
+            val reminders by context.container.reminders.reminders.collectAsState(initial = emptyList())
             GlanceTheme(colors = widgetColors(context)) {
                 Column(
                     GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(10.dp)
@@ -44,6 +47,7 @@ class HebrewDateWidget : GlanceAppWidget() {
                     Text(HebrewNumerals.toHebrew(h.day), style = TextStyle(color = GlanceTheme.colors.secondary, fontSize = 30.sp, fontWeight = FontWeight.Bold))
                     Text("${h.monthName} ${HebrewCalendar.yearLabel(h.year)}", style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, textAlign = TextAlign.Center))
                     Text(chapters, style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 11.sp, textAlign = TextAlign.Center), maxLines = 2)
+                    reminders.count { it.enabled }.takeIf { it > 0 }?.let { Pill("⏰ $it", openApp(context, "reminders"), GlanceModifier.padding(top = 4.dp)) }
                 }
             }
         }
@@ -60,6 +64,7 @@ class WeekdayWidget : GlanceAppWidget() {
         val today = context.container.locations.logicalToday()
         val chapters = summarizeChapters(PsalmSchedules.weekly(today.dayOfWeek))
         provideContent {
+            val reminders by context.container.reminders.reminders.collectAsState(initial = emptyList())
             GlanceTheme(colors = widgetColors(context)) {
                 Column(
                     GlanceModifier.fillMaxSize().cornerRadius(20.dp).background(GlanceTheme.colors.surface).padding(10.dp)
@@ -69,6 +74,7 @@ class WeekdayWidget : GlanceAppWidget() {
                 ) {
                     Text(today.dayOfWeek.hebrewName, style = TextStyle(color = GlanceTheme.colors.secondary, fontSize = 20.sp, fontWeight = FontWeight.Bold))
                     Text("תהילים $chapters", style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, textAlign = TextAlign.Center), maxLines = 3)
+                    reminders.count { it.enabled }.takeIf { it > 0 }?.let { Pill("⏰ $it", openApp(context, "reminders"), GlanceModifier.padding(top = 4.dp)) }
                 }
             }
         }
