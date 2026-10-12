@@ -49,6 +49,7 @@ import com.ohadsam.tehilim.ui.reader.ChapterPage
 import com.ohadsam.tehilim.ui.reader.AutoScrollPlayback
 import com.ohadsam.tehilim.ui.reader.AutoScrollToolbar
 import com.ohadsam.tehilim.ui.reader.ChipStrip
+import com.ohadsam.tehilim.ui.reader.CommentaryToggle
 import com.ohadsam.tehilim.ui.reader.ReaderToolbar
 import com.ohadsam.tehilim.ui.reader.ToolbarAction
 import com.ohadsam.tehilim.ui.reader.rememberAutoScrollController
@@ -103,6 +104,7 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
                 onOpenBookmark = { b -> scope.launch { pager.scrollToPage((b.chapter - 1).coerceIn(0, PSALMS_COUNT - 1)) } },
                 onOpenAllBookmarks = onOpenBookmarks,
                 extra = {
+                    CommentaryToggle(settings.showCommentary) { container.readerPrefs.update { it.copy(showCommentary = !it.showCommentary) } }
                     FilledTonalButton(onClick = { showPicker = true }) { Text(stringResource(R.string.browse_pick_chapter)) }
                 },
                 actions = listOf(
@@ -129,6 +131,7 @@ fun BrowseScreen(container: AppContainer, initialChapter: Int = 1, initialVerse:
                     bookmarks = hooks,
                     autoScroll = autoScroll,
                     active = page == pager.currentPage,
+                    commentary = container.commentary,
                 )
             }
             AutoScrollToolbar(autoScroll, settings.keepScreenOn, Modifier.align(Alignment.BottomStart))

@@ -58,7 +58,7 @@ class AppContainer(context: Context) {
     private val database: AppDatabase by lazy {
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "tehilim.db")
             // Pre-release debug builds may change the schema between installs; release builds never wipe data (add migrations instead).
-            .addMigrations(com.ohadsam.tehilim.data.db.Migrations.V1_V2)
+            .addMigrations(com.ohadsam.tehilim.data.db.Migrations.V1_V2, com.ohadsam.tehilim.data.db.Migrations.V2_V3)
             .apply { if (com.ohadsam.tehilim.BuildConfig.DEBUG) fallbackToDestructiveMigration(dropAllTables = true) }
             .build()
     }
@@ -72,6 +72,14 @@ class AppContainer(context: Context) {
 
     val psalms: PsalmsRepository by lazy {
         PsalmsRepository(RoomPsalmsLocal(database.chapterDao()), SefariaApi(httpClient), logger)
+    }
+
+    val commentary: com.ohadsam.tehilim.data.CommentaryRepository by lazy {
+        com.ohadsam.tehilim.data.CommentaryRepository(
+            com.ohadsam.tehilim.data.db.RoomCommentaryLocal(database.commentaryDao()),
+            com.ohadsam.tehilim.data.sefaria.SefariaCommentaryApi(httpClient),
+            logger,
+        )
     }
 
     val favorites: FavoritesRepository by lazy { FavoritesRepository(database.favoriteDao(), logger) }

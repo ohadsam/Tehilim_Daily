@@ -77,6 +77,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
         Row(Modifier.fillMaxWidth().padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.action_back)) }
             Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+            com.ohadsam.tehilim.ui.reader.CommentaryToggle(settings.showCommentary) { container.readerPrefs.update { it.copy(showCommentary = !it.showCommentary) } }
         }
         Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             people.forEach { PersonTag(it) }
@@ -102,6 +103,7 @@ fun FavoriteReaderScreen(container: AppContainer, favoriteId: Long?, personId: L
                     chapters = chapters,
                     settings = settings,
                     startAtEnd = false,
+                    commentary = container.commentary,
                     autoScroll = com.ohadsam.tehilim.ui.reader.rememberAutoScrollController(container.autoScrollPrefs),
                     onPreviousDay = null,
                     onNextDay = null,

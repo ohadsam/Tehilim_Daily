@@ -37,8 +37,8 @@ interface ChapterDao {
 }
 
 @Database(
-    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class, SaidEntity::class, BookmarkEntity::class, ReminderEntity::class],
-    version = 2,
+    entities = [ChapterEntity::class, FavoriteEntity::class, PersonEntity::class, FavoritePersonEntity::class, SaidEntity::class, BookmarkEntity::class, ReminderEntity::class, CommentaryEntity::class],
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -51,4 +51,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookmarkDao(): BookmarkDao
 
     abstract fun reminderDao(): ReminderDao
+
+    abstract fun commentaryDao(): CommentaryDao
 }

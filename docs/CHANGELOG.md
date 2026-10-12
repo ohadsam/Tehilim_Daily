@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.0
+- Commentary on Psalms from Sefaria (verified live, tools/sefaria_commentary_probe.py): `GET /api/v3/texts/{Commentator} on Psalms {N}?version=hebrew` → `versions[0].text[verse-1]` = list of comments (flat string for Steinsaltz). v1 `texts` returns only the first verse section and `links?with_text=1` is 4 MB per chapter / times out, so neither is used.
+- Reader: "פירוש" toggle (toolbar, favorites reader) shows the chosen commentary under each verse that has one, smaller, in the palette's primary colour, opening words bold; hide with a second tap. Commentators: Metzudat David (default), Rashi, Ibn Ezra, Radak, Malbim, Meiri, Steinsaltz (Settings).
+- Room v3: `commentary_chapter` (migration V2_V3); local-first like the psalm text, only non-empty answers are stored; cleared with the text cache.
+
 ## 0.12.0
 - Reader redesign (owner feedback from a device screenshot): one slim toolbar (Hebrew date + mode/weekday/Gregorian) replaces the stack of headers; the day-picker panel (mode switch + day strip) is collapsible and remembered; the chapter strip has its own labelled, collapsible row ("פרקי היום · פרק א׳ מתוך ט׳") so day navigation and chapter navigation can no longer be confused; one bottom row `previous | said | next`; focus mode (text only).
 - Quick navigation: ⋮ menu (jump to date, browse all chapters, search, reminders, focus mode); 🔖 menu (add bookmark where I'm reading, 5 latest bookmarks, all bookmarks).

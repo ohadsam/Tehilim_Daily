@@ -11,4 +11,14 @@ object Migrations {
             db.execSQL("ALTER TABLE favorite ADD COLUMN nameSpec TEXT")
         }
     }
+
+    /** v3: cached commentary (פירושים) per chapter and commentator. */
+    val V2_V3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `commentary_chapter` (`chapter` INTEGER NOT NULL, `source` TEXT NOT NULL, " +
+                    "`json` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`chapter`, `source`))",
+            )
+        }
+    }
 }

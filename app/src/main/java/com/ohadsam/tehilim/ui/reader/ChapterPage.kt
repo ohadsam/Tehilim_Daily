@@ -68,6 +68,7 @@ fun ChapterPage(
     autoScroll: AutoScrollController? = null,
     /** False for the neighbouring pages a pager keeps composed: only the visible one drives auto-scroll and bookmarks. */
     active: Boolean = true,
+    commentary: com.ohadsam.tehilim.data.CommentaryRepository? = null,
 ) {
     var retry by remember(ref) { mutableIntStateOf(0) }
     val state by rememberPsalm(repo, ref, retry)
@@ -75,7 +76,7 @@ fun ChapterPage(
         when (val s = state) {
             LoadState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
             is LoadState.Error -> ErrorBox(s.kind, onRetry = { retry++ }, Modifier.align(Alignment.Center))
-            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks, headingLines, autoScroll, active)
+            is LoadState.Success -> ChapterText(ref, s.text, settings, starred, onToggleStar, highlightVerse, bookmarks, headingLines, autoScroll, active, commentary)
         }
     }
 }
@@ -92,6 +93,7 @@ private fun ChapterText(
     headingLines: List<androidx.compose.ui.text.AnnotatedString>,
     autoScroll: AutoScrollController?,
     active: Boolean,
+    commentaryRepo: com.ohadsam.tehilim.data.CommentaryRepository?,
 ) {
     val shown: (String) -> String = { TextDisplay.apply(it, settings.showNikud, settings.showTaamim) }
     val view = androidx.compose.ui.platform.LocalView.current
@@ -101,6 +103,9 @@ private fun ChapterText(
     }
     val marks = remember(bookmarks, ref.chapter) { bookmarks?.forChapter?.invoke(ref.chapter).orEmpty() }
     val listState = rememberLazyListState()
+    val commentarySource = com.ohadsam.tehilim.domain.CommentarySource.fromKey(settings.commentaryKey)
+    var commentaryRetry by remember(ref) { mutableIntStateOf(0) }
+    val commentary by rememberCommentary(commentaryRepo, ref.chapter, commentarySource, settings.showCommentary, commentaryRetry)
     LaunchedEffect(highlightVerse, text) {
         val i = text.verses.indexOfFirst { it.number == highlightVerse }
         if (highlightVerse > 0 && i >= 0) listState.animateScrollToItem(i + 1) // +1: the title is item 0
@@ -157,9 +162,15 @@ private fun ChapterText(
                 }
             }
         }
+        if (settings.showCommentary) {
+            item(key = "commentary-status") {
+                CommentaryStatus(commentary, commentarySource, onRetry = { commentaryRetry++ })
+            }
+        }
         items(text.verses, key = { it.number }) { v ->
             val marked = v.number == highlightVerse
             val mark = marks[v.number]
+            Column(Modifier.fillMaxWidth()) {
             Row(
                 Modifier.fillMaxWidth()
                     .background(if (marked) MaterialTheme.colorScheme.secondaryContainer else androidx.compose.ui.graphics.Color.Transparent)
@@ -199,6 +210,25 @@ private fun ChapterText(
                     modifier = Modifier.weight(1f),
                 )
             }
+            val comments = (commentary as? CommentaryState.Loaded)?.byVerse?.get(v.number)
+            if (settings.showCommentary && !comments.isNullOrEmpty()) {
+                val size = (settings.fontSizeSp * COMMENTARY_SCALE).coerceAtLeast(MIN_COMMENTARY_SP)
+                // Same start inset as the verse text so the commentary sits right under the verse it explains.
+                val inset = if (settings.showVerseNumbers) (settings.fontSizeSp * 1.7f).dp else 0.dp
+                comments.forEach { c ->
+                    Text(
+                        commentaryAnnotated(c, shown),
+                        style = ReaderTextStyle.copy(
+                            fontFamily = ReaderFont.fromKey(settings.fontKey).family,
+                            fontSize = size.sp,
+                            lineHeight = (size * COMMENTARY_LINE).sp,
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth().padding(start = inset, top = 2.dp, bottom = 4.dp),
+                    )
+                }
+            }
+            }
         }
         item(key = "source") {
             Text(
@@ -230,3 +260,7 @@ private fun ErrorBox(kind: PsalmErrorKind, onRetry: () -> Unit, modifier: Modifi
         Button(onClick = onRetry) { Text(stringResource(R.string.action_retry)) }
     }
 }
+
+private const val COMMENTARY_SCALE = 0.72f
+private const val MIN_COMMENTARY_SP = 12f
+private const val COMMENTARY_LINE = 1.5f

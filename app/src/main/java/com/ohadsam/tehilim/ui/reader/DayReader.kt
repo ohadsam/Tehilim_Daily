@@ -66,6 +66,7 @@ fun DayReader(
     autoScroll: AutoScrollController? = null,
     focusMode: Boolean = false,
     stripLabel: String? = null,
+    commentary: com.ohadsam.tehilim.data.CommentaryRepository? = null,
 ) {
     if (chapters.isEmpty()) return
     val saved = if (positions != null && positionKey != null) positions.get(positionKey) else 0
@@ -144,6 +145,7 @@ fun DayReader(
                     headingLines = headings?.getOrNull(page).orEmpty(),
                     autoScroll = autoScroll,
                     active = page == pager.currentPage,
+                    commentary = commentary,
                 )
             }
             if (autoScroll != null) {

@@ -378,4 +378,12 @@
     <string name="set_as_pause_touch">השהיה כשנוגעים במסך וגוללים</string>
     <string name="set_as_awake">שמירת המסך דלוק בזמן גלילה</string>
     <string name="set_as_advance">מעבר אוטומטי לפרק / ליום הבא בסוף הפרק</string>
+    <!-- Commentary (פירושים) -->
+    <string name="tb_commentary">פירוש</string>
+    <string name="set_commentary">הצגת פירוש מתחת לכל פסוק</string>
+    <string name="set_commentary_source">מקור הפירוש</string>
+    <string name="cm_loading">טוען פירוש…</string>
+    <string name="cm_source">פירוש: %1$s · מקור: ספריא</string>
+    <string name="cm_none">אין פירוש מ%1$s על פרק זה</string>
+    <string name="cm_unavailable">הפירוש לא זמין כרגע</string>
 </resources>

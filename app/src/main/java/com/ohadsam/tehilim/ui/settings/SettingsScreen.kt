@@ -169,6 +169,13 @@ fun SettingsScreen(
             SwitchRow(R.string.set_nikud, reader.showNikud) { v -> container.readerPrefs.update { it.copy(showNikud = v) } }
             SwitchRow(R.string.set_taamim, reader.showTaamim) { v -> container.readerPrefs.update { it.copy(showTaamim = v) } }
             SwitchRow(R.string.set_verse_numbers, reader.showVerseNumbers) { v -> container.readerPrefs.update { it.copy(showVerseNumbers = v) } }
+            SwitchRow(R.string.set_commentary, reader.showCommentary) { v -> container.readerPrefs.update { it.copy(showCommentary = v) } }
+            Label(R.string.set_commentary_source)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.ohadsam.tehilim.domain.CommentarySource.entries.forEach { c ->
+                    FilterChip(reader.commentaryKey == c.key, { container.readerPrefs.update { it.copy(commentaryKey = c.key) } }, { Text(c.hebrewName) })
+                }
+            }
             SwitchRow(R.string.set_keep_screen, reader.keepScreenOn) { v -> container.readerPrefs.update { it.copy(keepScreenOn = v) } }
         }
 
@@ -277,6 +284,7 @@ fun SettingsScreen(
                     confirmClearCache = false
                     scope.launch {
                         container.psalms.clearCache()
+                        container.commentary.clearCache()
                         cached = 0
                     }
                 }) { Text(stringResource(R.string.action_delete)) }

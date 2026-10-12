@@ -14,6 +14,42 @@ interface PsalmsRemote {
     suspend fun fetchChapter(chapter: Int): RemoteChapter
 }
 
+/** Shared HTTP GET with the app's error mapping (offline / 404 / server); returns the body. */
+internal fun httpGetBody(client: OkHttpClient, url: okhttp3.HttpUrl, label: String): String {
+    val request = Request.Builder().url(url).header("Accept", "application/json").build()
+    return try {
+        client.newCall(request).execute().use { resp ->
+            when {
+                resp.code == 404 -> throw PsalmException(PsalmErrorKind.NOT_FOUND, "HTTP 404 for $label")
+                !resp.isSuccessful -> throw PsalmException(PsalmErrorKind.SERVER, "HTTP ${resp.code} for $label")
+                else -> resp.body?.string() ?: throw PsalmException(PsalmErrorKind.SERVER, "empty body for $label")
+            }
+        }
+    } catch (e: IOException) {
+        throw PsalmException(PsalmErrorKind.OFFLINE, "network error for $label: ${e.message}", e)
+    }
+}
+
+/** Network source of verse-aligned commentary (one commentator, one chapter). */
+interface CommentaryRemote {
+    suspend fun fetch(chapter: Int, source: com.ohadsam.tehilim.domain.CommentarySource): Map<Int, List<String>>
+}
+
+class SefariaCommentaryApi(
+    private val client: OkHttpClient,
+    private val baseUrl: String = "https://www.sefaria.org",
+) : CommentaryRemote {
+    override suspend fun fetch(chapter: Int, source: com.ohadsam.tehilim.domain.CommentarySource): Map<Int, List<String>> = withContext(Dispatchers.IO) {
+        val label = "${source.sefariaTitle} on Psalms $chapter"
+        val url = baseUrl.toHttpUrl().newBuilder()
+            .addPathSegments("api/v3/texts")
+            .addPathSegment(label)
+            .addQueryParameter("version", "hebrew")
+            .build()
+        CommentaryParser.parse(httpGetBody(client, url, label))
+    }
+}
+
 // verified against kodesh-app's working client (see .claude/skills/sefaria-fetch); live re-check runs in CI `sefaria-probe`.
 class SefariaApi(
     private val client: OkHttpClient,
@@ -26,18 +62,7 @@ class SefariaApi(
             .addQueryParameter("commentary", "0")
             .addQueryParameter("context", "0")
             .build()
-        val request = Request.Builder().url(url).header("Accept", "application/json").build()
-        val body = try {
-            client.newCall(request).execute().use { resp ->
-                when {
-                    resp.code == 404 -> throw PsalmException(PsalmErrorKind.NOT_FOUND, "HTTP 404 for Psalms.$chapter")
-                    !resp.isSuccessful -> throw PsalmException(PsalmErrorKind.SERVER, "HTTP ${resp.code} for Psalms.$chapter")
-                    else -> resp.body?.string() ?: throw PsalmException(PsalmErrorKind.SERVER, "empty body for Psalms.$chapter")
-                }
-            }
-        } catch (e: IOException) {
-            throw PsalmException(PsalmErrorKind.OFFLINE, "network error for Psalms.$chapter: ${e.message}", e)
-        }
+        val body = httpGetBody(client, url, "Psalms.$chapter")
         SefariaParser.parseChapter(body)
     }
 }

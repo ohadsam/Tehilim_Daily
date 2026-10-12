@@ -55,6 +55,7 @@ import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.ui.bookmarks.BookmarkHost
 import com.ohadsam.tehilim.ui.reader.ChipStrip
+import com.ohadsam.tehilim.ui.reader.CommentaryToggle
 import com.ohadsam.tehilim.ui.reader.ReaderToolbar
 import com.ohadsam.tehilim.ui.reader.ToolbarAction
 import com.ohadsam.tehilim.ui.reader.rememberAutoScrollController
@@ -153,6 +154,7 @@ fun TodayScreen(
                         onOpenBookmark = { onOpenChapter(it.chapter, it.verse) },
                         onOpenAllBookmarks = onOpenBookmarks,
                         extra = {
+                            CommentaryToggle(settings.showCommentary) { container.readerPrefs.update { it.copy(showCommentary = !it.showCommentary) } }
                             if (!isToday) TextButton(onClick = { goTo(LocalDate.ofEpochDay(todayEpoch)) }) { Text(stringResource(R.string.action_today)) }
                         },
                         actions = listOf(
@@ -218,6 +220,7 @@ fun TodayScreen(
                         onToggleStar = { ref -> scope.launch { container.favorites.toggleStar(ref, ref.title(), favState) } },
                         autoScroll = autoScroll,
                         focusMode = focusMode,
+                        commentary = container.commentary,
                     )
                 }
             }

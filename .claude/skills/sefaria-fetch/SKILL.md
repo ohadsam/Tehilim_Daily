@@ -18,3 +18,7 @@ description: Verified Sefaria Psalms fetching behavior (URL, ref format, respons
 Checked: endpoint/params identical (`texts/Psalms.N?lang=he&commentary=0&context=0`); `he` string/flat/nested handled; v3 `versions[]` fallback;
 empty `he` with HTTP 200 = failure; only non-empty text cached; serial prefetch with 350 ms delay; whole chapter fetched, ranges sliced locally
 (avoids the "mid-chapter range returns whole chapter" pitfall); `length` not used. Live verification runs in CI (`sefaria-probe.yml`, both probes) since the sandbox blocks sefaria.org.
+
+## Commentary on Psalms (verified live, see tools/sefaria_commentary_probe.py)
+- Use `GET /api/v3/texts/{Name} on Psalms {N}?version=hebrew` (Name = Rashi, Metzudat David, Ibn Ezra, Radak, Malbim, Meiri, Steinsaltz). `versions[0].text` is indexed by verse (index+1); each entry is a list of comments (a plain string for Steinsaltz); empty verses are `[]`. Comments carry `<b>` for the opening words.
+- Do NOT use v1 `texts/{Name} on Psalms N` (returns only the first verse section) or `links/Psalms.N?with_text=1` (4 MB, 504 on Psalms.119).
