@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Shape of the verse-aligned commentary data Sefaria returns for Psalms (live check, run in CI)."""
-import json, sys, time, urllib.parse, urllib.request
+"""Shape of whole-chapter commentary replies for Psalms (live check, run in CI)."""
+import json, time, urllib.parse, urllib.request
 
 BASE = "https://www.sefaria.org/api/"
-WANT = ["Rashi", "Metzudat David", "Ibn Ezra", "Radak", "Malbim", "Meiri", "Steinsaltz", "Metzudat Zion"]
+NAMES = ["Rashi", "Metzudat David", "Ibn Ezra", "Radak", "Malbim", "Meiri", "Steinsaltz"]
 
 
 def get(path):
@@ -19,36 +19,24 @@ def get(path):
     return {"_error": str(last)}, 0
 
 
-def flat(x, out=None):
-    out = [] if out is None else out
+def shape(x, depth=0):
     if isinstance(x, list):
-        for i in x:
-            flat(i, out)
-    elif isinstance(x, str) and x.strip():
-        out.append(x)
-    return out
+        return "[" + ",".join(shape(i, depth + 1) for i in x[:12]) + ("…" if len(x) > 12 else "") + "]"
+    if isinstance(x, str):
+        return "s%d" % len(x)
+    return type(x).__name__
 
 
-for path in ("links/Psalms.1?with_text=1", "links/Psalms.119?with_text=1", "links/Psalms.1.2?with_text=1"):
-    d, size = get(path)
-    print(f"== {path}: bytes={size} type={type(d).__name__}")
-    if isinstance(d, dict):
-        print("   ", str(d)[:200])
-        continue
-    cats = {}
-    for l in d:
-        cats[l.get("category")] = cats.get(l.get("category"), 0) + 1
-    print("   categories:", cats)
-    commentary = [l for l in d if l.get("category") == "Commentary"]
-    print("   keys of a link:", sorted(commentary[0].keys()) if commentary else None)
-    byname = {}
-    for l in commentary:
-        byname.setdefault((l.get("collectiveTitle") or {}).get("en"), []).append(l)
-    for name in WANT:
-        ls = byname.get(name, [])
-        verses = sorted({l.get("anchorRef") for l in ls})
-        print(f"   {name}: links={len(ls)} anchors={verses[:12]}{'...' if len(verses) > 12 else ''}")
-        if ls:
-            l = ls[0]
-            he = l.get("he")
-            print(f"      sample ref={l.get('ref')!r} anchorRef={l.get('anchorRef')!r} anchorVerse={l.get('anchorVerse')!r} sourceRef={l.get('sourceRef')!r} he_type={type(he).__name__} he={str(flat(he))[:140]}")
+for name in NAMES:
+    for ch in (1, 2, 119):
+        q = urllib.parse.quote(f"{name} on Psalms {ch}", safe="")
+        for label, path in (("v1", f"texts/{q}?lang=he&commentary=0&context=0"), ("v3", f"v3/texts/{q}?version=hebrew")):
+            d, size = get(path)
+            if "_error" in d:
+                print(f"{name} {ch} {label}: ERROR {d['_error'][:70]}")
+                continue
+            if label == "v1":
+                print(f"{name} {ch} v1 bytes={size} sections={d.get('sections')} toSections={d.get('toSections')} textDepth={d.get('textDepth')} length={d.get('length')} he={shape(d.get('he'))}")
+            else:
+                vs = d.get("versions") or []
+                print(f"{name} {ch} v3 bytes={size} versions={len(vs)} " + " | ".join(f"{v.get('versionTitle')!r}:{v.get('language')}:{shape(v.get('text'))}" for v in vs[:3]) + f" err={d.get('error')}")
