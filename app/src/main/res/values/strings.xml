@@ -22,6 +22,7 @@
 
     <string name="mode_month_day">יום בחודש</string>
     <string name="mode_weekday">יום בשבוע</string>
+    <string name="action_more">עוד פעולות</string>
     <string name="action_today">היום</string>
     <string name="action_retry">נסה שוב</string>
     <string name="nav_previous_chapter">הפרק הקודם</string>
@@ -47,7 +48,6 @@
     <string name="action_save">שמירה</string>
     <string name="action_undo">בטל</string>
     <string name="action_back">חזרה</string>
-    <string name="action_more">עוד פעולות</string>
     <string name="action_star">הוספה למועדפים</string>
     <string name="action_unstar">הסרה מהמועדפים</string>
     <string name="fav_tab_all">הכל</string>
@@ -351,7 +351,6 @@
     <string name="strip_pick_weekday">בחירת יום בשבוע</string>
     <string name="action_collapse">כיווץ</string>
     <string name="action_expand">הרחבה</string>
-    <string name="action_more">עוד פעולות</string>
     <string name="tb_jump_date">מעבר לתאריך…</string>
     <string name="tb_open_chapters">עיון בכל הפרקים</string>
     <string name="tb_search">חיפוש בטקסט</string>
