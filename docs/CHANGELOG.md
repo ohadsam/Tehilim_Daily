@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.12.0
+- Reader redesign (owner feedback from a device screenshot): one slim toolbar (Hebrew date + mode/weekday/Gregorian) replaces the stack of headers; the day-picker panel (mode switch + day strip) is collapsible and remembered; the chapter strip has its own labelled, collapsible row ("פרקי היום · פרק א׳ מתוך ט׳") so day navigation and chapter navigation can no longer be confused; one bottom row `previous | said | next`; focus mode (text only).
+- Quick navigation: ⋮ menu (jump to date, browse all chapters, search, reminders, focus mode); 🔖 menu (add bookmark where I'm reading, 5 latest bookmarks, all bookmarks).
+- Auto-scroll ported from kodesh-app: ▶ button when the text overflows; pause/resume, stop, speed 1–15 (8 px/s per level), % + time left, hold at a new section, hands over to the next chapter / day, pauses on a deliberate drag, keeps the screen on; defaults in Settings. Pure maths in `AutoScrollMath` (tested).
+- Widgets: the reading widget now rebuilds its model INSIDE the composition from live flows (Glance reuses a running session on update(), so the old once-captured model never changed — the cause of the dead ‹ › buttons, "said" and bookmark taps); paging arrows are RTL-correct pill buttons; compact "said" pill; ⏰/🔖 badges (tap opens reminders / bookmarks) on every widget; per-widget look settings (font family/size/bold, alignment, spacing, colours, opacity, title, nikud/ta'amim/numbers) with live preview for ALL configurable widgets; bookmark widget = live list with two-tap delete, ➕, continue reading; favorites/refuah/ilui widgets: per-row said toggle and ➕ (opens the matching "add" editor).
+
+## 0.11.1
+- Fix: monthly division of Psalm 119 is verses 1–96 (stanzas א–ל) on day 25 and 97–176 (מ–ת) on day 26 (was 1–88 / 89–176).
+
 ## 0.11.1
 - Fix: monthly division of Psalm 119 is verses 1–96 (stanzas א–ל) on day 25 and 97–176 (מ–ת) on day 26 (was 1–88 / 89–176). Schedule, golden tests, spec and skills updated.
 

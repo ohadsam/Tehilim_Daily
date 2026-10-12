@@ -4,6 +4,7 @@
 Read order: CLAUDE.md → docs/PLAN.md → STRUCTURE.md → the batch's section in docs/SPEC.md.
 
 ## Recently done
+- v0.12.0: reader redesign + auto-scroll + live widgets (SPEC C1). Widget lesson: never capture data once in `provideGlance` — collect flows inside `provideContent` (Glance reuses the session on update()).
 - v0.9.0: everything in docs/CHANGELOG.md. CI (Android CI + Sefaria probe) is the only build/test gate (sandbox has no SDK/network).
 - v0.11.1: Psalm 119 monthly split fixed to 1–96 (א–ל) / 97–176 (מ–ת) per the owner (was 1–88 / 89–176, which also matched kodesh-app — that app has the same issue). Existing saved refs with old ranges stay valid.
 

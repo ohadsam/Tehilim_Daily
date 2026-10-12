@@ -84,3 +84,10 @@ Upgrades (user asked for suggestions): multiple bookmarks (not one per tab) + on
 ## Addendum B (owner decisions, 2026-10-11)
 ### B1 Name letters (confirmed custom)
 Input: one or more names (joined into the full name). Output: for every distinct Hebrew letter of the full name, in order of first appearance, the 8-verse stanza of Psalm 119 for that letter (final letters = regular letters); then, optionally, the stanzas of נ-ש-מ-ה (always complete, even if the same stanza already appeared for the name). Above each stanza the reader shows the name ("נשמה" for the last four) with all occurrences of that stanza's letter highlighted. Saved as a favorite linked to a person (refuah / ilui nishmat); with a yahrzeit date a yearly reminder (target: favorite + person) is created and opens the reading. Implemented: `NameLetterPlan`, `NameLettersScreen`, `Repeat.YearlyHebrew`.
+
+## Addendum C (owner feedback after first device test, 2026-10-12)
+### C1 Reader layout, quick navigation, auto-scroll, bookmarks, widgets
+- Text first: the reader screen gets one slim toolbar; every other area is collapsible (day panel, chapter strip) or hidden in focus mode. Day-selection and chapter-selection are separate, labelled strips.
+- Auto-scroll behaves like kodesh-app (`js/autoscroll.js`): levels 1–15 at 8 px/s per level; pause/resume/stop; progress + ETA computed from real position; hold of N seconds on a new section; keeps going into the next chapter/day (setting); pauses on a deliberate vertical drag (setting); keeps the screen on (setting).
+- Bookmarks (kodesh-app parity, ours are verse-based and multiple): add by long-press, add at the verse currently at the top of the screen, jump to recent/all from the toolbar, undo on delete, reminders on bookmarks (existing), widgets show/delete/add.
+- Widgets: all data shown is rebuilt inside the Glance composition from live flows (never captured once in `provideGlance`); every configurable widget has the same style editor; reminder/bookmark badges open the matching screen; actions from widgets (page, said, bookmark toggle/delete, add) write to the same repositories as the app.

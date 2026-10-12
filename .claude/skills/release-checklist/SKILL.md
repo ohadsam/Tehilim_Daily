@@ -44,6 +44,7 @@ Real incidents so far (keep concrete):
 - Navigation/lifecycle calls after a `suspend` repository call must run on `Dispatchers.Main` — under Compose test dispatchers the continuation resumes off-main and crashes (`setCurrentState`).
 - Any external-API assumption (e.g. Sefaria `length`) must be checked by the live probe, not by reading docs/memory.
 - Schedule data (e.g. the 119 split) must be confirmed by the owner, not inferred from another repo or an unverified web summary.
+- Glance widgets: data captured once in `provideGlance` is stale after `update()` (the session is reused and only recomposes) — collect flows / read `currentState` inside `provideContent`.
 - Sealed-class additions (e.g. `Repeat.YearlyHebrew`) must be handled in every `when` (planner, codec, list text, editor) — grep before pushing.
 
 ## 8. Merge
