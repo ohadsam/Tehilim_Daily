@@ -65,6 +65,24 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reader" />
         </receiver>
+        <receiver android:name=".widget.ReaderFavoriteWidgetReceiver" android:exported="true" android:label="@string/widget_reader_favorite_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reader_favorite" />
+        </receiver>
+        <receiver android:name=".widget.ReaderRefuahWidgetReceiver" android:exported="true" android:label="@string/widget_reader_refuah_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reader_refuah" />
+        </receiver>
+        <receiver android:name=".widget.ReaderIluiWidgetReceiver" android:exported="true" android:label="@string/widget_reader_ilui_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_reader_ilui" />
+        </receiver>
         <receiver android:name=".widget.FavoritesListWidgetReceiver" android:exported="true" android:label="@string/widget_favorites_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

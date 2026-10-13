@@ -16,6 +16,8 @@ data class ReaderSettings(
     /** Show the chosen commentary under every verse that has one. */
     val showCommentary: Boolean = false,
     val commentaryKey: String = "metzudat_david",
+    /** ARGB of the commentary text; 0 = the theme's primary colour. */
+    val commentaryColor: Int = 0,
 ) {
     companion object {
         const val MIN_SIZE = 14f
@@ -41,6 +43,7 @@ class ReaderPrefs(context: Context) {
         keepScreenOn = prefs.getBoolean(KEY_SCREEN_ON, false),
         showCommentary = prefs.getBoolean(KEY_COMMENTARY, false),
         commentaryKey = prefs.getString(KEY_COMMENTARY_SOURCE, "metzudat_david") ?: "metzudat_david",
+        commentaryColor = prefs.getInt(KEY_COMMENTARY_COLOR, 0),
     )
 
     fun update(change: (ReaderSettings) -> ReaderSettings) {
@@ -49,7 +52,8 @@ class ReaderPrefs(context: Context) {
         prefs.edit().putFloat(KEY_SIZE, next.fontSizeSp).putBoolean(KEY_NUMBERS, next.showVerseNumbers)
             .putString(KEY_FONT, next.fontKey).putFloat(KEY_LINE, next.lineHeight).putBoolean(KEY_NIKUD, next.showNikud)
             .putBoolean(KEY_TAAMIM, next.showTaamim).putBoolean(KEY_SCREEN_ON, next.keepScreenOn)
-            .putBoolean(KEY_COMMENTARY, next.showCommentary).putString(KEY_COMMENTARY_SOURCE, next.commentaryKey).apply()
+            .putBoolean(KEY_COMMENTARY, next.showCommentary).putString(KEY_COMMENTARY_SOURCE, next.commentaryKey)
+            .putInt(KEY_COMMENTARY_COLOR, next.commentaryColor).apply()
     }
 
     /** Where the user last read in Browse, for the "continue where I left off" shortcut (0 = none). */
@@ -71,6 +75,7 @@ class ReaderPrefs(context: Context) {
         const val KEY_PANEL = "top_panel_expanded"
         const val KEY_COMMENTARY = "commentary_on"
         const val KEY_COMMENTARY_SOURCE = "commentary_source"
+        const val KEY_COMMENTARY_COLOR = "commentary_color"
 
         const val KEY_PREFETCH_DISMISSED = "prefetch_dismissed"
         const val KEY_LAST_CHAPTER = "last_chapter"

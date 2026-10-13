@@ -176,6 +176,8 @@ fun SettingsScreen(
                     FilterChip(reader.commentaryKey == c.key, { container.readerPrefs.update { it.copy(commentaryKey = c.key) } }, { Text(c.hebrewName) })
                 }
             }
+            Label(R.string.set_commentary_color)
+            Swatches(COMMENTARY_COLORS, reader.commentaryColor.takeIf { it != 0 }) { c -> container.readerPrefs.update { it.copy(commentaryColor = c ?: 0) } }
             SwitchRow(R.string.set_keep_screen, reader.keepScreenOn) { v -> container.readerPrefs.update { it.copy(keepScreenOn = v) } }
         }
 
@@ -390,3 +392,6 @@ private fun nusachName(key: String) = when (key) {
     "chabad" -> "חב״ד"
     else -> key
 }
+
+/** Mid-tone colours that stay readable on both the light and the dark backgrounds. */
+private val COMMENTARY_COLORS = listOf(0xFF00796B, 0xFF1F5FA6, 0xFF7B1FA2, 0xFFB45F06, 0xFF2E7D32, 0xFFC2185B, 0xFF607D8B, 0xFF8D6E63).map { Color(it) }

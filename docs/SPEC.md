@@ -94,3 +94,6 @@ Input: one or more names (joined into the full name). Output: for every distinct
 
 ### C2 Commentary (פירוש)
 Sefaria offers commentary on Psalms by Rashi, Metzudat David/Zion, Ibn Ezra, Radak, Malbim, Meiri, Steinsaltz, Alshich and others. The app supports seven (see `CommentarySource`). Fetch one commentator per chapter with the v3 text API (shape: `text[verse-1]` = list of comments); cache per (chapter, commentator); display under the verse (never alters the psalm text); attribution line under the chapter title; toggle in the reader toolbar, default off; source chosen in Settings. Ranges (e.g. 119:1-96) show only the commentary of the verses in the range.
+
+### C3 Widget follow-ups (owner device test, 2026-10-13)
+Arrows in RTL: right = previous, left = next (use direction-aware non-mirrored glyphs). Progress label "current – last (n/total)". Every reading widget must expose add / open-edit / delete (confirmed) bookmark controls and a bookmarks chip. A new chapter always starts at its top. One widget entry per source kind (month/week generic, favorite, refuah, ilui). Widgets can be added from inside the app via the pin-widget request.

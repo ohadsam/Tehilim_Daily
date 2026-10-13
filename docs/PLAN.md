@@ -18,6 +18,7 @@ Constraint: no local Gradle (see CLAUDE.md); CI is the gate. Keep batches small 
 | 10 | Polish & hardening: a11y, perf (baseline profile), security review, shortcuts/tile, UI tests on emulator, release signing + artifacts | S10 | 0.9.0 (1.0.0 after owner sign-off) | [x] |
 | 12 | Owner device feedback: reader redesign, quick nav, auto-scroll, live widgets + styling (SPEC C1) | C1 | 0.12.0 | [x] |
 | 13 | Commentary (פירוש) under each verse, toggle + source choice (SPEC C2) | C2 | 0.13.0 | [x] |
+| 14 | Widget follow-ups: arrows, label, bookmarks, scroll reset, per-source reader widgets, add-widget screen, commentary colour (SPEC C3) | C3 | 0.14.0 | [x] |
 
 ## Per-batch routine (also in skill `batch-workflow`)
 1) read spec slice 2) implement + unit tests 3) push, CI green 4) 4-persona review (`release-checklist`) 5) version + What's New + docs 6) merge.

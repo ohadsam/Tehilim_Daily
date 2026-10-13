@@ -81,6 +81,8 @@ object ReaderKeys {
     val SPACING = intPreferencesKey("spacing")
     val BG_ALPHA = floatPreferencesKey("bg_alpha")
     val SHOW_TITLE = booleanPreferencesKey("show_title")
+    /** chapter * 1000 + verse of the bookmark whose delete button was tapped once (second tap deletes). */
+    val PENDING_BM = intPreferencesKey("pending_bookmark")
     val StepKey = ActionParameters.Key<Int>("step")
     val ChapterKey = ActionParameters.Key<Int>("chapter")
     val VerseKey = ActionParameters.Key<Int>("verse")
@@ -180,6 +182,7 @@ private class ReaderModel(
     val bookmarkedVerses: Set<Int>,
     val bookmarkCount: Int,
     val reminderCount: Int,
+    val pendingDelete: Int,
     val configAction: Action?,
 )
 
@@ -224,7 +227,7 @@ class ReaderWidget : GlanceAppWidget() {
         return ReaderModel(
             src, index, verses, error, src.saidContext?.let { c.said.isSaid(src.today, it) } == true,
             WidgetDisplay.resolve(ReaderKeys.display(prefs), c.readerPrefs.settings.value), marks,
-            allMarks.size, c.reminders.snapshot().count { it.enabled }, config,
+            allMarks.size, c.reminders.snapshot().count { it.enabled }, prefs[ReaderKeys.PENDING_BM] ?: 0, config,
         )
     }
 
@@ -243,7 +246,7 @@ class ReaderWidget : GlanceAppWidget() {
                 } else {
                     Row(GlanceModifier.defaultWeight().clickable(openApp(context, m.src.route))) {}
                 }
-                HeaderBadges(context, m.reminderCount, m.bookmarkCount)
+                HeaderBadges(context, m.reminderCount, m.bookmarkCount, alwaysShowBookmarks = true)
                 m.configAction?.let { Pill("⚙", it, GlanceModifier.padding(start = 4.dp)) }
             }
             m.src.personTag?.let {
@@ -256,13 +259,13 @@ class ReaderWidget : GlanceAppWidget() {
                 if (m.src.chapters.size > 1) {
                     // The first child sits on the right in RTL, so "previous" is first and points right.
                     Row(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        NavArrow("›", m.index > 0, -1)
+                        NavArrow(rtlArrow(context, previous = true), m.index > 0, -1)
                         Text(
-                            "${m.src.chapters[m.index].shortLabel()}  (${HebrewNumerals.toHebrew(m.index + 1)}/${HebrewNumerals.toHebrew(m.src.chapters.size)})",
+                            progressLabel(m.src.chapters, m.index),
                             style = TextStyle(color = textColor, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center),
                             modifier = GlanceModifier.defaultWeight(),
                         )
-                        NavArrow("‹", m.index < m.src.chapters.lastIndex, 1)
+                        NavArrow(rtlArrow(context, previous = false), m.index < m.src.chapters.lastIndex, 1)
                     }
                 } else {
                     Text(m.src.chapters[0].shortLabel(), style = TextStyle(color = textColor, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp))
@@ -271,26 +274,47 @@ class ReaderWidget : GlanceAppWidget() {
                     val verses = m.verses
                     val chapter = m.src.chapters[m.index].chapter
                     when {
-                        verses != null -> LazyColumn {
-                            items(verses) { v ->
+                        verses != null -> ParityBox(m.index % 2 == 1) { LazyColumn {
+                            items(verses, itemId = { chapter * 1000L + it.number }) { v ->
+                                val marked = v.number in m.bookmarkedVerses
+                                val confirming = m.pendingDelete == chapter * 1000 + v.number
                                 Row(GlanceModifier.fillMaxWidth().padding(vertical = d.spacingDp.dp), verticalAlignment = Alignment.Top) {
-                                    // Tapping the verse number toggles a bookmark on that verse (same bookmarks as in the app).
-                                    val marked = v.number in m.bookmarkedVerses
                                     Text(
-                                        (if (marked) "🔖" else "") + if (d.numbers || marked) HebrewNumerals.toHebrew(v.number, punctuation = false) else "·",
+                                        if (d.numbers) HebrewNumerals.toHebrew(v.number, punctuation = false) else "·",
                                         style = TextStyle(color = GlanceTheme.colors.secondary, fontSize = (d.fontSp * 0.7f).sp),
-                                        modifier = GlanceModifier.padding(end = 6.dp).clickable(
-                                            actionRunCallback<ToggleBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
-                                        ),
+                                        modifier = GlanceModifier.padding(end = 6.dp),
                                     )
                                     Text(
                                         TextDisplay.apply(v.text, d.nikud, d.taamim),
                                         style = TextStyle(color = textColor, fontSize = d.fontSp.sp, fontWeight = d.fontWeight(), fontFamily = d.fontFamily(), textAlign = d.textAlign()),
                                         modifier = GlanceModifier.defaultWeight(),
                                     )
+                                    // Bookmark controls: 🔖 adds; on a bookmarked verse 🔖 opens it in the app (edit) and ✕ deletes (tap twice).
+                                    if (marked) {
+                                        Text(
+                                            "🔖",
+                                            style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 15.sp),
+                                            modifier = GlanceModifier.padding(horizontal = 6.dp, vertical = 2.dp).clickable(openApp(context, "browse?chapter=$chapter&verse=${v.number}")),
+                                        )
+                                        Text(
+                                            if (confirming) "למחוק? ✕" else "✕",
+                                            style = TextStyle(color = if (confirming) GlanceTheme.colors.error else GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp, fontWeight = FontWeight.Bold),
+                                            modifier = GlanceModifier.padding(horizontal = 4.dp, vertical = 2.dp).clickable(
+                                                actionRunCallback<DeleteVerseBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
+                                            ),
+                                        )
+                                    } else {
+                                        Text(
+                                            "＋🔖",
+                                            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp),
+                                            modifier = GlanceModifier.padding(horizontal = 6.dp, vertical = 2.dp).clickable(
+                                                actionRunCallback<AddBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
+                                            ),
+                                        )
+                                    }
                                 }
                             }
-                        }
+                        } }
                         m.error != null -> Text(m.error, style = TextStyle(color = GlanceTheme.colors.error, fontSize = 12.sp), modifier = GlanceModifier.padding(8.dp))
                     }
                 }
@@ -311,6 +335,15 @@ class ReaderWidget : GlanceAppWidget() {
     }
 }
 
+/**
+ * Glance keeps a list's scroll position across updates. Alternating between two different tree shapes (and giving every verse a
+ * chapter-specific item id) makes each new chapter start at its top.
+ */
+@androidx.compose.runtime.Composable
+private fun ParityBox(odd: Boolean, content: @androidx.compose.runtime.Composable () -> Unit) {
+    if (odd) androidx.glance.layout.Box(GlanceModifier.fillMaxSize()) { content() } else content()
+}
+
 class ReaderStep : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val step = parameters[ReaderKeys.StepKey] ?: 0
@@ -319,6 +352,7 @@ class ReaderStep : ActionCallback {
         if (src.chapters.isEmpty()) return
         val next = (context.container.positions.get(src.positionKey) + step).coerceIn(0, src.chapters.lastIndex)
         context.container.positions.set(src.positionKey, next) // shared with the app
+        updateAppWidgetState(context, glanceId) { it.remove(ReaderKeys.PENDING_BM) }
         WidgetUpdater.updateAll(context)
     }
 }
@@ -332,15 +366,12 @@ class ToggleSaid : ActionCallback {
     }
 }
 
-class ToggleBookmark : ActionCallback {
+class AddBookmark : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val chapter = parameters[ReaderKeys.ChapterKey] ?: return
         val verse = parameters[ReaderKeys.VerseKey] ?: return
         val c = context.container
-        val existing = c.bookmarks.bookmarks.first().firstOrNull { it.chapter == chapter && it.verse == verse }
-        if (existing != null) {
-            c.bookmarks.delete(existing.id)
-        } else {
+        if (c.bookmarks.bookmarks.first().none { it.chapter == chapter && it.verse == verse }) {
             val text = c.psalms.get(PsalmRef(chapter)).getOrNull()?.verses?.firstOrNull { it.number == verse }?.text ?: return
             c.bookmarks.add(chapter, verse, text)
         }
@@ -348,6 +379,51 @@ class ToggleBookmark : ActionCallback {
     }
 }
 
+/** First tap arms the delete (the ✕ turns into "למחוק?"), second tap on the same verse deletes the bookmark. */
+class DeleteVerseBookmark : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        val chapter = parameters[ReaderKeys.ChapterKey] ?: return
+        val verse = parameters[ReaderKeys.VerseKey] ?: return
+        val key = chapter * 1000 + verse
+        var delete = false
+        updateAppWidgetState(context, glanceId) { prefs ->
+            if (prefs[ReaderKeys.PENDING_BM] == key) {
+                delete = true
+                prefs.remove(ReaderKeys.PENDING_BM)
+            } else {
+                prefs[ReaderKeys.PENDING_BM] = key
+            }
+        }
+        if (delete) {
+            val c = context.container
+            c.bookmarks.bookmarks.first().firstOrNull { it.chapter == chapter && it.verse == verse }?.let { c.bookmarks.delete(it.id) }
+            WidgetUpdater.updateAll(context)
+        } else {
+            ReaderWidget().update(context, glanceId)
+        }
+    }
+}
+
+/** Arrow glyphs are not bidi-mirrored triangles, so they point where they say; "previous" is the first child (right edge in RTL). */
+private fun rtlArrow(context: Context, previous: Boolean): String {
+    val rtl = context.resources.configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL
+    val pointsRight = previous == rtl
+    return if (pointsRight) "▶\uFE0E" else "◀\uFE0E"
+}
+
 class ReaderWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = ReaderWidget()
+}
+
+/** Pickable widget entries that pre-select the kind of source: one specific favorite, a refuah name or an ilui nishmat name. */
+class ReaderFavoriteWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = ReaderWidget()
+}
+
+class ReaderRefuahWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = ReaderWidget()
+}
+
+class ReaderIluiWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ReaderWidget()
 }

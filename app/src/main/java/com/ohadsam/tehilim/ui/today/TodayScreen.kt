@@ -84,6 +84,7 @@ fun TodayScreen(
     onOpenBookmarks: () -> Unit = {},
     onOpenSearch: () -> Unit = {},
     onOpenReminders: () -> Unit = {},
+    onAddWidget: () -> Unit = {},
 ) {
     var mode by rememberSaveable { mutableStateOf(if (initialWeek) DayMode.WEEK else DayMode.MONTH) }
     var todayEpoch by rememberSaveable { mutableLongStateOf(container.locations.logicalToday().toEpochDay()) }
@@ -162,6 +163,7 @@ fun TodayScreen(
                             ToolbarAction(stringResource(R.string.tb_open_chapters)) { onOpenChapter(container.readerPrefs.lastChapter.coerceAtLeast(1), 0) },
                             ToolbarAction(stringResource(R.string.tb_search), onOpenSearch),
                             ToolbarAction(stringResource(R.string.tb_reminders), onOpenReminders),
+                            ToolbarAction(stringResource(R.string.aw_row), onAddWidget),
                             ToolbarAction(stringResource(R.string.tb_focus)) { focusMode = true },
                         ),
                     )

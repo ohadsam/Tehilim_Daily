@@ -80,6 +80,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenBookmarks = { nav.navigate("bookmarks") },
                     onOpenSearch = { nav.navigate("search") },
                     onOpenReminders = { nav.navigate(Destination.REMINDERS.route) },
+                    onAddWidget = { nav.navigate("addwidget") },
                 )
             }
             composable(
@@ -136,6 +137,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenSettings = { nav.navigate("settings") },
                     onOpenLogs = { nav.navigate("logs") },
                     onOpenBookmarks = { nav.navigate("bookmarks") },
+                    onAddWidget = { nav.navigate("addwidget") },
                 )
             }
             composable("settings") {
@@ -151,6 +153,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenPermissions = { nav.navigate("permissions") },
                 )
             }
+            composable("addwidget") { com.ohadsam.tehilim.ui.widgets.AddWidgetScreen(onBack = { nav.popBackStack() }) }
             composable("permissions") { PermissionsScreen(onBack = { nav.popBackStack() }) }
             composable("logs") { LogsScreen(container, onBack = { nav.popBackStack() }) }
             composable("bookmarks") {

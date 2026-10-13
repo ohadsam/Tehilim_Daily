@@ -62,6 +62,8 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalLayoutApi::class)
 class ReaderWidgetConfigActivity : ComponentActivity() {
+    private enum class Only { ANY, FAVORITES, REFUAH, ILUI }
+
     private data class Choice(val title: String, val subtitle: String, val source: String, val id: Long)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +75,14 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
             return
         }
         val container = applicationContext.container
+        // The dedicated "favorite / refuah / ilui nishmat" widgets only offer their own kind of source.
+        val receiver = AppWidgetManager.getInstance(this).getAppWidgetInfo(widgetId)?.provider?.className.orEmpty()
+        val only = when {
+            receiver.endsWith("ReaderFavoriteWidgetReceiver") -> Only.FAVORITES
+            receiver.endsWith("ReaderRefuahWidgetReceiver") -> Only.REFUAH
+            receiver.endsWith("ReaderIluiWidgetReceiver") -> Only.ILUI
+            else -> Only.ANY
+        }
         setContent {
             androidx.compose.runtime.CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 TehilimTheme(container.themePrefs.settings.collectAsState().value) {
@@ -93,18 +103,39 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                     }
 
                     val choices = buildList {
-                        add(Choice("תהילים של היום בחודש", "מתעדכן אוטומטית כל יום", ReaderKeys.MONTH, 0))
-                        add(Choice("תהילים של היום בשבוע", "מתעדכן אוטומטית כל יום", ReaderKeys.WEEKDAY, 0))
-                        state.favorites.forEach { add(Choice(it.name, "מועדף", ReaderKeys.FAVORITE, it.id)) }
-                        state.persons.forEach { add(Choice(it.displayName(), if (it.kind == PersonKind.REFUAH) "לרפואה" else "לעילוי נשמת", ReaderKeys.PERSON, it.id)) }
+                        if (only == Only.ANY) {
+                            add(Choice("תהילים של היום בחודש", "מתעדכן אוטומטית כל יום", ReaderKeys.MONTH, 0))
+                            add(Choice("תהילים של היום בשבוע", "מתעדכן אוטומטית כל יום", ReaderKeys.WEEKDAY, 0))
+                        }
+                        if (only == Only.ANY || only == Only.FAVORITES) state.favorites.forEach { add(Choice(it.name, "מועדף", ReaderKeys.FAVORITE, it.id)) }
+                        state.persons.filter {
+                            when (only) {
+                                Only.ANY -> true
+                                Only.REFUAH -> it.kind == PersonKind.REFUAH
+                                Only.ILUI -> it.kind == PersonKind.ILUI_NISHMAT
+                                Only.FAVORITES -> false
+                            }
+                        }.forEach { add(Choice(it.displayName(), if (it.kind == PersonKind.REFUAH) "לרפואה" else "לעילוי נשמת", ReaderKeys.PERSON, it.id)) }
                     }
+                    // A restricted widget starts on its first available choice instead of the month schedule.
+                    val effective = choices.firstOrNull { it.source == source && it.id == sourceId } ?: choices.firstOrNull()
 
                     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp).padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("הגדרות הווידג'ט", style = MaterialTheme.typography.titleLarge)
+                        if (choices.isEmpty()) {
+                            Text(
+                                when (only) {
+                                    Only.FAVORITES -> "אין עדיין מועדפים. הוסיפו מועדף באפליקציה ואז הוסיפו את הווידג'ט שוב."
+                                    Only.REFUAH -> "אין עדיין שמות לרפואה. הוסיפו שם באפליקציה ואז הוסיפו את הווידג'ט שוב."
+                                    else -> "אין עדיין שמות לעילוי נשמת. הוסיפו שם באפליקציה ואז הוסיפו את הווידג'ט שוב."
+                                },
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
                         Text("מה להציג?", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
                         choices.forEach { c ->
                             Row(Modifier.fillMaxWidth().clickable { source = c.source; sourceId = c.id }, verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(selected = source == c.source && sourceId == c.id, onClick = { source = c.source; sourceId = c.id })
+                                RadioButton(selected = effective != null && effective.source == c.source && effective.id == c.id, onClick = { source = c.source; sourceId = c.id })
                                 Column {
                                     Text(c.title)
                                     Text(c.subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -117,12 +148,12 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
                         StyleEditor(display, { display = it })
                         Text("לחיצה על מספר פסוק בווידג'ט שומרת או מסירה סימניה — אותן סימניות כמו באפליקציה. מיקום הפרק והסימון ״נאמר״ משותפים לאפליקציה.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-                        Button(enabled = loaded, onClick = {
+                        Button(enabled = loaded && (only == Only.ANY || effective != null), onClick = {
                             scope.launch {
                                 val glanceId = GlanceAppWidgetManager(this@ReaderWidgetConfigActivity).getGlanceIdBy(widgetId)
                                 updateAppWidgetState(this@ReaderWidgetConfigActivity, glanceId) {
-                                    it[ReaderKeys.SOURCE] = source
-                                    it[ReaderKeys.SOURCE_ID] = sourceId
+                                    it[ReaderKeys.SOURCE] = effective?.source ?: source
+                                    it[ReaderKeys.SOURCE_ID] = effective?.id ?: sourceId
                                     ReaderKeys.write(it, display)
                                 }
                                 ReaderWidget().update(this@ReaderWidgetConfigActivity, glanceId)

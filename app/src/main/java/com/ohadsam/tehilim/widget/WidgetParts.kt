@@ -72,11 +72,11 @@ internal fun Pill(text: String, action: Action, modifier: GlanceModifier = Glanc
 
 /** Small indicators for the reminders that are switched on and the saved bookmarks; tapping opens that screen of the app. */
 @androidx.compose.runtime.Composable
-internal fun HeaderBadges(context: Context, reminders: Int, bookmarks: Int) {
+internal fun HeaderBadges(context: Context, reminders: Int, bookmarks: Int, alwaysShowBookmarks: Boolean = false) {
     if (reminders > 0) {
         Pill("⏰ $reminders", openApp(context, "reminders"), GlanceModifier.padding(start = 4.dp))
     }
-    if (bookmarks > 0) {
+    if (bookmarks > 0 || alwaysShowBookmarks) {
         Pill("🔖 $bookmarks", openApp(context, "bookmarks"), GlanceModifier.padding(start = 4.dp))
     }
 }

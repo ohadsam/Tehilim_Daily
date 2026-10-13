@@ -386,4 +386,17 @@
     <string name="cm_source">פירוש: %1$s · מקור: ספריא</string>
     <string name="cm_none">אין פירוש מ%1$s על פרק זה</string>
     <string name="cm_unavailable">הפירוש לא זמין כרגע</string>
+    <string name="widget_reader_favorite_name">קריאה: מועדף מסוים</string>
+    <string name="widget_reader_favorite_desc">בוחרים מועדף, ופרקיו מוצגים לקריאה ישירות בווידג׳ט, עם דפדוף, סימניות וסימון נאמר</string>
+    <string name="widget_reader_refuah_name">קריאה: לרפואה</string>
+    <string name="widget_reader_refuah_desc">בוחרים שם לרפואה, ופרקיו מוצגים לקריאה ישירות בווידג׳ט</string>
+    <string name="widget_reader_ilui_name">קריאה: לעילוי נשמת</string>
+    <string name="widget_reader_ilui_desc">בוחרים שם לעילוי נשמת, ופרקיו מוצגים לקריאה ישירות בווידג׳ט</string>
+    <string name="aw_title">הוספת ווידג׳ט</string>
+    <string name="aw_intro">לחצו ״הוסף למסך הבית״ — המסך הראשי יבקש אישור ויציע מקום. אם הכפתור לא פועל במכשיר שלכם: לחיצה ארוכה על מסך הבית ← ווידג׳טים ← ״תהילים יומי״.</string>
+    <string name="aw_add">הוסף למסך הבית</string>
+    <string name="aw_unsupported">המסך הראשי במכשיר אינו מאפשר הוספה מתוך אפליקציה. הוסיפו ידנית: לחיצה ארוכה על מסך הבית ← ווידג׳טים ← תהילים יומי.</string>
+    <string name="aw_row">הוספת ווידג׳ט למסך הבית</string>
+    <string name="aw_row_sub">קריאה, מועדף מסוים, לרפואה, לעילוי נשמת, סימניות ועוד</string>
+    <string name="set_commentary_color">צבע הפירוש</string>
 </resources>

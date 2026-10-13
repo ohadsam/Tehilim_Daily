@@ -223,7 +223,7 @@ private fun ChapterText(
                             fontSize = size.sp,
                             lineHeight = (size * COMMENTARY_LINE).sp,
                         ),
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (settings.commentaryColor != 0) androidx.compose.ui.graphics.Color(settings.commentaryColor) else MaterialTheme.colorScheme.primary,
                         modifier = Modifier.fillMaxWidth().padding(start = inset, top = 2.dp, bottom = 4.dp),
                     )
                 }

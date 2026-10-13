@@ -33,6 +33,7 @@ fun MoreScreen(
     onOpenSettings: () -> Unit = {},
     onOpenLogs: () -> Unit = {},
     onOpenBookmarks: () -> Unit = {},
+    onAddWidget: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val store = remember { WhatsNewStore(context) }
@@ -53,6 +54,12 @@ fun MoreScreen(
         ListItem(
             headlineContent = { Text(stringResource(R.string.bm_title)) },
             modifier = Modifier.fillMaxWidth().clickable(onClick = onOpenBookmarks),
+        )
+        HorizontalDivider()
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.aw_row)) },
+            supportingContent = { Text(stringResource(R.string.aw_row_sub)) },
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onAddWidget),
         )
         HorizontalDivider()
         ListItem(
