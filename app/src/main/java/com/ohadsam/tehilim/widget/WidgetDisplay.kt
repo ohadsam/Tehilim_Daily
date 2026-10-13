@@ -23,6 +23,8 @@ data class WidgetDisplayPrefs(
     /** Only applies together with a custom [background]. */
     val bgAlpha: Float = 1f,
     val showTitle: Boolean = true,
+    /** Reading widgets: first show a landing screen (icon, dates, source, chapter range); paging forward starts the reading. */
+    val landing: Boolean = true,
 )
 
 data class ResolvedDisplay(

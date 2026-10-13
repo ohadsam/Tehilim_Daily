@@ -62,8 +62,12 @@ import com.ohadsam.tehilim.domain.schedule.PsalmSchedules
 import com.ohadsam.tehilim.domain.schedule.hebrewName
 import com.ohadsam.tehilim.domain.shortLabel
 import com.ohadsam.tehilim.favorites.PersonKind
+import com.ohadsam.tehilim.favorites.summarizeChapters
+import androidx.glance.layout.size
 import com.ohadsam.tehilim.said.SaidContext
 import kotlinx.coroutines.flow.first
+
+private val GREGORIAN = java.time.format.DateTimeFormatter.ofPattern("d 'ב'MMMM yyyy", java.util.Locale("he"))
 
 object ReaderKeys {
     val SOURCE = stringPreferencesKey("source")
@@ -81,6 +85,9 @@ object ReaderKeys {
     val SPACING = intPreferencesKey("spacing")
     val BG_ALPHA = floatPreferencesKey("bg_alpha")
     val SHOW_TITLE = booleanPreferencesKey("show_title")
+    val LANDING = booleanPreferencesKey("landing")
+    /** positionKey (source + date) for which the user already left the landing screen; a new day or a new source shows it again. */
+    val LANDING_SEEN = stringPreferencesKey("landing_seen")
     /** chapter * 1000 + verse of the bookmark whose delete button was tapped once (second tap deletes). */
     val PENDING_BM = intPreferencesKey("pending_bookmark")
     val StepKey = ActionParameters.Key<Int>("step")
@@ -106,6 +113,7 @@ object ReaderKeys {
         spacingDp = p[SPACING] ?: 3,
         bgAlpha = p[BG_ALPHA] ?: 1f,
         showTitle = p[SHOW_TITLE] ?: true,
+        landing = p[LANDING] ?: true,
     )
 
     /** Writes every display option; shared by the reading and the style configuration screens. */
@@ -123,6 +131,7 @@ object ReaderKeys {
         p[SPACING] = d.spacingDp
         p[BG_ALPHA] = d.bgAlpha
         p[SHOW_TITLE] = d.showTitle
+        p[LANDING] = d.landing
     }
 }
 
@@ -184,6 +193,10 @@ private class ReaderModel(
     val reminderCount: Int,
     val pendingDelete: Int,
     val configAction: Action?,
+    val landingEnabled: Boolean,
+    val landing: Boolean,
+    val hebrewDate: String,
+    val gregorianDate: String,
 )
 
 /**
@@ -224,10 +237,15 @@ class ReaderWidget : GlanceAppWidget() {
         val marks = if (ref != null) allMarks.filter { it.chapter == ref.chapter }.map { it.verse }.toSet() else emptySet()
         val appWidgetId = runCatching { GlanceAppWidgetManager(context).getAppWidgetId(id) }.getOrDefault(AppWidgetManager.INVALID_APPWIDGET_ID)
         val config = if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) null else configureAction(context, appWidgetId, ReaderWidgetConfigActivity::class.java)
+        val landingEnabled = ReaderKeys.display(prefs).landing && src.chapters.isNotEmpty()
+        val landing = landingEnabled && prefs[ReaderKeys.LANDING_SEEN] != src.positionKey
+        val hebrewDate = HebrewCalendar.fromLocalDate(src.today).format()
+        val gregorianDate = "${src.today.dayOfWeek.hebrewName} · ${GREGORIAN.format(src.today)}"
         return ReaderModel(
             src, index, verses, error, src.saidContext?.let { c.said.isSaid(src.today, it) } == true,
             WidgetDisplay.resolve(ReaderKeys.display(prefs), c.readerPrefs.settings.value), marks,
             allMarks.size, c.reminders.snapshot().count { it.enabled }, prefs[ReaderKeys.PENDING_BM] ?: 0, config,
+            landingEnabled, landing, hebrewDate, gregorianDate,
         )
     }
 
@@ -253,13 +271,15 @@ class ReaderWidget : GlanceAppWidget() {
                 Text(it, maxLines = 1, style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
                     modifier = GlanceModifier.fillMaxWidth().background(GlanceTheme.colors.secondaryContainer).padding(2.dp))
             }
-            if (m.src.chapters.isEmpty()) {
+            if (m.landing) {
+                LandingBody(context, m)
+            } else             if (m.src.chapters.isEmpty()) {
                 Text("אין פרקים להצגה", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp), modifier = GlanceModifier.padding(8.dp))
             } else {
-                if (m.src.chapters.size > 1) {
+                if (m.src.chapters.size > 1 || m.landingEnabled) {
                     // The first child sits on the right in RTL, so "previous" is first and points right.
                     Row(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        NavArrow(rtlArrow(context, previous = true), m.index > 0, -1)
+                        NavArrow(rtlArrow(context, previous = true), m.index > 0 || m.landingEnabled, -1)
                         Text(
                             progressLabel(m.src.chapters, m.index),
                             style = TextStyle(color = textColor, fontSize = 14.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center),
@@ -319,7 +339,38 @@ class ReaderWidget : GlanceAppWidget() {
                     }
                 }
             }
-            if (m.src.saidContext != null) SaidPill(m.said, actionRunCallback<ToggleSaid>())
+            if (m.src.saidContext != null && !m.landing) SaidPill(m.said, actionRunCallback<ToggleSaid>())
+        }
+    }
+
+    /** The first screen of the day: app icon, Hebrew + Gregorian date, what is being read and the chapters of today; "next" starts the reading. */
+    @androidx.compose.runtime.Composable
+    private fun LandingBody(context: Context, m: ReaderModel) {
+        val d = m.display
+        Column(GlanceModifier.defaultWeight().fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalAlignment = Alignment.CenterHorizontally) {
+            androidx.glance.Image(
+                provider = androidx.glance.ImageProvider(com.ohadsam.tehilim.R.mipmap.ic_launcher),
+                contentDescription = "תהילים יומי",
+                modifier = GlanceModifier.size(52.dp),
+            )
+            Text(m.hebrewDate, style = TextStyle(color = GlanceTheme.colors.secondary, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(top = 6.dp))
+            Text(m.gregorianDate, style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth())
+            Text(m.src.title, style = TextStyle(color = d.textColorProvider(), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(top = 8.dp), maxLines = 2)
+            m.src.personTag?.let {
+                Text(it, maxLines = 1, style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.padding(top = 2.dp))
+            }
+            Text(
+                "פרקי היום: " + summarizeChapters(m.src.chapters),
+                style = TextStyle(color = d.textColorProvider(), fontSize = 15.sp, textAlign = TextAlign.Center),
+                modifier = GlanceModifier.fillMaxWidth().padding(top = 8.dp),
+                maxLines = 4,
+            )
+        }
+        // Same paging row as the reading view: "previous" is inert here, "next" starts the reading.
+        Row(GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            NavArrow(rtlArrow(context, previous = true), false, -1)
+            Text("לדפדוף לקריאה", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
+            NavArrow(rtlArrow(context, previous = false), true, 1)
         }
     }
 
@@ -350,8 +401,14 @@ class ReaderStep : ActionCallback {
         val prefs = getAppWidgetState<Preferences>(context, PreferencesGlanceStateDefinition, glanceId)
         val src = resolveSource(context, prefs)
         if (src.chapters.isEmpty()) return
-        val next = (context.container.positions.get(src.positionKey) + step).coerceIn(0, src.chapters.lastIndex)
-        context.container.positions.set(src.positionKey, next) // shared with the app
+        val landingEnabled = ReaderKeys.display(prefs).landing
+        val seen = prefs[ReaderKeys.LANDING_SEEN] == src.positionKey
+        val current = context.container.positions.get(src.positionKey)
+        val next = stepReader(landingEnabled, seen, current, src.chapters.size, step)
+        context.container.positions.set(src.positionKey, next.index) // shared with the app
+        updateAppWidgetState(context, glanceId) {
+            if (next.landingSeen) it[ReaderKeys.LANDING_SEEN] = src.positionKey else it.remove(ReaderKeys.LANDING_SEEN)
+        }
         updateAppWidgetState(context, glanceId) { it.remove(ReaderKeys.PENDING_BM) }
         WidgetUpdater.updateAll(context)
     }

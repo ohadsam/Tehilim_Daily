@@ -97,3 +97,6 @@ Sefaria offers commentary on Psalms by Rashi, Metzudat David/Zion, Ibn Ezra, Rad
 
 ### C3 Widget follow-ups (owner device test, 2026-10-13)
 Arrows in RTL: right = previous, left = next (use direction-aware non-mirrored glyphs). Progress label "current – last (n/total)". Every reading widget must expose add / open-edit / delete (confirmed) bookmark controls and a bookmarks chip. A new chapter always starts at its top. One widget entry per source kind (month/week generic, favorite, refuah, ilui). Widgets can be added from inside the app via the pin-widget request.
+
+### C4 Widget landing screen (owner request 2026-10-13)
+Reading widgets start on a designed landing screen (default on, switchable per widget): app icon, Hebrew and Gregorian date, source title, chapter range of the day. Next → reading; previous from the first chapter → landing; new day → landing again. Position stays shared with the app (landing is widget-only state).

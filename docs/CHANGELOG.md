@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.15.0
+- Reading widgets: optional landing screen (default on): app icon, Hebrew + Gregorian date, source title (+ person tag) and the chapter range of the day. Paging forward → saved/first chapter; previous on the first chapter → back to the landing; the "seen" marker is keyed by source + date so a new day shows the landing again. Setting in the widget's ⚙ screen. Pure transition logic `stepReader` (tested).
+
 ## 0.14.0 (owner device test of the widgets)
 - Reading widget: arrows use non-mirrored triangles (▶/◀ with text variation selector) chosen by layout direction — the bidi-mirrored ‹ › were drawn backwards in RTL; every verse has an explicit bookmark control (＋🔖 add, 🔖 open/edit in the app, ✕ two-tap delete), 🔖 N chip always visible; progress label "current – last (n/total)" (`progressLabel`, tested); paging resets scroll (chapter-specific item ids + alternating tree shape, since Glance keeps list scroll across updates).
 - New pickable widgets: reading of one favorite / one refuah name / one ilui nishmat name (same widget class, receiver decides which sources the config screen offers).

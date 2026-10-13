@@ -64,8 +64,9 @@ fun StylePreview(d: WidgetDisplayPrefs, app: ReaderSettings) {
 /** All the look options of a widget; [textOptions] hides nikud/ta'amim/verse numbers for widgets that show no psalm text. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun StyleEditor(d: WidgetDisplayPrefs, onChange: (WidgetDisplayPrefs) -> Unit, textOptions: Boolean = true) {
+fun StyleEditor(d: WidgetDisplayPrefs, onChange: (WidgetDisplayPrefs) -> Unit, textOptions: Boolean = true, landingOption: Boolean = false) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (landingOption) ToggleRow("מסך נחיתה: להתחיל במסך עם האייקון, התאריך והפרקים של היום (דפדוף מעביר לקריאה)", d.landing) { onChange(d.copy(landing = it)) }
         ToggleRow("לפי הגדרות הקריאה של האפליקציה (גודל${if (textOptions) ", ניקוד, טעמים, מספרי פסוקים" else ""})", d.followApp) { onChange(d.copy(followApp = it)) }
         if (!d.followApp) {
             Text("גודל גופן: ${d.fontSp.roundToInt()}")

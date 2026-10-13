@@ -145,7 +145,7 @@ class ReaderWidgetConfigActivity : ComponentActivity() {
 
                         Text("תצוגה", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
                         StylePreview(display, container.readerPrefs.settings.collectAsState().value)
-                        StyleEditor(display, { display = it })
+                        StyleEditor(display, { display = it }, landingOption = true)
                         Text("לחיצה על מספר פסוק בווידג'ט שומרת או מסירה סימניה — אותן סימניות כמו באפליקציה. מיקום הפרק והסימון ״נאמר״ משותפים לאפליקציה.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                         Button(enabled = loaded && (only == Only.ANY || effective != null), onClick = {
