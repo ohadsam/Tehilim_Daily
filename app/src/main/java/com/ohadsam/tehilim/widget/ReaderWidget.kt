@@ -345,7 +345,7 @@ class ReaderWidget : GlanceAppWidget() {
 
     /** The first screen of the day: app icon, Hebrew + Gregorian date, what is being read and the chapters of today; "next" starts the reading. */
     @androidx.compose.runtime.Composable
-    private fun LandingBody(context: Context, m: ReaderModel) {
+    private fun androidx.glance.layout.ColumnScope.LandingBody(context: Context, m: ReaderModel) {
         val d = m.display
         Column(GlanceModifier.defaultWeight().fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.glance.Image(
