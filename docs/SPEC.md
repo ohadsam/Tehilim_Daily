@@ -100,3 +100,6 @@ Arrows in RTL: right = previous, left = next (use direction-aware non-mirrored g
 
 ### C4 Widget landing screen (owner request 2026-10-13)
 Reading widgets start on a designed landing screen (default on, switchable per widget): app icon, Hebrew and Gregorian date, source title, chapter range of the day. Next → reading; previous from the first chapter → landing; new day → landing again. Position stays shared with the app (landing is widget-only state).
+
+### C5 Widget bookmark UI (owner feedback 2026-10-13)
+No permanent per-verse add buttons. A single toolbar button toggles add mode; bookmarked verses always show their marker with removal.

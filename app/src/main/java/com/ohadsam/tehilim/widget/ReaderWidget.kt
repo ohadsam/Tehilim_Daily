@@ -86,6 +86,8 @@ object ReaderKeys {
     val BG_ALPHA = floatPreferencesKey("bg_alpha")
     val SHOW_TITLE = booleanPreferencesKey("show_title")
     val LANDING = booleanPreferencesKey("landing")
+    /** "Add bookmark" mode: only then the per-verse ＋ buttons are shown (keeps the text clean the rest of the time). */
+    val BM_MODE = booleanPreferencesKey("bookmark_mode")
     /** positionKey (source + date) for which the user already left the landing screen; a new day or a new source shows it again. */
     val LANDING_SEEN = stringPreferencesKey("landing_seen")
     /** chapter * 1000 + verse of the bookmark whose delete button was tapped once (second tap deletes). */
@@ -197,6 +199,7 @@ private class ReaderModel(
     val landing: Boolean,
     val hebrewDate: String,
     val gregorianDate: String,
+    val bmMode: Boolean,
 )
 
 /**
@@ -245,7 +248,7 @@ class ReaderWidget : GlanceAppWidget() {
             src, index, verses, error, src.saidContext?.let { c.said.isSaid(src.today, it) } == true,
             WidgetDisplay.resolve(ReaderKeys.display(prefs), c.readerPrefs.settings.value), marks,
             allMarks.size, c.reminders.snapshot().count { it.enabled }, prefs[ReaderKeys.PENDING_BM] ?: 0, config,
-            landingEnabled, landing, hebrewDate, gregorianDate,
+            landingEnabled, landing, hebrewDate, gregorianDate, prefs[ReaderKeys.BM_MODE] == true,
         )
     }
 
@@ -264,7 +267,12 @@ class ReaderWidget : GlanceAppWidget() {
                 } else {
                     Row(GlanceModifier.defaultWeight().clickable(openApp(context, m.src.route))) {}
                 }
-                HeaderBadges(context, m.reminderCount, m.bookmarkCount, alwaysShowBookmarks = true)
+                HeaderBadges(context, m.reminderCount, 0)
+                if (!m.landing) {
+                    // One bookmark button: tap to show the ＋ buttons next to the verses, tap again (or add one) to hide them.
+                    Pill(if (m.bmMode) "🔖 ✓" else "🔖＋", actionRunCallback<ToggleBookmarkMode>(), GlanceModifier.padding(start = 4.dp), highlighted = m.bmMode)
+                    if (m.bmMode && m.bookmarkCount > 0) Pill("הכל (${m.bookmarkCount})", openApp(context, "bookmarks"), GlanceModifier.padding(start = 4.dp))
+                }
                 m.configAction?.let { Pill("⚙", it, GlanceModifier.padding(start = 4.dp)) }
             }
             m.src.personTag?.let {
@@ -323,13 +331,11 @@ class ReaderWidget : GlanceAppWidget() {
                                                 actionRunCallback<DeleteVerseBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
                                             ),
                                         )
-                                    } else {
-                                        Text(
-                                            "＋🔖",
-                                            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp),
-                                            modifier = GlanceModifier.padding(horizontal = 6.dp, vertical = 2.dp).clickable(
-                                                actionRunCallback<AddBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
-                                            ),
+                                    } else if (m.bmMode) {
+                                        Pill(
+                                            "＋",
+                                            actionRunCallback<AddBookmark>(actionParametersOf(ReaderKeys.ChapterKey to chapter, ReaderKeys.VerseKey to v.number)),
+                                            GlanceModifier.padding(start = 6.dp),
                                         )
                                     }
                                 }
@@ -409,7 +415,10 @@ class ReaderStep : ActionCallback {
         updateAppWidgetState(context, glanceId) {
             if (next.landingSeen) it[ReaderKeys.LANDING_SEEN] = src.positionKey else it.remove(ReaderKeys.LANDING_SEEN)
         }
-        updateAppWidgetState(context, glanceId) { it.remove(ReaderKeys.PENDING_BM) }
+        updateAppWidgetState(context, glanceId) {
+            it.remove(ReaderKeys.PENDING_BM)
+            it[ReaderKeys.BM_MODE] = false
+        }
         WidgetUpdater.updateAll(context)
     }
 }
@@ -423,6 +432,13 @@ class ToggleSaid : ActionCallback {
     }
 }
 
+class ToggleBookmarkMode : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        updateAppWidgetState(context, glanceId) { it[ReaderKeys.BM_MODE] = it[ReaderKeys.BM_MODE] != true }
+        ReaderWidget().update(context, glanceId)
+    }
+}
+
 class AddBookmark : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val chapter = parameters[ReaderKeys.ChapterKey] ?: return
@@ -432,6 +448,7 @@ class AddBookmark : ActionCallback {
             val text = c.psalms.get(PsalmRef(chapter)).getOrNull()?.verses?.firstOrNull { it.number == verse }?.text ?: return
             c.bookmarks.add(chapter, verse, text)
         }
+        updateAppWidgetState(context, glanceId) { it[ReaderKeys.BM_MODE] = false }
         WidgetUpdater.updateAll(context)
     }
 }

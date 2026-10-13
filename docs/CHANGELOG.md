@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.15.1
+- Reading widget: bookmark controls moved out of the text. One header button (🔖＋) toggles "add bookmark" mode; only then the ＋ buttons appear next to the verses (adding one, paging, or tapping again hides them). Bookmarked verses always show just 🔖 (open/edit in the app) and ✕ (two-tap delete). In add mode an "הכל (N)" pill opens the full list.
+
 ## 0.15.0
 - Reading widgets: optional landing screen (default on): app icon, Hebrew + Gregorian date, source title (+ person tag) and the chapter range of the day. Paging forward → saved/first chapter; previous on the first chapter → back to the landing; the "seen" marker is keyed by source + date so a new day shows the landing again. Setting in the widget's ⚙ screen. Pure transition logic `stepReader` (tested).
 
