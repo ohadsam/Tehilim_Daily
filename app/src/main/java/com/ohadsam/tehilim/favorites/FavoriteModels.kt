@@ -35,6 +35,9 @@ data class Favorite(
 data class FavoritesState(val favorites: List<Favorite>, val persons: List<Person>) {
     fun person(id: Long): Person? = persons.firstOrNull { it.id == id }
 
+    /** The favorite that holds only this person's own chapter list (created from the person editor), if any. */
+    fun personalFavorite(personId: Long): Favorite? = favorites.firstOrNull { it.nameSpec == null && it.personIds == listOf(personId) }
+
     fun personsOf(f: Favorite): List<Person> = f.personIds.mapNotNull(::person)
 
     fun favoritesOf(p: Person): List<Favorite> = favorites.filter { p.id in it.personIds }

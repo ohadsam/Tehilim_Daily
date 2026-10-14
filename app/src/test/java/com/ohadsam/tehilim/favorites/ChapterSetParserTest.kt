@@ -34,4 +34,13 @@ class ChapterSetParserTest {
         assertNull(parsePsalmRef("119:5"))
         assertNull(parsePsalmRef("151"))
     }
+
+    @Test
+    fun commaSeparatedHebrewLettersWithoutSpaces() {
+        val r = ChapterSetParser.parse("א,ג,כג,ל,קיח")
+        assertEquals(listOf(1, 3, 23, 30, 118), r.refs.map { it.chapter })
+        assertEquals(emptyList<String>(), r.invalidTokens)
+        val mixed = ChapterSetParser.parse("א, ג-ה,כג , 119:1-96,קמה")
+        assertEquals(listOf(1, 3, 4, 5, 23, 119, 145), mixed.refs.map { it.chapter })
+    }
 }

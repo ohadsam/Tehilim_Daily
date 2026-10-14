@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.16.0
+- Free chapter lists ("א, ג, כג, ל, קיח", ranges, verse ranges) — already supported by `ChapterSetParser` in the favorite editor (now explicit in the hint and covered by a test); the refuah / ilui nishmat person editor gets a chapters field too: the list is stored as a favorite linked only to that person (`FavoritesState.personalFavorite`), so the reader, widgets and reminders work unchanged; clearing the field removes that list.
+
 ## 0.15.1
 - Reading widget: bookmark controls moved out of the text. One header button (🔖＋) toggles "add bookmark" mode; only then the ＋ buttons appear next to the verses (adding one, paging, or tapping again hides them). Bookmarked verses always show just 🔖 (open/edit in the app) and ✕ (two-tap delete). In add mode an "הכל (N)" pill opens the full list.
 

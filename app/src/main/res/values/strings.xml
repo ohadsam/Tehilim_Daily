@@ -59,7 +59,7 @@
     <string name="fav_new_ilui">לעילוי נשמת (אדם חדש)</string>
     <string name="fav_name">שם המועדף</string>
     <string name="fav_chapters">פרקים</string>
-    <string name="fav_chapters_hint">למשל: 20-24, 91 או כ-כד, צא</string>
+    <string name="fav_chapters_hint">פרקים מופרדים בפסיקים, אפשר גם טווחים: א, ג, כג, ל, קיח או 20-24, 91</string>
     <string name="fav_chapters_invalid">לא הובן: %1$s</string>
     <string name="fav_color">צבע</string>
     <string name="fav_link_people">קישור לאנשים</string>
@@ -399,4 +399,5 @@
     <string name="aw_row">הוספת ווידג׳ט למסך הבית</string>
     <string name="aw_row_sub">קריאה, מועדף מסוים, לרפואה, לעילוי נשמת, סימניות ועוד</string>
     <string name="set_commentary_color">צבע הפירוש</string>
+    <string name="person_chapters">פרקים לקריאה (לא חובה): א, ג, כג, ל, קיח</string>
 </resources>

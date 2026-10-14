@@ -103,3 +103,6 @@ Reading widgets start on a designed landing screen (default on, switchable per w
 
 ### C5 Widget bookmark UI (owner feedback 2026-10-13)
 No permanent per-verse add buttons. A single toolbar button toggles add mode; bookmarked verses always show their marker with removal.
+
+### C6 Chapter lists for people (owner request 2026-10-14)
+Favorites accept free chapter lists (comma/space separated letters or numbers, ranges, verse ranges). Persons (refuah / ilui nishmat) can hold their own list too: a favorite linked exclusively to the person, edited from the person editor.
