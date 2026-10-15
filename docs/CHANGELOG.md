@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.1
+- Reading widget: "סגור" button returns to the landing screen (shown only while the landing screen is enabled).
+- Share: the shared APK is always the build that is installed and running — copied fresh into the cache each time, verified with `getPackageArchiveInfo` against the installed `longVersionCode`, and named with the build number (`tehilim-daily-0.16.1-b<code>.apk`) so two builds of one version name can never be mistaken for each other.
+
 ## 0.16.0
 - Free chapter lists ("א, ג, כג, ל, קיח", ranges, verse ranges) — already supported by `ChapterSetParser` in the favorite editor (now explicit in the hint and covered by a test); the refuah / ilui nishmat person editor gets a chapters field too: the list is stored as a favorite linked only to that person (`FavoritesState.personalFavorite`), so the reader, widgets and reminders work unchanged; clearing the field removes that list.
 

@@ -25,17 +25,23 @@ object AppSharer {
         עדכון לגרסה חדשה: מתקינים את הקובץ החדש ישירות מעל הקיים — אין צורך להסיר את האפליקציה, וכל המועדפים, הסימניות וההגדרות נשמרים.
     """.trimIndent()
 
-    fun fileName(versionName: String, zip: Boolean) = "tehilim-daily-$versionName.apk" + if (zip) ".zip" else ""
+    /** The build number is part of the name: two builds with the same versionName must never look like the same file. */
+    fun fileName(versionName: String, zip: Boolean, build: Long? = null) =
+        "tehilim-daily-$versionName" + (build?.let { "-b$it" } ?: "") + ".apk" + if (zip) ".zip" else ""
 
     /** Copies the installed APK into the cache (shared through FileProvider); optionally wrapped in a zip for mail apps that block .apk. */
     fun prepare(context: Context, versionName: String, zip: Boolean): File {
         val dir = File(context.cacheDir, "share").apply { mkdirs() }
         dir.listFiles()?.forEach { it.delete() } // keep only the latest copy
         val source = File(context.applicationInfo.sourceDir)
-        val apk = File(dir, fileName(versionName, false))
+        val installed = context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
+        val apk = File(dir, fileName(versionName, false, installed))
         source.copyTo(apk, overwrite = true)
+        // Never hand out a file that is not the build that is running now.
+        val copied = context.packageManager.getPackageArchiveInfo(apk.path, 0)?.longVersionCode
+        check(copied == installed) { "shared APK build $copied differs from the installed build $installed" }
         if (!zip) return apk
-        val zipFile = File(dir, fileName(versionName, true))
+        val zipFile = File(dir, fileName(versionName, true, installed))
         zipSingle(apk, zipFile)
         apk.delete()
         return zipFile

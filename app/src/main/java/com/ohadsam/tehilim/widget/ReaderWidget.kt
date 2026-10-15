@@ -273,6 +273,8 @@ class ReaderWidget : GlanceAppWidget() {
                     Pill(if (m.bmMode) "🔖 ✓" else "🔖＋", actionRunCallback<ToggleBookmarkMode>(), GlanceModifier.padding(start = 4.dp), highlighted = m.bmMode)
                     if (m.bmMode && m.bookmarkCount > 0) Pill("הכל (${m.bookmarkCount})", openApp(context, "bookmarks"), GlanceModifier.padding(start = 4.dp))
                 }
+                // Back to the landing screen (only when the landing screen is enabled for this widget).
+                if (!m.landing && m.landingEnabled) Pill("סגור", actionRunCallback<CloseToLanding>(), GlanceModifier.padding(start = 4.dp))
                 m.configAction?.let { Pill("⚙", it, GlanceModifier.padding(start = 4.dp)) }
             }
             m.src.personTag?.let {
@@ -429,6 +431,18 @@ class ToggleSaid : ActionCallback {
         val src = resolveSource(context, prefs)
         src.saidContext?.let { context.container.said.toggle(src.today, it) }
         WidgetUpdater.updateAll(context)
+    }
+}
+
+/** "סגור": leave the reading view and show the landing screen again (the saved chapter position stays, shared with the app). */
+class CloseToLanding : ActionCallback {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
+        updateAppWidgetState(context, glanceId) {
+            it.remove(ReaderKeys.LANDING_SEEN)
+            it.remove(ReaderKeys.PENDING_BM)
+            it[ReaderKeys.BM_MODE] = false
+        }
+        ReaderWidget().update(context, glanceId)
     }
 }
 

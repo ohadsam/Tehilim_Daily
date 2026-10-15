@@ -19,6 +19,8 @@ class AppSharerTest {
     fun fileNames() {
         assertEquals("tehilim-daily-1.0.apk", AppSharer.fileName("1.0", false))
         assertEquals("tehilim-daily-1.0.apk.zip", AppSharer.fileName("1.0", true))
+        assertEquals("tehilim-daily-1.0-b142.apk", AppSharer.fileName("1.0", false, 142))
+        assertEquals("tehilim-daily-1.0-b142.apk.zip", AppSharer.fileName("1.0", true, 142))
     }
 
     @Test
