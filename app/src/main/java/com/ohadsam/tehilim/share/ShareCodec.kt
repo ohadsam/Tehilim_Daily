@@ -44,7 +44,7 @@ object ShareCodec {
     /** Accepts a whole `.tehilim` file, a chat message containing a code, or just the code. */
     fun parse(text: String): ShareParse {
         if (text.length > MAX_INPUT) return ShareParse.Invalid("too large")
-        val trimmed = text.trim().trimStart('﻿')
+        val trimmed = text.trim { it.isWhitespace() || it == '\uFEFF' }
         val body = when {
             trimmed.startsWith("{") -> trimmed
             else -> {
