@@ -15,6 +15,10 @@ class ShareImporter(private val favorites: FavoritesRepository) {
     fun favoriteName(pkg: SharePackage, part: SharePart): String =
         if (part.label.isBlank()) pkg.title else "${pkg.title} · ${part.label}"
 
+    /** Loads only the chapters the person picked from the whole share, as one favorite named "title · [label]". */
+    suspend fun importSelection(pkg: SharePackage, refs: List<PsalmRef>, label: String): ImportResult =
+        import(pkg.copy(parts = listOf(SharePart(label, csvOf(refs)))), listOf(0))
+
     suspend fun import(pkg: SharePackage, partIndexes: List<Int>): ImportResult {
         val state = favorites.state.first()
         val personId = pkg.kind.personKind?.let { kind ->

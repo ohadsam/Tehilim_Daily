@@ -21,7 +21,8 @@ object ShareSender {
         return "tehilim-${pkg.id.ifEmpty { "share" }}$suffix.${ShareCodec.FILE_EXTENSION}"
     }
 
-    fun message(pkg: SharePackage): String = buildString {
+    fun message(pkg: SharePackage, greetingName: String? = null): String = buildString {
+        if (!greetingName.isNullOrBlank()) appendLine("שלום $greetingName,")
         append("📖 ").appendLine(pkg.title)
         if (pkg.isDivision) {
             appendLine("חלוקת תהילים ל-${pkg.parts.size} חלקים — בחרו את החלק שלכם באפליקציה.")
@@ -48,13 +49,13 @@ object ShareSender {
 
     enum class Target { WHATSAPP, EMAIL, ANY }
 
-    fun intent(context: Context, pkg: SharePackage, target: Target): Intent {
+    fun intent(context: Context, pkg: SharePackage, target: Target, greetingName: String? = null): Intent {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", prepare(context, pkg))
         val send = Intent(Intent.ACTION_SEND)
             .setType(ShareCodec.MIME)
             .putExtra(Intent.EXTRA_STREAM, uri)
             .putExtra(Intent.EXTRA_SUBJECT, pkg.title)
-            .putExtra(Intent.EXTRA_TEXT, message(pkg))
+            .putExtra(Intent.EXTRA_TEXT, message(pkg, greetingName))
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val preferred = when (target) {
             Target.WHATSAPP -> listOf(WHATSAPP, WHATSAPP_BUSINESS)

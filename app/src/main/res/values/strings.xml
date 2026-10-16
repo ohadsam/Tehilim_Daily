@@ -453,4 +453,18 @@
     <string name="sh_import_failed">הטעינה נכשלה</string>
     <string name="sh_nothing_to_share">אין עדיין פרקים לשיתוף כאן</string>
     <string name="sh_share_fav">שיתוף</string>
+    <string name="sh_distribute">שליחה לכל אחד בנפרד</string>
+    <string name="sh_dist_progress">נשלחו %1$d מתוך %2$d</string>
+    <string name="sh_dist_next">שליחת הבא (חלק %1$d)</string>
+    <string name="sh_dist_all_done">כל החלקים נשלחו</string>
+    <string name="sh_dist_reset">איפוס סימוני שליחה</string>
+    <string name="sh_dist_recipient">למי? (לא חובה)</string>
+    <string name="sh_dist_send">שליחה</string>
+    <string name="sh_dist_sent">נשלח</string>
+    <string name="sh_dist_hint">בחרו אפליקציה, ואז שלחו כל חלק לנמען שלו — כל אחד מקבל קובץ עם החלק שלו בלבד.</string>
+    <string name="sh_my_selection">הבחירה שלי</string>
+    <string name="sh_import_pick_chapters">בחירת פרקים בעצמי</string>
+    <string name="sh_import_pick_chapters_hint">סמנו את הפרקים שתרצו לקרוא</string>
+    <string name="sh_import_load_selected">טעינת הנבחרים</string>
+    <string name="sh_import_back">חזרה לחלקים</string>
 </resources>

@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -38,6 +39,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.ohadsam.tehilim.AppContainer
 import com.ohadsam.tehilim.R
+import com.ohadsam.tehilim.domain.PsalmRef
+import com.ohadsam.tehilim.domain.shortLabel
 import com.ohadsam.tehilim.favorites.summarizeChapters
 import com.ohadsam.tehilim.share.DivisionPlanner
 import com.ohadsam.tehilim.share.ImportResult
@@ -64,6 +67,9 @@ fun ShareImportSheet(container: AppContainer, initialText: String, onDismiss: ()
     var text by remember { mutableStateOf(initialText) }
     var selected by remember { mutableStateOf<Int?>(null) }
     var failed by remember { mutableStateOf(false) }
+    var picking by remember { mutableStateOf(false) }
+    var picked by remember { mutableStateOf(setOf<PsalmRef>()) }
+    val mySelection = stringResource(R.string.sh_my_selection)
     val parse = remember(text) { if (text.isBlank()) null else ShareCodec.parse(text) }
     val pkg = (parse as? ShareParse.Ok)?.pkg
 
@@ -80,6 +86,17 @@ fun ShareImportSheet(container: AppContainer, initialText: String, onDismiss: ()
         val p = pkg ?: return
         scope.launch {
             runCatching { container.shareImporter.import(p, indexes) }
+                .onSuccess { sheet.hide(); onImported(it) }
+                .onFailure { failed = true }
+        }
+    }
+
+    fun loadPicked() {
+        val p = pkg ?: return
+        // keep the order of the share, not the order of tapping
+        val refs = p.parts.flatMap { it.refs() }.distinct().filter { it in picked }
+        scope.launch {
+            runCatching { container.shareImporter.importSelection(p, refs, mySelection) }
                 .onSuccess { sheet.hide(); onImported(it) }
                 .onFailure { failed = true }
         }
@@ -110,22 +127,46 @@ fun ShareImportSheet(container: AppContainer, initialText: String, onDismiss: ()
                     OutlinedButton(onClick = { openFile.launch(arrayOf("*/*")) }) { Text(stringResource(R.string.sh_import_file)) }
                 }
             } else {
-                SharePreview(pkg, selected) { selected = it }
+                if (picking) {
+                    PickChapters(pkg, picked) { picked = it }
+                } else {
+                    SharePreview(pkg, selected) { selected = it }
+                }
                 if (failed) Text(stringResource(R.string.sh_import_failed), color = MaterialTheme.colorScheme.error)
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
-                    if (pkg.isDivision) {
-                        OutlinedButton(onClick = { load(pkg.parts.indices.toList()) }) { Text(stringResource(R.string.sh_import_load_all)) }
-                        Button(
-                            enabled = selected != null,
-                            onClick = { selected?.let { load(listOf(it)) } },
-                            modifier = Modifier.padding(start = 8.dp),
-                        ) { Text(stringResource(R.string.sh_import_load_mine)) }
-                    } else {
-                        Button(onClick = { load(listOf(0)) }) { Text(stringResource(R.string.sh_import_load)) }
+                    OutlinedButton(onClick = { picking = !picking }) {
+                        Text(stringResource(if (picking) R.string.sh_import_back else R.string.sh_import_pick_chapters))
+                    }
+                    when {
+                        picking -> Button(enabled = picked.isNotEmpty(), onClick = { loadPicked() }) { Text(stringResource(R.string.sh_import_load_selected)) }
+                        pkg.isDivision -> {
+                            OutlinedButton(onClick = { load(pkg.parts.indices.toList()) }) { Text(stringResource(R.string.sh_import_load_all)) }
+                            Button(enabled = selected != null, onClick = { selected?.let { load(listOf(it)) } }) {
+                                Text(stringResource(R.string.sh_import_load_mine))
+                            }
+                        }
+                        else -> Button(onClick = { load(listOf(0)) }) { Text(stringResource(R.string.sh_import_load)) }
                     }
                 }
             }
+        }
+    }
+}
+
+/** Free choice of chapters out of the whole share (all parts), e.g. "I take 20–24 and 91 from the division". */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun PickChapters(pkg: SharePackage, picked: Set<PsalmRef>, onChange: (Set<PsalmRef>) -> Unit) {
+    Text(pkg.title, style = MaterialTheme.typography.titleMedium)
+    Text(stringResource(R.string.sh_import_pick_chapters_hint), style = MaterialTheme.typography.labelLarge)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        pkg.parts.flatMap { it.refs() }.distinct().forEach { ref ->
+            FilterChip(
+                selected = ref in picked,
+                onClick = { onChange(if (ref in picked) picked - ref else picked + ref) },
+                label = { Text(ref.shortLabel()) },
+            )
         }
     }
 }

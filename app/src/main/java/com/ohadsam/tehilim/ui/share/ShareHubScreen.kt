@@ -54,6 +54,8 @@ private sealed interface HubSheet {
 
     data class Send(val pkg: SharePackage) : HubSheet
 
+    data class Distribute(val pkg: SharePackage) : HubSheet
+
     data class Receive(val text: String) : HubSheet
 }
 
@@ -115,15 +117,18 @@ fun ShareHubScreen(container: AppContainer, onBack: () -> Unit, onOpenFavorite: 
         null -> Unit
         is HubSheet.Edit -> ShareEditorSheet(s.pkg, s.division, onDismiss = { sheet = null }, onSave = {
             val stored = container.sharedLists.save(it)
+            if (s.pkg != null && s.pkg.parts != stored.parts) container.sharedLists.resetSent(stored.id) // parts changed: old marks are meaningless
             sheet = HubSheet.Details(stored)
         })
         is HubSheet.Details -> DetailsSheet(
             s.pkg,
             onDismiss = { sheet = null },
             onSend = { sheet = HubSheet.Send(it) },
+            onDistribute = { sheet = HubSheet.Distribute(s.pkg) },
             onLoadMine = { sheet = HubSheet.Receive(ShareCodec.toCode(s.pkg)) },
         )
         is HubSheet.Send -> ShareTargetSheet(s.pkg, onDismiss = { sheet = null })
+        is HubSheet.Distribute -> ShareDistributeSheet(container, s.pkg, onDismiss = { sheet = null })
         is HubSheet.Receive -> ShareImportSheet(container, s.text, onDismiss = { sheet = null }, onImported = { r: ImportResult ->
             sheet = null
             val id = r.firstFavoriteId
@@ -189,9 +194,15 @@ private fun SharedCard(pkg: SharePackage, onOpen: () -> Unit, onShare: () -> Uni
 }
 
 /** The share's parts; for a division each part has its own send button ("send only this part to Dan"). */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun DetailsSheet(pkg: SharePackage, onDismiss: () -> Unit, onSend: (SharePackage) -> Unit, onLoadMine: () -> Unit) {
+private fun DetailsSheet(
+    pkg: SharePackage,
+    onDismiss: () -> Unit,
+    onSend: (SharePackage) -> Unit,
+    onDistribute: () -> Unit,
+    onLoadMine: () -> Unit,
+) {
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = state) {
         LazyColumn(
@@ -200,8 +211,13 @@ private fun DetailsSheet(pkg: SharePackage, onDismiss: () -> Unit, onSend: (Shar
         ) {
             item {
                 Text(pkg.title, style = MaterialTheme.typography.titleLarge)
-                Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { onSend(pkg) }) { Text(stringResource(R.string.sh_share_all)) }
+                FlowRow(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (pkg.isDivision) {
+                        Button(onClick = onDistribute) { Text(stringResource(R.string.sh_distribute)) }
+                        OutlinedButton(onClick = { onSend(pkg) }) { Text(stringResource(R.string.sh_share_all)) }
+                    } else {
+                        Button(onClick = { onSend(pkg) }) { Text(stringResource(R.string.sh_share_all)) }
+                    }
                     OutlinedButton(onClick = onLoadMine) { Text(stringResource(R.string.sh_load_mine)) }
                 }
             }

@@ -79,4 +79,14 @@ class ShareCodecTest {
         assertTrue(ShareSender.message(pkg).contains("TD1:"))
         assertTrue(ShareSender.message(pkg).contains("30"))
     }
+
+    @Test
+    fun greetingNamesTheRecipientAndPartMessageHasOnlyThatPart() {
+        val one = division(30).onlyPart(6)
+        val text = ShareSender.message(one, "דן")
+        assertTrue(text.startsWith("שלום דן,"))
+        val parsed = (ShareCodec.parse(text) as ShareParse.Ok).pkg
+        assertEquals(1, parsed.parts.size)
+        assertEquals(division(30).parts[6], parsed.parts[0])
+    }
 }

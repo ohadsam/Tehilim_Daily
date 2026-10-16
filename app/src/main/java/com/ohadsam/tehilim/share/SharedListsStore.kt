@@ -31,7 +31,44 @@ class SharedListsStore(context: Context) {
     /** Used by backup restore. */
     fun replaceAll(list: List<SharePackage>) = persist(list)
 
-    fun delete(id: String) = persist(_items.value.filterNot { it.id == id })
+    fun delete(id: String) {
+        persist(_items.value.filterNot { it.id == id })
+        val e = prefs.edit()
+        prefs.all.keys.filter { it.startsWith("recipient.$id.") || it.startsWith("sent.$id.") }.forEach { e.remove(it) }
+        e.apply()
+        bump()
+    }
+
+    // Who a part is meant for and whether it was already sent: local bookkeeping for the sender, never part of the shared data.
+    private val _progress = MutableStateFlow(0)
+
+    /** Changes whenever recipients / sent marks change, so screens showing them refresh. */
+    val progress: StateFlow<Int> = _progress.asStateFlow()
+
+    private fun bump() {
+        _progress.value++
+    }
+
+    fun recipient(id: String, part: Int): String = prefs.getString("recipient.$id.$part", "").orEmpty()
+
+    fun setRecipient(id: String, part: Int, name: String) {
+        prefs.edit().putString("recipient.$id.$part", name.trim().take(SharePackage.MAX_NAME)).apply()
+        bump()
+    }
+
+    fun isSent(id: String, part: Int): Boolean = prefs.getBoolean("sent.$id.$part", false)
+
+    fun setSent(id: String, part: Int, sent: Boolean) {
+        prefs.edit().putBoolean("sent.$id.$part", sent).apply()
+        bump()
+    }
+
+    fun resetSent(id: String) {
+        val e = prefs.edit()
+        prefs.all.keys.filter { it.startsWith("sent.$id.") }.forEach { e.remove(it) }
+        e.apply()
+        bump()
+    }
 
     private fun persist(list: List<SharePackage>) {
         _items.value = list
