@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import com.ohadsam.tehilim.share.IncomingShare
 import com.ohadsam.tehilim.ui.nav.AppRoot
 import com.ohadsam.tehilim.ui.theme.TehilimTheme
 
@@ -20,11 +21,23 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         pendingRoute.value = intent.getStringExtra(EXTRA_ROUTE)
+        handleIncomingShare(intent)
+    }
+
+    /** A `.tehilim` file opened from WhatsApp / mail, or a message forwarded to the app: read it off the main thread and hand it to the sharing screen. */
+    private fun handleIncomingShare(intent: Intent?) {
+        if (!IncomingShare.isCandidate(intent) || intent == null) return
+        val container = (application as TehilimApp).container
+        kotlin.concurrent.thread(name = "incoming-share") {
+            val text = IncomingShare.readText(applicationContext, intent)
+            if (!text.isNullOrBlank()) runOnUiThread { container.shareInbox.value = text }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingRoute.value = intent?.getStringExtra(EXTRA_ROUTE)
+        if (savedInstanceState == null) handleIncomingShare(intent)
         enableEdgeToEdge()
         val container = (application as TehilimApp).container
         setContent {

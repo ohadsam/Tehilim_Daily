@@ -51,6 +51,7 @@ import com.ohadsam.tehilim.favorites.FavoritesState
 import com.ohadsam.tehilim.favorites.Person
 import com.ohadsam.tehilim.favorites.PersonKind
 import com.ohadsam.tehilim.favorites.summarizeChapters
+import com.ohadsam.tehilim.share.toSharePackage
 import kotlinx.coroutines.launch
 
 private enum class FavTab(val label: Int) {
@@ -78,6 +79,7 @@ fun FavoritesScreen(
     var tab by rememberSaveable { mutableStateOf(FavTab.ALL) }
     var editor by remember { mutableStateOf<Editor?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
+    var sharing by remember { mutableStateOf<com.ohadsam.tehilim.share.SharePackage?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     androidx.compose.runtime.LaunchedEffect(autoAdd) {
@@ -130,6 +132,7 @@ fun FavoritesScreen(
                                 onOpen = { onOpenFavorite(f.id) },
                                 onEdit = { editor = Editor.OfFavorite(f) },
                                 onDelete = { deleteFavoriteWithUndo(f) },
+                                onShare = { sharing = f.toSharePackage(state) },
                             )
                         }
                     } else {
@@ -141,6 +144,7 @@ fun FavoritesScreen(
                                 onNameLetters = { onOpenNameLetters(p.id) },
                                 onOpenFavorite = onOpenFavorite,
                                 onDelete = { scope.launch { container.favorites.deletePerson(p.id) } },
+                                onShare = p.toSharePackage(state)?.let { pkg -> { sharing = pkg } },
                             )
                         }
                     }
@@ -180,6 +184,7 @@ fun FavoritesScreen(
         is Editor.OfFavorite -> FavoriteEditorSheet(container, state, e.favorite, onDismiss = { editor = null })
         is Editor.OfPerson -> PersonEditorSheet(container, e.person, e.kind, onDismiss = { editor = null })
     }
+    sharing?.let { com.ohadsam.tehilim.ui.share.ShareTargetSheet(it, onDismiss = { sharing = null }) }
 }
 
 @Composable
@@ -200,7 +205,7 @@ private fun EmptyState(tab: FavTab) {
 }
 
 @Composable
-private fun FavoriteCard(f: Favorite, state: FavoritesState, onOpen: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
+private fun FavoriteCard(f: Favorite, state: FavoritesState, onOpen: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit, onShare: () -> Unit) {
     val persons = state.personsOf(f)
     Card(Modifier.fillMaxWidth().clickable(onClick = onOpen)) {
         Row(Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -210,7 +215,7 @@ private fun FavoriteCard(f: Favorite, state: FavoritesState, onOpen: () -> Unit,
                 Text(summarizeChapters(f.chapters), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 persons.forEach { PersonTag(it) }
             }
-            CardMenu(onEdit, onDelete)
+            CardMenu(onEdit, onDelete, onShare = onShare)
         }
     }
 }
@@ -224,6 +229,7 @@ private fun PersonCard(
     onOpenFavorite: (Long) -> Unit,
     onDelete: () -> Unit,
     onNameLetters: () -> Unit = {},
+    onShare: (() -> Unit)? = null,
 ) {
     var confirm by remember { mutableStateOf(false) }
     val linked = state.favoritesOf(p)
@@ -231,7 +237,7 @@ private fun PersonCard(
         Column(Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PersonTag(p, Modifier.weight(1f))
-                CardMenu(onEdit, onDelete = { confirm = true }, extraLabel = R.string.nl_menu, onExtra = onNameLetters)
+                CardMenu(onEdit, onDelete = { confirm = true }, extraLabel = R.string.nl_menu, onExtra = onNameLetters, onShare = onShare)
             }
             if (linked.isEmpty()) {
                 Text(stringResource(R.string.fav_person_no_links), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -276,7 +282,7 @@ fun PersonTag(p: Person, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit, extraLabel: Int? = null, onExtra: () -> Unit = {}) {
+private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit, extraLabel: Int? = null, onExtra: () -> Unit = {}, onShare: (() -> Unit)? = null) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) { Icon(Icons.Filled.MoreVert, stringResource(R.string.action_more)) }
@@ -289,6 +295,12 @@ private fun CardMenu(onEdit: () -> Unit, onDelete: () -> Unit, extraLabel: Int? 
                 DropdownMenuItem(text = { Text(stringResource(extraLabel)) }, onClick = {
                     open = false
                     onExtra()
+                })
+            }
+            if (onShare != null) {
+                DropdownMenuItem(text = { Text(stringResource(R.string.sh_share_fav)) }, onClick = {
+                    open = false
+                    onShare()
                 })
             }
             DropdownMenuItem(text = { Text(stringResource(R.string.action_delete)) }, onClick = {

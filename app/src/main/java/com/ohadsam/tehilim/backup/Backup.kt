@@ -21,6 +21,8 @@ data class Backup(
     val bookmarks: List<BookmarkEntity> = emptyList(),
     val reminders: List<ReminderEntity> = emptyList(),
     val said: List<SaidEntity> = emptyList(),
+    /** Lists and divisions made for sharing (older backups simply have none). */
+    val shares: List<com.ohadsam.tehilim.share.SharePackage> = emptyList(),
 ) {
     companion object {
         const val FORMAT = "tehilim-daily-backup"

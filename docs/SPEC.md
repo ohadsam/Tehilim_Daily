@@ -106,3 +106,6 @@ No permanent per-verse add buttons. A single toolbar button toggles add mode; bo
 
 ### C6 Chapter lists for people (owner request 2026-10-14)
 Favorites accept free chapter lists (comma/space separated letters or numbers, ranges, verse ranges). Persons (refuah / ilui nishmat) can hold their own list too: a favorite linked exclusively to the person, edited from the person editor.
+
+### C7 Sharing and division (owner request 2026-10-16)
+A *share* is a title, a kind (plain favorite / לרפואת / לעילוי נשמת + person name, mother's name, optional yahrzeit) and one or more *parts* (label + chapter list). Only references travel, never psalm text. Division: N consecutive parts covering the chosen chapters exactly once, in order; by length (verse counts, `PsalmVerseCounts`) or by chapter count; N ≤ number of units (151 by length because Psalm 119 may split at 1–96 / 97–176, 150 by count). Transport without a server: a `.tehilim` file (JSON) opened from any app, or a text code `TD1:…:` pasted / forwarded to the app; both parse through `ShareCodec` and are validated before anything is saved. Importing a one-part share opens it; a division asks which part is mine (or loads all). Receiver data is never overwritten; identical favorites are skipped.

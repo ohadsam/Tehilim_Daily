@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.0
+- Sharing & division (More ← שיתוף וחלוקה, SPEC C7): divide a chapter list between N people (`DivisionPlanner`: consecutive parts, balanced by verse count or by chapter count; Psalm 119 may be split at verse 96 only when needed and is rejoined when both halves land in one part) or share a free chapter list. Saved on the device (`SharedListsStore`, included in the backup), sent as a `.tehilim` file plus a message with a paste-able code via WhatsApp / e-mail / any app, or one part only.
+- Receiving needs no server: the app opens `.tehilim` files (VIEW filters by type, extension and untyped files), accepts a shared chat message (SEND text/plain) and has a paste / open-file screen. The code (`TD1:<deflate+base64>:`, alphabet without `_ * ~`) is validated strictly (`SharePackage.validate`: chapter and verse ranges against the golden verse counts, size caps, newer-version check; Adler-32 rejects damaged codes). Import creates a favorite, or a person + linked favorite for refuah / ilui nishmat, never overwrites, skips exact duplicates and reuses an existing person.
+- Share an existing favorite or a person's list from the ⋮ menu in Favorites. `<queries>` for WhatsApp / Gmail so "send straight to" also works on Android 11+ (also fixes the app-share target detection). MainActivity is `singleTop`.
+
 ## 0.16.1
 - Reading widget: "סגור" button returns to the landing screen (shown only while the landing screen is enabled).
 - Share: the shared APK is always the build that is installed and running — copied fresh into the cache each time, verified with `getPackageArchiveInfo` against the installed `longVersionCode`, and named with the build number (`tehilim-daily-0.16.1-b<code>.apk`) so two builds of one version name can never be mistaken for each other.

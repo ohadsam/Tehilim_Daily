@@ -21,6 +21,7 @@ Constraint: no local Gradle (see CLAUDE.md); CI is the gate. Keep batches small 
 | 14 | Widget follow-ups: arrows, label, bookmarks, scroll reset, per-source reader widgets, add-widget screen, commentary colour (SPEC C3) | C3 | 0.14.0 | [x] |
 | 15 | Widget landing screen (SPEC C4) | C4 | 0.15.0 | [x] |
 | 16 | Chapter lists for refuah / ilui nishmat people (SPEC C6) | C6 | 0.16.0 | [x] |
+| 17 | Sharing & division: divide psalms between N people, share lists as .tehilim file / code, auto-load on the receiving side (SPEC C7) | C7 | 0.17.0 | [x] |
 
 ## Per-batch routine (also in skill `batch-workflow`)
 1) read spec slice 2) implement + unit tests 3) push, CI green 4) 4-persona review (`release-checklist`) 5) version + What's New + docs 6) merge.

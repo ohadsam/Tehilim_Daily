@@ -98,7 +98,14 @@ class AppContainer(context: Context) {
         ReminderScheduler(context.applicationContext, reminders, locations, logger)
     }
 
-    val backup: BackupRepository by lazy { BackupRepository(database, logger) }
+    val sharedLists: com.ohadsam.tehilim.share.SharedListsStore = com.ohadsam.tehilim.share.SharedListsStore(context.applicationContext)
+
+    /** Text of a share that arrived from outside (opened file / forwarded message), waiting for the sharing screen to show it. */
+    val shareInbox = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
+    val shareImporter: com.ohadsam.tehilim.share.ShareImporter by lazy { com.ohadsam.tehilim.share.ShareImporter(favorites) }
+
+    val backup: BackupRepository by lazy { BackupRepository(database, logger, sharedLists) }
 
     private val appScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 

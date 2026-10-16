@@ -9,6 +9,7 @@
 - `favorites/` models, `ChapterSetParser`, `NameLetters`, `ChapterSummary`. `bookmarks/` model. `said/` models + `HistoryBuilder`. `search/PsalmSearch`.
 - `reminders/` — `ReminderModels`, `ReminderPlanner` (pure; Shabbat/Yom Tov shifting), `ReminderContent`, `ReminderScheduler` (AlarmManager), receivers, `NotificationHelper`.
 - `backup/` — `Backup` + `BackupRepository`. `prayers/` — verified-only prayer catalog (`assets/prayers.json`). `log/` — `AppLogger` ring buffer + file.
+- `share/` — app sharing (`AppSharer`) and reading sharing: `SharePackage`/`ShareCodec` (file + `TD1:` code), `DivisionPlanner`, `ShareImporter`, `ShareSender`, `IncomingShare`, `SharedListsStore`; UI in `ui/share/`.
 - `widget/` — Glance widgets (live: model built inside the composition), receivers, `WidgetUpdater` (+ midnight alarm), config activities (`ReaderWidgetConfigActivity`, `WidgetStyleConfigActivity`), shared `WidgetStyleEditor`, `WidgetParts` (pills, badges, said pill).
 - `ui/reader/` — `DayReader`, `ChapterPage`, `ReaderToolbar` (slim top bar + bookmark/overflow menus), `AutoScrollController` / `AutoScrollOverlay`; `domain/AutoScrollMath`, `data/prefs/AutoScrollPrefs`.
 - `ui/` — `nav/AppRoot`, `today/`, `browse/`, `reader/` (`ChapterPage`, `DayReader`, `ChipStrip`, `SaidBar`), `favorites/`, `bookmarks/`, `reminders/`, `location/`, `history/`, `search/`, `settings/`, `logs/`, `more/`, `theme/`.

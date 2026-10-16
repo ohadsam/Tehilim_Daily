@@ -8,6 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,6 +44,10 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
             runCatching { nav.navigate(startRoute) }
             onRouteHandled()
         }
+    }
+    val incomingShare by container.shareInbox.collectAsState()
+    LaunchedEffect(incomingShare) {
+        if (incomingShare != null) runCatching { nav.navigate("share") { launchSingleTop = true } }
     }
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
@@ -138,6 +143,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenLogs = { nav.navigate("logs") },
                     onOpenBookmarks = { nav.navigate("bookmarks") },
                     onAddWidget = { nav.navigate("addwidget") },
+                    onOpenShare = { nav.navigate("share") },
                 )
             }
             composable("settings") {
@@ -151,6 +157,14 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenHistory = { nav.navigate("history") },
                     onShowWhatsNew = { nav.navigate("more") },
                     onOpenPermissions = { nav.navigate("permissions") },
+                )
+            }
+            composable("share") {
+                com.ohadsam.tehilim.ui.share.ShareHubScreen(
+                    container,
+                    onBack = { nav.popBackStack() },
+                    onOpenFavorite = { nav.navigate("favorite/$it") },
+                    onOpenFavorites = { nav.navigate(Destination.FAVORITES.route) },
                 )
             }
             composable("addwidget") { com.ohadsam.tehilim.ui.widgets.AddWidgetScreen(onBack = { nav.popBackStack() }) }
