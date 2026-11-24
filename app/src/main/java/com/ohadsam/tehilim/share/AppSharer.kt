@@ -3,6 +3,7 @@ package com.ohadsam.tehilim.share
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
+import androidx.core.content.pm.PackageInfoCompat
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -34,11 +35,11 @@ object AppSharer {
         val dir = File(context.cacheDir, "share").apply { mkdirs() }
         dir.listFiles()?.forEach { it.delete() } // keep only the latest copy
         val source = File(context.applicationInfo.sourceDir)
-        val installed = context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
+        val installed = PackageInfoCompat.getLongVersionCode(context.packageManager.getPackageInfo(context.packageName, 0))
         val apk = File(dir, fileName(versionName, false, installed))
         source.copyTo(apk, overwrite = true)
         // Never hand out a file that is not the build that is running now.
-        val copied = context.packageManager.getPackageArchiveInfo(apk.path, 0)?.longVersionCode
+        val copied = context.packageManager.getPackageArchiveInfo(apk.path, 0)?.let { PackageInfoCompat.getLongVersionCode(it) }
         check(copied == installed) { "shared APK build $copied differs from the installed build $installed" }
         if (!zip) return apk
         val zipFile = File(dir, fileName(versionName, true, installed))

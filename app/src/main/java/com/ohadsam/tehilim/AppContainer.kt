@@ -105,6 +105,13 @@ class AppContainer(context: Context) {
 
     val shareImporter: com.ohadsam.tehilim.share.ShareImporter by lazy { com.ohadsam.tehilim.share.ShareImporter(favorites) }
 
+    val updates: com.ohadsam.tehilim.update.UpdateController by lazy {
+        com.ohadsam.tehilim.update.UpdateController(
+            context.applicationContext, httpClient, appScope, logger,
+            com.ohadsam.tehilim.BuildConfig.VERSION_CODE.toLong(), com.ohadsam.tehilim.BuildConfig.VERSION_NAME,
+        )
+    }
+
     val backup: BackupRepository by lazy { BackupRepository(database, logger, sharedLists) }
 
     private val appScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)

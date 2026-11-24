@@ -5,6 +5,7 @@ Read order: CLAUDE.md → docs/PLAN.md → STRUCTURE.md → the batch's section 
 
 ## Recently done
 - v0.14.0: widget follow-ups (SPEC C3). Unverified on a device: scroll-reset trick (item ids + alternating tree) and pin-widget flow — check after install.
+- v0.18.0: in-app updates read the latest GitHub Release (public repo required). **Before the repo is made public:** `app/sideload.jks` and its password are committed, so anyone could build an APK that Android accepts as an update over the user's install (they would still have to get the user to install it; the in-app updater only ever fetches releases of this repo). Moving the key into Actions secrets (`KEYSTORE_*`, release.yml already supports it) fixes that but changes the signature once → everyone reinstalls one time. Owner decision.
 - v0.17.0: sharing & division (SPEC C7). Not verifiable here: how WhatsApp / Gmail present a `.tehilim` attachment on the receiving phone (intent filters cover type, extension and octet-stream; the paste-code and "share message to the app" routes are the fallback). Ideas not built: QR code (needs a library), https link (needs a hosted domain + assetlinks).
 - v0.12.0: reader redesign + auto-scroll + live widgets (SPEC C1). Widget lesson: never capture data once in `provideGlance` — collect flows inside `provideContent` (Glance reuses the session on update()).
 - v0.9.0: everything in docs/CHANGELOG.md. CI (Android CI + Sefaria probe) is the only build/test gate (sandbox has no SDK/network).

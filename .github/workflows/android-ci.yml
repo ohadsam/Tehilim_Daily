@@ -26,6 +26,7 @@ jobs:
         run: keytool -printcert -jarfile app/build/outputs/apk/debug/app-debug.apk | grep -E 'SHA256|Owner' || true
       - uses: actions/upload-artifact@v4
         if: steps.has.outputs.ok == 'true'
+        continue-on-error: true  # a full artifact-storage quota must not turn a green build red
         with:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk

@@ -49,6 +49,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
     LaunchedEffect(incomingShare) {
         if (incomingShare != null) runCatching { nav.navigate("share") { launchSingleTop = true } }
     }
+    com.ohadsam.tehilim.ui.update.UpdatePrompt(container, onOpen = { nav.navigate("update") { launchSingleTop = true } })
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
     Scaffold(
@@ -144,6 +145,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenBookmarks = { nav.navigate("bookmarks") },
                     onAddWidget = { nav.navigate("addwidget") },
                     onOpenShare = { nav.navigate("share") },
+                    onOpenUpdate = { nav.navigate("update") },
                 )
             }
             composable("settings") {
@@ -159,6 +161,7 @@ fun AppRoot(container: AppContainer, startRoute: String? = null, onRouteHandled:
                     onOpenPermissions = { nav.navigate("permissions") },
                 )
             }
+            composable("update") { com.ohadsam.tehilim.ui.update.UpdateScreen(container, onBack = { nav.popBackStack() }) }
             composable("share") {
                 com.ohadsam.tehilim.ui.share.ShareHubScreen(
                     container,

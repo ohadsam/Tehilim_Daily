@@ -247,25 +247,7 @@ fun SettingsScreen(
         }
 
         Section(R.string.set_share) {
-            var asZip by remember { mutableStateOf(false) }
-            Text(stringResource(R.string.set_share_intro), style = MaterialTheme.typography.bodySmall)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(
-                    R.string.set_share_whatsapp to com.ohadsam.tehilim.share.AppSharer.Target.WHATSAPP,
-                    R.string.set_share_email to com.ohadsam.tehilim.share.AppSharer.Target.EMAIL,
-                    R.string.set_share_other to com.ohadsam.tehilim.share.AppSharer.Target.ANY,
-                ).forEach { (label, target) ->
-                    OutlinedButton(onClick = {
-                        val ok = runCatching {
-                            val v = BuildConfig.VERSION_NAME
-                            val file = com.ohadsam.tehilim.share.AppSharer.prepare(context, v, asZip)
-                            context.startActivity(com.ohadsam.tehilim.share.AppSharer.intent(context, file, v, asZip, target).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
-                        }.isSuccess
-                        if (!ok) message = R.string.set_share_failed
-                    }) { Text(stringResource(label)) }
-                }
-            }
-            FilterChip(asZip, { asZip = !asZip }, { Text(stringResource(R.string.set_share_zip)) })
+            com.ohadsam.tehilim.ui.share.ShareAppSection(onFailed = { message = R.string.set_share_failed })
         }
 
         Section(R.string.more_about) {
