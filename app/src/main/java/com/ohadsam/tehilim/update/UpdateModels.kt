@@ -51,7 +51,10 @@ object ReleaseParser {
             return null
         }
         if (r.draft || r.prerelease) return null
-        val apk = r.assets.firstOrNull { it.name.endsWith(".apk") && it.url.startsWith(TRUSTED_PREFIX) } ?: return null
+        // The release also carries a stable-named copy (tehilim-daily.apk, for the store's fixed download link): prefer the
+        // build-numbered file, which is what names the build, and fall back to any APK from github.com.
+        val candidates = r.assets.filter { it.name.endsWith(".apk") && it.url.startsWith(TRUSTED_PREFIX) }
+        val apk = candidates.firstOrNull { buildInName.containsMatchIn(it.name) } ?: candidates.firstOrNull() ?: return null
         val build = buildInName.find(apk.name)?.groupValues?.get(1)?.toLongOrNull()
             ?: buildInTag.find(r.tag)?.groupValues?.get(1)?.toLongOrNull()
         val sha = apk.digest?.removePrefix("sha256:")?.lowercase()?.takeIf { it.length == 64 && it.all { c -> c in "0123456789abcdef" } }

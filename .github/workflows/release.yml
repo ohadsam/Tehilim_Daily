@@ -41,11 +41,15 @@ jobs:
           NAME="tehilim-daily-${VER}-b${CODE}.apk"
           TAG="v${VER}-b${CODE}"
           cp "$APK" "$RUNNER_TEMP/$NAME"
+          # Stable file names for fixed download links (the OS APPs and Downs store links releases/latest/download/tehilim-daily.apk).
+          cp "$APK" "$RUNNER_TEMP/tehilim-daily.apk"
+          (cd "$RUNNER_TEMP" && sha256sum tehilim-daily.apk > tehilim-daily.apk.sha256)
+          FILES=("$RUNNER_TEMP/$NAME" "$RUNNER_TEMP/tehilim-daily.apk" "$RUNNER_TEMP/tehilim-daily.apk.sha256")
           python3 -c "import json;d=json.load(open('app/src/main/assets/whatsnew.json'));print('\n'.join('- '+i for i in d['items']))" > "$RUNNER_TEMP/notes.md"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$RUNNER_TEMP/$NAME" --clobber
+            gh release upload "$TAG" "${FILES[@]}" --clobber
           else
-            gh release create "$TAG" "$RUNNER_TEMP/$NAME" --target "$GITHUB_SHA" --title "Tehilim Daily ${VER}" --notes-file "$RUNNER_TEMP/notes.md" --latest
+            gh release create "$TAG" "${FILES[@]}" --target "$GITHUB_SHA" --title "Tehilim Daily ${VER}" --notes-file "$RUNNER_TEMP/notes.md" --latest
           fi
       - uses: actions/upload-artifact@v4
         continue-on-error: true  # the Release below is the durable copy; the artifact quota may be full

@@ -45,6 +45,8 @@ Real incidents so far (keep concrete):
 - Any external-API assumption (e.g. Sefaria `length`) must be checked by the live probe, not by reading docs/memory.
 - Schedule data (e.g. the 119 split) must be confirmed by the owner, not inferred from another repo or an unverified web summary.
 - Glance widgets: data captured once in `provideGlance` is stale after `update()` (the session is reused and only recomposes) — collect flows / read `currentState` inside `provideContent`.
+- The OS APPs and Downs store links `releases/latest/download/tehilim-daily.apk` (+ `.sha256`): keep those two stable file names in `release.yml`, and keep `ReleaseParser` preferring the build-numbered APK when a release carries both (tested).
+- The in-app update check only works while the releases are public (private repo = 404 for everyone but the owner): before telling anyone to install, confirm the visibility decision recorded in `AGENT.md` and that `releases/latest` opens logged out.
 - Sealed-class additions (e.g. `Repeat.YearlyHebrew`) must be handled in every `when` (planner, codec, list text, editor) — grep before pushing.
 
 ## 8. Merge

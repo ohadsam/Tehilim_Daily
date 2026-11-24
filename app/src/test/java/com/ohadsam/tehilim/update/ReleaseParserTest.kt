@@ -50,6 +50,20 @@ class ReleaseParserTest {
     }
 
     @Test
+    fun prefersTheBuildNumberedApkOverTheStableNamedCopy() {
+        val base = "https://github.com/ohadsam/Tehilim_Daily/releases/download/v0.18.0-b310"
+        val assets = """[{"name":"tehilim-daily.apk","size":1,"browser_download_url":"$base/tehilim-daily.apk"},
+            {"name":"tehilim-daily.apk.sha256","browser_download_url":"$base/tehilim-daily.apk.sha256"},
+            {"name":"tehilim-daily-0.18.0-b310.apk","size":2,"browser_download_url":"$base/tehilim-daily-0.18.0-b310.apk"}]"""
+        val info = ReleaseParser.parse(release(assets = assets))!!
+        assertEquals("tehilim-daily-0.18.0-b310.apk", info.apkName)
+        assertEquals(310L, info.build)
+        // Only the stable-named copy (no build in any name): still usable, the build comes from the tag.
+        val onlyStable = """[{"name":"tehilim-daily.apk","browser_download_url":"$base/tehilim-daily.apk"}]"""
+        assertEquals("tehilim-daily.apk", ReleaseParser.parse(release(assets = onlyStable))!!.apkName)
+    }
+
+    @Test
     fun badChecksumIsDroppedNotTrusted() {
         val assets = """[{"name":"a-b5.apk","browser_download_url":"https://github.com/o/r/a.apk","digest":"sha256:xyz"}]"""
         assertNull(ReleaseParser.parse(release(assets = assets))!!.sha256)
