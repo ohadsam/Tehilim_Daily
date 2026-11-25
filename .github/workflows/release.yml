@@ -44,7 +44,7 @@ jobs:
           NAME="tehilim-daily-${VER}-b${CODE}.apk"
           TAG="v${VER}-b${CODE}"
           cp "$APK" "$RUNNER_TEMP/$NAME"
-          # Stable file names for fixed download links (the OS APPs and Downs store links releases/latest/download/tehilim-daily.apk).
+          # Stable file names for fixed download links (the OS APPs & Downs store links releases/latest/download/tehilim-daily.apk).
           cp "$APK" "$RUNNER_TEMP/tehilim-daily.apk"
           (cd "$RUNNER_TEMP" && sha256sum tehilim-daily.apk > tehilim-daily.apk.sha256)
           FILES=("$RUNNER_TEMP/$NAME" "$RUNNER_TEMP/tehilim-daily.apk" "$RUNNER_TEMP/tehilim-daily.apk.sha256")

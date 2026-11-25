@@ -45,14 +45,14 @@ Real incidents so far (keep concrete):
 - Any external-API assumption (e.g. Sefaria `length`) must be checked by the live probe, not by reading docs/memory.
 - Schedule data (e.g. the 119 split) must be confirmed by the owner, not inferred from another repo or an unverified web summary.
 - Glance widgets: data captured once in `provideGlance` is stale after `update()` (the session is reused and only recomposes) — collect flows / read `currentState` inside `provideContent`.
-- The OS APPs and Downs store links `releases/latest/download/tehilim-daily.apk` (+ `.sha256`): keep those two stable file names in `release.yml`, and keep `ReleaseParser` preferring the build-numbered APK when a release carries both (tested).
+- The OS APPs & Downs store links `releases/latest/download/tehilim-daily.apk` (+ `.sha256`): keep those two stable file names in `release.yml`, and keep `ReleaseParser` preferring the build-numbered APK when a release carries both (tested).
 - The in-app update check only works while the releases are public (private repo = 404 for everyone but the owner): before telling anyone to install, confirm the visibility decision recorded in `AGENT.md` and that `releases/latest` opens logged out.
 - Sealed-class additions (e.g. `Repeat.YearlyHebrew`) must be handled in every `when` (planner, codec, list text, editor) — grep before pushing.
 
 ## 8. Merge
 Feature branch → push → PR → CI green → merge to `main`. Resolve conflicts for real; never force-push over others' work.
 
-## Store - update "OS APPs and Downs" (every shipped version)
+## Store - update "OS APPs & Downs" (every shipped version)
 The owner's app store (repo `ohadsam/os_app_store`, https://ohadsam.github.io/os_app_store/) must always show this app's latest version.
 1. After the release is live (APK release / Pages deployed), find the app's entry in `web/data/apps.json` (its `source` block says which file here holds the version).
 2. Preferred: trigger the store's sync - GitHub Actions -> "Sync catalog" -> Run workflow in `ohadsam/os_app_store` (or `mcp__github__actions_run_trigger` workflow `sync-catalog.yml`). It reads this repo's version + CHANGELOG and updates version, update date and what's-new.
